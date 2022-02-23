@@ -137,6 +137,8 @@ public class FileServiceImpl implements FileService {
                             appendFile(input, destFile);
 
                             if (chunk == chunks - 1) {
+                                long length1 = destFile.length()/1024/1024;
+                                log.info("\n====>文件上传成功：{} 文件大小：{} MB", destFile.getAbsolutePath(), length1);
 
                                 // 文件路径一定不要用绝对路径
                                 long length = destFile.length();
