@@ -7,13 +7,12 @@ import hxy.dragon.service.FileService;
 import hxy.dragon.util.DateUtil;
 import hxy.dragon.util.file.DirUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.FileItem;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.apache.tomcat.util.http.fileupload.ProgressListener;
-import org.apache.tomcat.util.http.fileupload.RequestContext;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
-import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
-import org.apache.tomcat.util.http.fileupload.util.Streams;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.ProgressListener;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -82,7 +81,7 @@ public class FileServiceImpl implements FileService {
 
                 try {
                     @SuppressWarnings("unchecked")
-                    List<FileItem> fileList = upload.parseRequest((RequestContext) request);
+                    List<FileItem> fileList = upload.parseRequest(request);
                     Iterator<FileItem> it = fileList.iterator();
                     while (it.hasNext()) {
                         FileItem item = it.next();
