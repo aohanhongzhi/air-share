@@ -113,7 +113,7 @@
         <appender-ref ref="ERROR_FILE"/>
     </root>
 
-    <logger name="hxy.base.*" level="info" additivity="false">
+    <logger name="hxy.dragon.*" level="info" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="DEBUG_FILE"/>
         <appender-ref ref="INFO_FILE"/>
