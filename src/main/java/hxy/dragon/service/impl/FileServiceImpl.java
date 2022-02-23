@@ -1,7 +1,6 @@
 package hxy.dragon.service.impl;
 
-import hxy.dragon.dao.model.FileEntity;
-import hxy.dragon.entity.enums.FileTypeEnum;
+
 import hxy.dragon.entity.reponse.BaseResponse;
 import hxy.dragon.service.FileService;
 import hxy.dragon.util.DateUtil;
@@ -80,8 +79,11 @@ public class FileServiceImpl implements FileService {
                 });
 
                 try {
+
+                    // 如果下面这行代码获取的fileList为空请检查配置文件 spring.servlet.multipart.enabled=false https://www.cnblogs.com/tinya/p/9626710.html
                     @SuppressWarnings("unchecked")
                     List<FileItem> fileList = upload.parseRequest(request);
+
                     Iterator<FileItem> it = fileList.iterator();
                     while (it.hasNext()) {
                         FileItem item = it.next();
@@ -95,7 +97,7 @@ public class FileServiceImpl implements FileService {
                             // 这个地方是依据文件流得到信息，虽然Servlet响应多次，但是死上传过来的流组成的文件是整体的。
                             // &不能在get方法中，所以下载时候可能无法找到文件
                             fileName = Streams.asString(input).replace("&", "");
-                            log.debug("\n====>正在上传文件《{}》", fileName);
+                            log.info("\n====>正在上传文件《{}》", fileName);
                             continue;
                         }
                         if ("chunk".equals(name)) {
@@ -136,8 +138,6 @@ public class FileServiceImpl implements FileService {
 
                             if (chunk == chunks - 1) {
 
-                                log.info("文件上传完成=> {}", destFile);
-
                                 // 文件路径一定不要用绝对路径
                                 long length = destFile.length();
                                 String suffixName = "unknown";
@@ -146,38 +146,13 @@ public class FileServiceImpl implements FileService {
                                     suffixName = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
                                 }
 
-                                // 等提交指令，并且确认支付，再写入到数据库，这里以后刻以写到数据库
-                                // 用户的phone，用户文件名，当前时间
-
-                                FileEntity fileEntity = new FileEntity();
-                                fileEntity.setFileName(fileName);
-                                //存储相对路径不再存储绝对路径，如果时线下使用Windows开发，必然存在问题。不利于环境隔离等配置
-                                fileEntity.setFilePath(filePath);
-                                fileEntity.setFileUuid(uuid);
-                                fileEntity.setFileSize(length);
-                                FileTypeEnum fileTypeEnum = FileTypeEnum.getEnumByType(suffixName);
-                                fileEntity.setFileType(fileTypeEnum);
-                                // 存储到数据库，存在就忽略，不存在就新建
-//                                fileMapper.insertFileEntity(fileEntity);
-//                                try {
-//                                    int insert = fileMapper.insert(fileEntity);
-//                                    if (insert != 1) {
-//                                        log.error("\n====>文件信息插入数据库失败{}", fileEntity);
-//                                    }
-//                                } catch (Exception e) {
-//                                    log.error("\n====>文件信息插入数据库异常", e);
-//                                    this.saveOrUpdate(fileEntity);
-//                                }
-                                // 需要开启线程池对上传文件进行分析，分析文档的类型与页数。然后等待上传打印指令
-//                                asyncCalculator.calculator(fileEntity);
-
                             } else {
                                 log.debug("\n====>还剩[" + (chunks - 1 - chunk) + "]个块文件");
                             }
                         }
                     }
                 } catch (FileUploadException ex) {
-                    log.warn(fileName + "上传文件失败：", ex);
+                    log.warn(fileName + "上传文件失败：" + ex.getMessage());
                     return BaseResponse.error("文件上传失败", ex.getMessage());
                 }
                 return BaseResponse.success("文件上传成功");
@@ -185,7 +160,7 @@ public class FileServiceImpl implements FileService {
                 return BaseResponse.error("请求体异常，仅支持POST方法");
             }
         } catch (IOException e) {
-            log.error("文件上传发生异常", e);
+            log.error(e.getMessage());
             return BaseResponse.error("文件上传失败", e.getMessage());
         }
     }

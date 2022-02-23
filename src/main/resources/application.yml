@@ -1,3 +1,13 @@
+spring:
+  servlet:
+    multipart:
+      enabled: false
+
 hxy:
   print:
-    file : /home/ubuntu/print-user/file
+    file : /upload-file
+
+logging:
+  level:
+    root: info
+    hxy.dragon: debug
