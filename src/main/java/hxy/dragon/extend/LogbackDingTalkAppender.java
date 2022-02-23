@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.util.StringUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,11 +33,14 @@ public class LogbackDingTalkAppender extends UnsynchronizedAppenderBase<ILogging
     @Override
     protected void append(ILoggingEvent eventObject) {
         String activeProfile = EnvironmentUtil.getActiveProfile();
-        if (StringUtils.hasText(activeProfile) && (activeProfile.contains("dev") || activeProfile.contains("test"))) {
-            log.debug("\n====>当前是本地测试环境，错误信息不通知钉钉");
+        Level level = eventObject.getLevel();
+
+        if (activeProfile == null || activeProfile.contains("dev")) {
+            if (level.toInt() == Level.ERROR_INT) {
+                log.debug("\n====>当前是本地测试环境，错误信息不通知钉钉");
+            }
             return;
         }
-        Level level = eventObject.getLevel();
         switch (level.toInt()) {
             case Level.ERROR_INT:
                 // 发送到钉钉
