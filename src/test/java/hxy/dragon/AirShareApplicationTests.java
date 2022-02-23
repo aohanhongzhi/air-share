@@ -1,13 +1,13 @@
-package hxy.print;
+package hxy.dragon;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PrintApplicationTests {
+public abstract class AirShareApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }

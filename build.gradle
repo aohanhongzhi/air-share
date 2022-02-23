@@ -1,22 +1,51 @@
 plugins {
-	id 'org.springframework.boot' version '2.6.3'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.6.3'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
 }
 
 group = 'hxy'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+description = "文件分享"
+
 
 repositories {
-	mavenCentral()
+    mavenLocal()
+    maven { name "Alibaba central"; url "https://maven.aliyun.com/repository/central" }
+    maven { name "Alibaba"; url "https://maven.aliyun.com/repository/public" }
+    maven { name "Alibaba google"; url "https://maven.aliyun.com/repository/google" }
+    maven { name "Alibaba gradle-plugin"; url "https://maven.aliyun.com/repository/gradle-plugin" }
+    maven { name "Alibaba spring"; url "https://maven.aliyun.com/repository/spring" }
+    maven { name "Alibaba spring-plugin"; url "https://maven.aliyun.com/repository/spring-plugin" }
+    maven { name "Alibaba grails-core"; url "https://maven.aliyun.com/repository/grails-core" }
+    maven { name "Alibaba apache-snapshots"; url "https://maven.aliyun.com/repository/apache-snapshots" }
+    maven {
+        url "https://mirrors.huaweicloud.com/repository/maven/"
+        name = "华为开源镜像库"
+    }
+    maven { url "https://repo.spring.io/libs-release" }
+    mavenCentral()
+    if (version.contains('-')) {
+        maven { url "https://repo.spring.io/milestone" }
+    }
+    if (version.endsWith('-SNAPSHOT')) {
+        maven { url "https://repo.spring.io/snapshot" }
+    }
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation('org.springframework.boot:spring-boot-starter-web')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
