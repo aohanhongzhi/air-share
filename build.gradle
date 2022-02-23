@@ -43,8 +43,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
     // https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter
-    implementation 'mysql:mysql-connector-java'
-    implementation 'com.baomidou:mybatis-plus-boot-starter:3.4.3.4'
+//    implementation 'mysql:mysql-connector-java'
+//    implementation 'com.baomidou:mybatis-plus-boot-starter:3.4.3.4'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
