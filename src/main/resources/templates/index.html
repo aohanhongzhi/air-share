@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Air Share!</title>
+
+    <!-- zui -->
+    <link rel="stylesheet" href="../css/zui.css">
+    <link rel="stylesheet" href="../lib/uploader/zui.uploader.css">
+</head>
+
+<body>
+<h1>Air Share!</h1>
+
+<div id="uploaderExample" class="uploader">
+    <div class="file-list" data-drag-placeholder="请拖拽文件到此处"></div>
+    <button type="button" class="btn btn-primary uploader-btn-browse"><i class="icon icon-cloud-upload"></i>
+        选择文件
+    </button>
+</div>
+
+<!-- 在此处编码你的创意 -->
+
+<!-- jQuery (ZUI中的Javascript组件依赖于jQuery) -->
+<script src="../js/jquery-1.11.0.min.js"></script>
+<!-- ZUI Javascript组件 -->
+<!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+<script src="../js/zui.js"></script>
+<script src="../lib/uploader/zui.uploader.js"></script>
+
+<script>
+    $('#uploaderExample').uploader({
+        autoUpload: true, // 当选择文件后立即自动进行上传操作
+        prevent_duplicates: true, // 阻止重复文件上传
+        chunk_size: '2mb',
+        url: '/file/upload' // 文件上传提交地址
+    });
+</script>
+</body>
+
+</html>

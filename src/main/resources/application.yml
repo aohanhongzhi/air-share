@@ -1,1 +1,3 @@
-
+hxy:
+  print:
+    file : /home/ubuntu/print-user/file
