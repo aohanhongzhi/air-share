@@ -98,7 +98,6 @@ public class FileServiceImpl implements FileService {
                             // 这个地方是依据文件流得到信息，虽然Servlet响应多次，但是死上传过来的流组成的文件是整体的。
                             // &不能在get方法中，所以下载时候可能无法找到文件
                             fileName = Streams.asString(input).replace("&", "");
-                            log.info("\n====>正在上传文件《{}》", fileName);
                             continue;
                         }
                         if ("chunk".equals(name)) {
@@ -141,7 +140,7 @@ public class FileServiceImpl implements FileService {
                                 long length1 = destFile.length() / 1024 / 1024;
                                 log.info("\n====>文件上传成功：{} 文件大小：{} MB", destFile.getAbsolutePath(), length1);
 
-                                fileUrl = "http://localhost:8080/file/" + filePath;
+                                fileUrl = "file/" + filePath;
 
                                 // 文件路径一定不要用绝对路径
                                 long length = destFile.length();
@@ -152,7 +151,7 @@ public class FileServiceImpl implements FileService {
                                 }
 
                             } else {
-                                log.debug("\n====>还剩[" + (chunks - 1 - chunk) + "]个块文件");
+//                                log.debug("\n====>还剩[" + (chunks - 1 - chunk) + "]个块文件");
                             }
                         }
                     }
