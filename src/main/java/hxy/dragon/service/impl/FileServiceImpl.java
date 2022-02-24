@@ -77,6 +77,7 @@ public class FileServiceImpl implements FileService {
 //                        System.out.println("文件大小为：" + pContentLength + ",当前已处理：" + pBytesRead);
                     }
                 });
+                String fileUrl = null;
 
                 try {
 
@@ -137,8 +138,10 @@ public class FileServiceImpl implements FileService {
                             appendFile(input, destFile);
 
                             if (chunk == chunks - 1) {
-                                long length1 = destFile.length()/1024/1024;
+                                long length1 = destFile.length() / 1024 / 1024;
                                 log.info("\n====>文件上传成功：{} 文件大小：{} MB", destFile.getAbsolutePath(), length1);
+
+                                fileUrl = "http://localhost:8080/file/" + filePath;
 
                                 // 文件路径一定不要用绝对路径
                                 long length = destFile.length();
@@ -157,7 +160,7 @@ public class FileServiceImpl implements FileService {
                     log.warn(fileName + "上传文件失败：" + ex.getMessage());
                     return BaseResponse.error("文件上传失败", ex.getMessage());
                 }
-                return BaseResponse.success("文件上传成功");
+                return BaseResponse.success("文件上传成功", fileUrl);
             } else {
                 return BaseResponse.error("请求体异常，仅支持POST方法");
             }

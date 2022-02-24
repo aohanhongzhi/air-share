@@ -36,7 +36,27 @@
         autoUpload: true, // 当选择文件后立即自动进行上传操作
         prevent_duplicates: true, // 阻止重复文件上传
         chunk_size: '2mb',
-        url: '/file/upload' // 文件上传提交地址
+        url: '/file/upload', // 文件上传提交地址
+        responseHandler: function (responseObject, file) {
+            // alert(file.files[0].name)
+            // 当服务器返回的文本内容包含 `'error'` 文本时视为上传失败
+            // alert(responseObject.response)
+            console.log("服务器返回信息:", responseObject);
+            /* 使用触发器对象直接显示 */
+            let parse = JSON.parse(responseObject.response);
+            (new $.zui.ModalTrigger({custom: parse.data})).show();
+
+            if (responseObject.response.indexOf('error') === 0) {
+                return '上传失败。服务器返回了一个错误：' + responseObject.response;
+            } else if (responseObject.response.indexOf('error2') === 0) {
+                //无论返回啥都是错误，没有错误就不返回即可
+                return true;
+            }
+        },
+        onError: function (error) {
+            console.log(error.code + error.message + file.name)
+
+        }
     });
 </script>
 </body>
