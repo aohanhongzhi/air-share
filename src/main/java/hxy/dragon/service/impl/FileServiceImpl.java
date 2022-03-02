@@ -184,6 +184,14 @@ public class FileServiceImpl implements FileService {
         return BaseResponse.success();
     }
 
+    @Override
+    public BaseResponse deleteFile(String fileNam) {
+        //  TODO 文件删除
+
+
+        return null;
+    }
+
 
     @Override
     public void downloadByFilePath(String filePath, HttpServletResponse response) {

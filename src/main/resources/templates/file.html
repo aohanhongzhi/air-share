@@ -5,44 +5,43 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello world!</title>
-
+    <title>Air Share!</title>
     <!-- zui -->
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/zui/1.10.0/css/zui.min.css">
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/zui/1.10.0/lib/uploader/zui.uploader.css">
+    <!--    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/zui/1.10.0/css/zui.min.css">-->
+    <link rel="stylesheet" href="../css/zui.css">
+
+    <link href="../lib/datagrid/zui.datagrid.min.css" rel="stylesheet">
+    <script src="../lib/datagrid/zui.datagrid.min.js"></script>
 </head>
 
 <body>
-<!-- 在此处编码你的创意 -->
-    <h1>all file</h1>
 
-    <table border="1">
+<div class="container">
+    <ul class="nav nav-primary" style="margin-top: 20px">
+        <li><a href="index">首页</a></li>
+        <li class="active"><a href="file">文件</a></li>
+    </ul>
+    <!-- 在此处编码你的创意 -->
+    <h3>All File</h3>
+
+    <table border="1" class="datagrid">
         <tr>
             <th>path</th>
             <th>size</th>
         </tr>
         <tr th:each="fileEntity:${fileList}">
-            <td ><a th:href="@{'/'+${fileEntity.filePath}}" target="_blank" th:text="${fileEntity.fileName}"></a></td>
+            <td><a th:href="@{'/'+${fileEntity.filePath}}" target="_blank" th:text="${fileEntity.fileName}"></a></td>
             <td th:text="${fileEntity.fileSize}"></td>
         </tr>
     </table>
+</div>
 
 
+<!-- jQuery (ZUI中的Javascript组件依赖于jQuery) -->
+<script src="../js/jquery-1.11.0.min.js"></script>
+<!-- ZUI Javascript组件 -->
+<!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+<script src="../js/zui.js"></script>
 
-
-    <!-- jQuery (ZUI中的Javascript组件依赖于jQuery) -->
-    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-    <!-- ZUI Javascript组件 -->
-    <!-- ZUI 标准版压缩后的 JavaScript 文件 -->
-    <script src="https://cdn.bootcdn.net/ajax/libs/zui/1.10.0/js/zui.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/zui/1.10.0/lib/uploader/zui.uploader.js"></script>
-
-    <script>
-        $('#uploaderExample').uploader({
-            autoUpload: true, // 当选择文件后立即自动进行上传操作
-            url: '/file/upload' // 文件上传提交地址
-        });
-    </script>
 </body>
-
 </html>

@@ -5,10 +5,10 @@ import hxy.dragon.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,16 +26,20 @@ public class FileController {
      * 这里的方法必须是POST
      */
     @PostMapping("/file/upload")
-    @ResponseBody
     public BaseResponse upload(HttpServletRequest request, HttpServletResponse response) {
         return fileService.uploadFile(request, response);
     }
+
+    @DeleteMapping("/file/delete")
+    public BaseResponse delete(String fileName) {
+        return fileService.deleteFile(fileName);
+    }
+
 
     /**
      * 文档查询是否已经有相同的了
      */
     @GetMapping("/api/file/exsit")
-    @ResponseBody
     public BaseResponse exsit(String uuid, String md5) {
         return fileService.fileMd5Check(uuid, md5);
     }
