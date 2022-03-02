@@ -37,7 +37,7 @@ public class IndexController {
                     String fileName = f1.getName();
                     String fileUrl = "file/" + name + "/" + fileName;
                     FileEntity fileEntity = new FileEntity();
-                    if (fileName.startsWith("o_1ft")) {
+                    if (fileName.startsWith("o_1f")) {
                         fileName = fileName.substring(30);
                     }
                     fileEntity.setFileName(fileName);
