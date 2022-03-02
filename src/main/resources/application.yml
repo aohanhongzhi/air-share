@@ -1,1 +1,13 @@
+spring:
+  servlet:
+    multipart:
+      enabled: false
 
+hxy:
+  print:
+    file : /upload-file
+
+logging:
+  level:
+    root: info
+    hxy.dragon: debug

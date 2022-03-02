@@ -12,3 +12,10 @@
 前端采用 https://www.openzui.com/ 支持文件上传分片。
 
 后期需要加上文件断点上传。
+
+
+### 部署
+
+```shell
+./gradlew clean bootJar -x test
+```
