@@ -11,3 +11,5 @@ logging:
   level:
     root: info
     hxy.dragon: debug
+server:
+  port: 8888

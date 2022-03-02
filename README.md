@@ -1,4 +1,11 @@
 # air-share
+#### 主页
+
+http://file.bosch-smartlife.com/
+
+或者
+
+http://file.bosch-smartlife.com:8888/index
 
 #### 介绍
 文件分享或者传输中心。可以对标：https://airportal.cn/。
@@ -18,4 +25,20 @@
 
 ```shell
 ./gradlew clean bootJar -x test
+```
+
+```shell
+gradlew.bat clean bootJar -x test
+```
+
+```shell
+ssh insite@insite.cupb.top
+```
+上传到服务器
+```shell
+scp build/libs/air-share-0.0.1-SNAPSHOT.jar insite@insite.cupb.top:/home/insite/app/
+```
+启动
+```shell
+nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -jar /home/insite/app/air-share-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod -Xmx1G -Xms512M -server -XX:+UseG1GC >>/home/insite/app/air-share.log  2>&1 &
 ```
