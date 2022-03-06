@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Air Share!</title>
     <!-- zui -->
-    <!--    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/zui/1.10.0/css/zui.min.css">-->
     <link rel="stylesheet" href="../css/zui.css">
-
     <link href="../lib/datagrid/zui.datagrid.min.css" rel="stylesheet">
-    <script src="../lib/datagrid/zui.datagrid.min.js"></script>
 </head>
-
 <body>
+
 
 <div class="container">
     <ul class="nav nav-primary" style="margin-top: 20px">
@@ -28,20 +24,36 @@
         <tr>
             <th>path</th>
             <th>size</th>
+            <th>操作</th>
         </tr>
         <tr th:each="fileEntity:${fileList}">
             <td><a th:href="@{'/'+${fileEntity.filePath}}" target="_blank" th:text="${fileEntity.fileName}"></a></td>
             <td th:text="${fileEntity.fileSize}"></td>
+            <td>
+                <button th:attr="del_uri=@{/emp/}+${fileEntity.filePath}" class="btn btn-sm btn-danger deleteBtn">删除
+                </button>
+            </td>
         </tr>
     </table>
 </div>
 
+</div>
+
 
 <!-- jQuery (ZUI中的Javascript组件依赖于jQuery) -->
-<script src="../js/jquery-1.11.0.min.js"></script>
+<script src="../js/jquery-3.6.0.min.js"></script>
+<script src="../lib/datagrid/zui.datagrid.min.js"></script>
+<!--<script src="../js/jquery-1.11.0.min.js"></script>-->
 <!-- ZUI Javascript组件 -->
 <!-- ZUI 标准版压缩后的 JavaScript 文件 -->
 <script src="../js/zui.js"></script>
-
+<script>
+    $(".deleteBtn").click(function () {
+        console.log("点击了删除")
+        //根据点击事件获取到的请求删除当前id
+        $("#deleteEmpForm").attr("action", $(this).attr("del_uri")).submit();
+        return false;
+    });
+</script>
 </body>
 </html>
