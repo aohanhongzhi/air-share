@@ -1,6 +1,6 @@
 package hxy.dragon.controller;
 
-import hxy.dragon.dao.model.FileEntity;
+import hxy.dragon.dao.model.FileModel;
 import hxy.dragon.util.file.DirUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,7 +25,7 @@ public class IndexController {
 
     @RequestMapping("/file")
     public String file(Model model) {
-        List<FileEntity> list = new ArrayList<>();
+        List<FileModel> list = new ArrayList<>();
 
         File file = new File(DirUtil.getFileStoreDir());
         File[] fs = file.listFiles();
@@ -36,20 +36,20 @@ public class IndexController {
                 for (File f1 : files) {
                     String fileName = f1.getName();
                     String fileUrl = "file/" + name + "/" + fileName;
-                    FileEntity fileEntity = new FileEntity();
+                    FileModel fileModel = new FileModel();
                     if (fileName.startsWith("o_1f")) {
                         fileName = fileName.substring(30);
                     }
-                    fileEntity.setFileName(fileName);
-                    fileEntity.setFileSize(f1.length());
-                    fileEntity.setFilePath(fileUrl);
-                    list.add(fileEntity);
+                    fileModel.setFileName(fileName);
+                    fileModel.setFileSize(f1.length());
+                    fileModel.setFilePath(fileUrl);
+                    list.add(fileModel);
                 }
             } else {
-                FileEntity fileEntity = new FileEntity();
-                fileEntity.setFileName(f.getName());
-                fileEntity.setFileSize(f.length());
-                list.add(fileEntity);
+                FileModel fileModel = new FileModel();
+                fileModel.setFileName(f.getName());
+                fileModel.setFileSize(f.length());
+                list.add(fileModel);
             }
         }
 

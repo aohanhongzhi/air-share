@@ -29,9 +29,9 @@
             <th>path</th>
             <th>size</th>
         </tr>
-        <tr th:each="fileEntity:${fileList}">
-            <td><a th:href="@{'/'+${fileEntity.filePath}}" target="_blank" th:text="${fileEntity.fileName}"></a></td>
-            <td th:text="${fileEntity.fileSize}"></td>
+        <tr th:each="fileModel:${fileList}">
+            <td><a th:href="@{'/'+${fileModel.filePath}}" target="_blank" th:text="${fileModel.fileName}"></a></td>
+            <td th:text="${fileModel.fileSize}"></td>
         </tr>
     </table>
 </div>

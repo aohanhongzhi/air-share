@@ -1,6 +1,9 @@
 package hxy.dragon.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import hxy.dragon.dao.mapper.FileMapper;
+import hxy.dragon.dao.model.FileModel;
 import hxy.dragon.entity.reponse.BaseResponse;
 import hxy.dragon.service.FileService;
 import hxy.dragon.util.DateUtil;
@@ -14,16 +17,19 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 
@@ -37,6 +43,9 @@ import java.util.List;
 public class FileServiceImpl implements FileService {
 
     private static final int BUFFER_SIZE = 100 * 1024;
+
+    @Resource
+    FileMapper fileMapper;
 
     /**
      * 文件分片上传，速度很快
@@ -150,6 +159,13 @@ public class FileServiceImpl implements FileService {
                                     suffixName = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
                                 }
 
+                                FileModel fileModel = new FileModel();
+                                fileModel.setFilePath(filePath);
+                                fileModel.setFileName(fileName);
+                                fileModel.setFileMd5(fileUuidName);
+                                fileModel.setFileUuid(uuid);
+                                fileMapper.insert(fileModel);
+
                             } else {
 //                                log.debug("\n====>还剩[" + (chunks - 1 - chunk) + "]个块文件");
                             }
@@ -185,11 +201,25 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public BaseResponse deleteFile(String fileNam) {
-        //  TODO 文件删除
+    public BaseResponse deleteFile(String fileMd5) {
+        QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("file_md5", fileMd5);
+        FileModel fileModel = fileMapper.selectOne(queryWrapper);
+        if (fileModel != null) {
+            String fileAbsolutePath = DirUtil.getFileStoreDir() + File.separator + fileModel.getFilePath();
+            File file = new File(fileAbsolutePath);
+            boolean delete = file.delete();
+            if (!delete) {
+                log.error("删除失败！{}", fileMd5);
+            } else {
+                int delete1 = fileMapper.delete(queryWrapper);
+                if (delete1 == 1) {
+                    return BaseResponse.success();
+                }
 
-
-        return null;
+            }
+        }
+        return BaseResponse.error();
     }
 
 
@@ -200,43 +230,43 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void downloadByFileId(String fileUuid, HttpServletResponse response) throws UnsupportedEncodingException {
-//        FileEntity fileEntity = fileMapper.selectById(fileUuid);
-//        boolean exist = false;
-//        File file = null;
-//        if (fileEntity != null) {
-//            String filePath = fileEntity.getFilePath();
-//            file = new File(DirUtil.getFileStoreDir(), filePath);
-//            exist = file.exists();
-//        }
-//
-//        if (exist) {
-//            log.debug("\n====>下载文件：" + file);
-//            // 告诉浏览器输出内容为流
-//            response.setContentType("application/octet-stream");
-//            // 设置响应头，控制浏览器下载该文件
-//            response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fileEntity.getFileName(), "UTF-8"));
-//
-//            try (
-//                // 读取要下载的文件，保存到文件输入流
-//                FileInputStream in = new FileInputStream(file);
-//                // 创建输出流
-//                OutputStream out = response.getOutputStream();
-//                // 创建缓冲区
-//            ) {
-//                byte[] buffer = new byte[1024];
-//                int len = 0;
-//                // 循环将输入流中的内容读取到缓冲区当中
-//                while ((len = in.read(buffer)) > 0) {
-//                    // 输出缓冲区的内容到浏览器，实现文件下载
-//                    out.write(buffer, 0, len);
-//                }
-//            } catch (IOException e) {
-//                log.error("下载异常", e);
-//            }
-//        } else {
-//            response.setHeader("Content-Type", "application/json;charset=UTF-8");
-//            ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
-//        }
+        FileModel fileEntity = fileMapper.selectById(fileUuid);
+        boolean exist = false;
+        File file = null;
+        if (fileEntity != null) {
+            String filePath = fileEntity.getFilePath();
+            file = new File(DirUtil.getFileStoreDir(), filePath);
+            exist = file.exists();
+        }
+
+        if (exist) {
+            log.debug("\n====>下载文件：" + file);
+            // 告诉浏览器输出内容为流
+            response.setContentType("application/octet-stream");
+            // 设置响应头，控制浏览器下载该文件
+            response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fileEntity.getFileName(), "UTF-8"));
+
+            try (
+                    // 读取要下载的文件，保存到文件输入流
+                    FileInputStream in = new FileInputStream(file);
+                    // 创建输出流
+                    OutputStream out = response.getOutputStream();
+                    // 创建缓冲区
+            ) {
+                byte[] buffer = new byte[1024];
+                int len = 0;
+                // 循环将输入流中的内容读取到缓冲区当中
+                while ((len = in.read(buffer)) > 0) {
+                    // 输出缓冲区的内容到浏览器，实现文件下载
+                    out.write(buffer, 0, len);
+                }
+            } catch (IOException e) {
+                log.error("下载异常", e);
+            }
+        } else {
+            response.setHeader("Content-Type", "application/json;charset=UTF-8");
+            ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
+        }
 
     }
 

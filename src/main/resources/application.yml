@@ -2,6 +2,9 @@ spring:
   servlet:
     multipart:
       enabled: false
+  datasource:
+    url: jdbc:sqlite:airshare.db
+    driver-class-name: org.sqlite.JDBC
 
 hxy:
   print:

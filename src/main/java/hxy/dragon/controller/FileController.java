@@ -31,8 +31,8 @@ public class FileController {
     }
 
     @DeleteMapping("/file/delete")
-    public BaseResponse delete(String fileName) {
-        return fileService.deleteFile(fileName);
+    public BaseResponse delete(String fileMd5) {
+        return fileService.deleteFile(fileMd5);
     }
 
 

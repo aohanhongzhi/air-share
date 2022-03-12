@@ -17,7 +17,7 @@ public interface FileService {
 
     BaseResponse fileMd5Check(String uuid,String md5);
 
-    BaseResponse deleteFile(String fileNam);
+    BaseResponse deleteFile(String fileMd5);
 
 
     void downloadByFilePath(String filePath, HttpServletResponse response);

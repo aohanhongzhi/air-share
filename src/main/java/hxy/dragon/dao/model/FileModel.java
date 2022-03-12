@@ -1,5 +1,7 @@
 package hxy.dragon.dao.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import hxy.dragon.entity.enums.FileTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,11 +11,12 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class FileEntity{
+public class FileModel {
     /**
      * 文件的uuid事主键
      * 主键，存在就更新，不存在就插入
      */
+    @TableId(type = IdType.AUTO)
     private String fileUuid;
 
     /**
