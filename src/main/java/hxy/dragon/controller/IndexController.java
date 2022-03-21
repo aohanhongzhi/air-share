@@ -29,27 +29,29 @@ public class IndexController {
 
         File file = new File(DirUtil.getFileStoreDir());
         File[] fs = file.listFiles();
-        for (File f : fs) {
-            if (f.isDirectory()) {
-                String name = f.getName();
-                File[] files = f.listFiles();
-                for (File f1 : files) {
-                    String fileName = f1.getName();
-                    String fileUrl = "file/" + name + "/" + fileName;
-                    FileModel fileModel = new FileModel();
-                    if (fileName.startsWith("o_1f")) {
-                        fileName = fileName.substring(30);
+        if (fs != null && fs.length > 0) {
+            for (File f : fs) {
+                if (f.isDirectory()) {
+                    String name = f.getName();
+                    File[] files = f.listFiles();
+                    for (File f1 : files) {
+                        String fileName = f1.getName();
+                        String fileUrl = "file/" + name + "/" + fileName;
+                        FileModel fileModel = new FileModel();
+                        if (fileName.startsWith("o_1f")) {
+                            fileName = fileName.substring(30);
+                        }
+                        fileModel.setFileName(fileName);
+                        fileModel.setFileSize(f1.length());
+                        fileModel.setFilePath(fileUrl);
+                        list.add(fileModel);
                     }
-                    fileModel.setFileName(fileName);
-                    fileModel.setFileSize(f1.length());
-                    fileModel.setFilePath(fileUrl);
+                } else {
+                    FileModel fileModel = new FileModel();
+                    fileModel.setFileName(f.getName());
+                    fileModel.setFileSize(f.length());
                     list.add(fileModel);
                 }
-            } else {
-                FileModel fileModel = new FileModel();
-                fileModel.setFileName(f.getName());
-                fileModel.setFileSize(f.length());
-                list.add(fileModel);
             }
         }
 

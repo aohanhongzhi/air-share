@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -29,15 +30,18 @@ public class DirUtil implements InitializingBean {
      * 文件存储的文件夹
      */
 
-    private static String fileStoreDir;
+    private static String fileStoreDir = getUserDir() + File.separator + "file";
 
     public static String getFileStoreDir() {
         return fileStoreDir;
     }
 
-    @Value("${hxy.print.file}")
+    @Value("${hxy.print.absolute-file-path}")
+    @Profile("prod")
     public void setFileStoreDir(String fileStoreDir) {
-        DirUtil.fileStoreDir = getUserDir() + fileStoreDir;
+        if (fileStoreDir != null && fileStoreDir.trim().length() > 0) {
+            DirUtil.fileStoreDir = fileStoreDir;
+        }
     }
 
 

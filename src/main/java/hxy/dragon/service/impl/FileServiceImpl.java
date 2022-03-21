@@ -265,7 +265,7 @@ public class FileServiceImpl implements FileService {
             }
         } else {
             response.setHeader("Content-Type", "application/json;charset=UTF-8");
-            ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
+//            ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
         }
 
     }
