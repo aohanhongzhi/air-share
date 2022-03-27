@@ -40,8 +40,4 @@ public class FileModel {
      */
     private long fileSize = 0;
 
-    /**
-     * 文档类型
-     */
-    private FileTypeEnum fileType;
 }

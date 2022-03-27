@@ -49,8 +49,7 @@ public class FileController {
      * 文件下载，直接文件地址
      */
     @GetMapping("/file/download")
-    @Deprecated
-    public void download(@RequestParam("filePath") String filePath) {
-
+    public void download(@RequestParam("fileUuid") String fileUuid, HttpServletResponse response) {
+        fileService.downloadByFileId(fileUuid, response);
     }
 }

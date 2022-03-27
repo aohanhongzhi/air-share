@@ -7,6 +7,7 @@ import hxy.dragon.dao.model.FileModel;
 import hxy.dragon.entity.reponse.BaseResponse;
 import hxy.dragon.service.FileService;
 import hxy.dragon.util.DateUtil;
+import hxy.dragon.util.ResponseJsonUtil;
 import hxy.dragon.util.file.DirUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.FileItem;
@@ -16,6 +17,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -91,8 +93,7 @@ public class FileServiceImpl implements FileService {
                 try {
 
                     // 如果下面这行代码获取的fileList为空请检查配置文件 spring.servlet.multipart.enabled=false https://www.cnblogs.com/tinya/p/9626710.html
-                    @SuppressWarnings("unchecked")
-                    List<FileItem> fileList = upload.parseRequest(request);
+                    @SuppressWarnings("unchecked") List<FileItem> fileList = upload.parseRequest(request);
 
                     Iterator<FileItem> it = fileList.iterator();
                     while (it.hasNext()) {
@@ -229,7 +230,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void downloadByFileId(String fileUuid, HttpServletResponse response) throws UnsupportedEncodingException {
+    public void downloadByFileId(String fileUuid, HttpServletResponse response) {
         FileModel fileEntity = fileMapper.selectById(fileUuid);
         boolean exist = false;
         File file = null;
@@ -244,28 +245,21 @@ public class FileServiceImpl implements FileService {
             // 告诉浏览器输出内容为流
             response.setContentType("application/octet-stream");
             // 设置响应头，控制浏览器下载该文件
-            response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fileEntity.getFileName(), "UTF-8"));
+            try {
+                response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fileEntity.getFileName(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                log.error("{}", e.getMessage(), e);
+            }
 
-            try (
-                    // 读取要下载的文件，保存到文件输入流
-                    FileInputStream in = new FileInputStream(file);
-                    // 创建输出流
-                    OutputStream out = response.getOutputStream();
-                    // 创建缓冲区
-            ) {
-                byte[] buffer = new byte[1024];
-                int len = 0;
-                // 循环将输入流中的内容读取到缓冲区当中
-                while ((len = in.read(buffer)) > 0) {
-                    // 输出缓冲区的内容到浏览器，实现文件下载
-                    out.write(buffer, 0, len);
-                }
-            } catch (IOException e) {
+            try (FileInputStream fileInputStream = new FileInputStream(file); BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream); BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(response.getOutputStream())) {
+                FileCopyUtils.copy(bufferedInputStream, bufferedOutputStream);
+            } catch (Exception e) {
                 log.error("下载异常", e);
+            } finally {
             }
         } else {
             response.setHeader("Content-Type", "application/json;charset=UTF-8");
-//            ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
+            ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
         }
 
     }
@@ -293,7 +287,7 @@ public class FileServiceImpl implements FileService {
                 out.write(buffer, 0, len);
             }
         } catch (Exception e) {
-            log.error("",e);
+            log.error("", e);
         } finally {
             try {
                 if (null != in) {
