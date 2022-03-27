@@ -293,7 +293,7 @@ public class FileServiceImpl implements FileService {
                 out.write(buffer, 0, len);
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("",e);
         } finally {
             try {
                 if (null != in) {

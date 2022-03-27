@@ -9,7 +9,7 @@ spring:
 hxy:
   print:
     file : /upload-file
-    absolute-file-path: /mnt/resource/file
+    absolute-file-path:
 
 logging:
   level:
