@@ -229,6 +229,12 @@ public class FileServiceImpl implements FileService {
 
     }
 
+    /**
+     * https://blog.csdn.net/shiboyuan0410/article/details/115209291
+     *
+     * @param fileUuid
+     * @param response
+     */
     @Override
     public void downloadByFileId(String fileUuid, HttpServletResponse response) {
         FileModel fileEntity = fileMapper.selectById(fileUuid);
