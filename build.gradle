@@ -8,7 +8,7 @@ plugins {
 archivesBaseName = "air-share"
 group = 'hxy'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+//sourceCompatibility = 11
 description = "文件分享"
 
 
@@ -17,9 +17,7 @@ repositories {
     maven { name "Alibaba central"; url "https://maven.aliyun.com/repository/central" }
     maven { name "Alibaba"; url "https://maven.aliyun.com/repository/public" }
     maven { name "Alibaba google"; url "https://maven.aliyun.com/repository/google" }
-    maven { name "Alibaba gradle-plugin"; url "https://maven.aliyun.com/repository/gradle-plugin" }
     maven { name "Alibaba spring"; url "https://maven.aliyun.com/repository/spring" }
-    maven { name "Alibaba spring-plugin"; url "https://maven.aliyun.com/repository/spring-plugin" }
     maven { name "Alibaba grails-core"; url "https://maven.aliyun.com/repository/grails-core" }
     maven { name "Alibaba apache-snapshots"; url "https://maven.aliyun.com/repository/apache-snapshots" }
     maven {
