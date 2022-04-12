@@ -38,6 +38,11 @@ ssh insite@insite.cupb.top
 ```shell
 scp build/libs/air-share-0.0.1-SNAPSHOT.jar insite@insite.cupb.top:/home/insite/app/
 ```
+上传数据库
+```shell
+scp airshare.db insite@insite.cupb.top:/home/insite/app/
+```
+
 启动
 ```shell
 nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -jar /home/insite/app/air-share-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod -Xmx1G -Xms512M -server -XX:+UseG1GC >>/home/insite/app/air-share.log  2>&1 &

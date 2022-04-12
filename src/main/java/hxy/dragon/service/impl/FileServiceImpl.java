@@ -264,6 +264,7 @@ public class FileServiceImpl implements FileService {
                 log.debug("\n====>下载文件：" + file);
                 // 告诉浏览器输出内容为流
                 response.setContentType("application/octet-stream");
+                response.setContentLengthLong(file.length());
                 // 设置响应头，控制浏览器下载该文件
                 try {
                     response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fileEntity.getFileName(), "UTF-8"));
