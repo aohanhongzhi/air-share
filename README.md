@@ -47,3 +47,13 @@ scp airshare.db insite@insite.cupb.top:/home/insite/app/
 ```shell
 nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -jar /home/insite/app/air-share-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod -Xmx1G -Xms512M -server -XX:+UseG1GC >>/home/insite/app/air-share.log  2>&1 &
 ```
+
+
+
+# 拓展
+
+只能查看文件列表
+
+```
+python3 -m http.server -b 192.168.0.118 8080
+```
