@@ -10,50 +10,68 @@
     <link href="../lib/datagrid/zui.datagrid.min.css" rel="stylesheet">
 </head>
 <body>
+<div id="app">
 
+    <div class="container">
+        <ul class="nav nav-primary" style="margin-top: 20px">
+            <li><a href="index">首页</a></li>
+            <li class="active"><a href="files">文件</a></li>
+        </ul>
+        <!-- 在此处编码你的创意 -->
+        <h3>请及时删除你的文件，文件会不定期清理，如果需要保留时长，联系管理员</h3>
 
-<div class="container">
-    <ul class="nav nav-primary" style="margin-top: 20px">
-        <li><a href="index">首页</a></li>
-        <li class="active"><a href="file">文件</a></li>
-    </ul>
-    <!-- 在此处编码你的创意 -->
-    <h3>All File</h3>
+        <table border="1" class="datagrid">
+            <tr>
+                <th>path</th>
+                <th>size(MB)</th>
+                <th>操作</th>
+            </tr>
+            <tr th:each="fileEntity:${fileList}">
+                <td><a th:href="@{'/file/download?fileUuid='+${fileEntity.fileUuid}}" target="_blank"
+                       th:text="${fileEntity.fileName}"></a></td>
+                <td th:text="${fileEntity.fileSize}"></td>
+                <td>
 
-    <table border="1" class="datagrid">
-        <tr>
-            <th>path</th>
-            <th>size</th>
-            <th>操作</th>
-        </tr>
-        <tr th:each="fileEntity:${fileList}">
-            <td><a th:href="@{'/'+${fileEntity.filePath}}" target="_blank" th:text="${fileEntity.fileName}"></a></td>
-            <td th:text="${fileEntity.fileSize}"></td>
-            <td>
-                <button th:attr="del_uri=@{/emp/}+${fileEntity.filePath}" class="btn btn-sm btn-danger deleteBtn">删除
-                </button>
-            </td>
-        </tr>
-    </table>
+               <a class="btn btn-sm btn-danger" th:href="@{/file/del(fileUuid=${fileEntity.fileUuid})}"> 删除 </a>
+
+<!--                <input type="button" value="确认删除"   @click="deleteFile("+${fileEntity.fileUuid}+")"-->
+<!--                           class="btn btn-sm btn-danger"/>-->
+<!--                    </input>-->
+                </td>
+            </tr>
+        </table>
+    </div>
+
 </div>
-
 </div>
-
-
+<script src="https://unpkg.com/vue@next"></script>
 <!-- jQuery (ZUI中的Javascript组件依赖于jQuery) -->
-<script src="../js/jquery-3.6.0.min.js"></script>
+<script src="../lib/jquery/jquery-3.4.1.min.js"></script>
+<script src="../js/axios.min.js"></script>
 <script src="../lib/datagrid/zui.datagrid.min.js"></script>
 <!--<script src="../js/jquery-1.11.0.min.js"></script>-->
 <!-- ZUI Javascript组件 -->
 <!-- ZUI 标准版压缩后的 JavaScript 文件 -->
 <script src="../js/zui.js"></script>
 <script>
-    $(".deleteBtn").click(function () {
-        console.log("点击了删除")
-        //根据点击事件获取到的请求删除当前id
-        $("#deleteEmpForm").attr("action", $(this).attr("del_uri")).submit();
-        return false;
-    });
+    Vue.createApp({
+        /* 选项 */
+        created() {
+            console.log("创建vue成功")
+        },
+        methods: {
+            deleteFile(fileUuid) {
+                console.log("vue文件删除"+fileUuid)
+                //     axios({
+                //         method: 'delete',
+                //         url: '/file/delete',
+                //         data: {
+                //             fileUuid: 'Fred'
+                //         }
+                //     });
+            }
+        }
+    }).mount("#app")
 </script>
 </body>
 </html>

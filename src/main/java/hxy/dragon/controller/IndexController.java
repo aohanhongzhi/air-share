@@ -1,15 +1,19 @@
 package hxy.dragon.controller;
 
 import hxy.dragon.dao.model.FileModel;
+import hxy.dragon.service.FileService;
 import hxy.dragon.util.file.DirUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Controller
 public class IndexController {
 
@@ -23,7 +27,11 @@ public class IndexController {
         return "hello";
     }
 
+    @Resource
+    private FileService fileService;
+
     @RequestMapping("/file")
+    @Deprecated
     public String file(Model model) {
         List<FileModel> list = new ArrayList<>();
 
@@ -57,5 +65,17 @@ public class IndexController {
 
         model.addAttribute("fileList", list);
         return "file";
+    }
+
+    @RequestMapping("/files")
+    public String files(Model model) {
+        return fileService.fileList(model);
+    }
+
+    @RequestMapping("/file/del")
+    public String fileDel(String fileUuid) {
+        log.info("{}",fileUuid);
+        fileService.deleteFile(fileUuid);
+        return "redirect:/files";
     }
 }

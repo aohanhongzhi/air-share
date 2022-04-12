@@ -17,7 +17,7 @@
 <div class="container">
     <ul class="nav nav-primary"  style="margin-top: 20px">
         <li class="active"><a href="index">首页</a></li>
-        <li><a href="file">文件</a></li>
+        <li><a href="files">文件</a></li>
     </ul>
     <h3>下面上传你的文件，任何人可以访问到</h3>
 
@@ -71,9 +71,9 @@
             // alert(responseObject.response)
             console.log("服务器返回信息:", responseObject);
             /* 使用触发器对象直接显示 */
-            var host = getHostPath();
-            let parse = JSON.parse(responseObject.response);
-            (new $.zui.ModalTrigger({custom: host + parse.data})).show();
+            // var host = getHostPath();
+            // let parse = JSON.parse(responseObject.response);
+            // (new $.zui.ModalTrigger({custom: host + parse.data})).show();
 
             if (responseObject.response.indexOf('error') === 0) {
                 return '上传失败。服务器返回了一个错误：' + responseObject.response;

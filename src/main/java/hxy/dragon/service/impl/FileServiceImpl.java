@@ -17,6 +17,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 
 import javax.annotation.Resource;
@@ -153,7 +154,6 @@ public class FileServiceImpl implements FileService {
                                 fileUrl = "file/" + filePath;
 
                                 // 文件路径一定不要用绝对路径
-                                long length = destFile.length();
                                 String suffixName = "unknown";
                                 // 获取文件的后缀名,后缀名有可能为空
                                 if (fileName.lastIndexOf(".") != -1) {
@@ -165,6 +165,7 @@ public class FileServiceImpl implements FileService {
                                 fileModel.setFileName(fileName);
                                 fileModel.setFileMd5(fileUuidName);
                                 fileModel.setFileUuid(uuid);
+                                fileModel.setFileSize(length1);
                                 fileMapper.insert(fileModel);
 
                             } else {
@@ -202,7 +203,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public BaseResponse deleteFile(String fileMd5) {
+    public BaseResponse deleteFileByMd5(String fileMd5) {
         QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("file_md5", fileMd5);
         FileModel fileModel = fileMapper.selectOne(queryWrapper);
@@ -223,6 +224,24 @@ public class FileServiceImpl implements FileService {
         return BaseResponse.error();
     }
 
+    @Override
+    public BaseResponse deleteFile(String fileUuid) {
+        QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("file_uuid", fileUuid);
+        FileModel fileModel = fileMapper.selectOne(queryWrapper);
+        if (fileModel != null) {
+            String filePath = fileModel.getFilePath();
+            File file = new File(DirUtil.getFileStoreDir(), filePath);
+            if (file.exists()) {
+                boolean delete = file.delete();
+                if (delete){
+                    fileMapper.delete(queryWrapper);
+                }
+            }
+        }
+        return BaseResponse.success();
+    }
+
 
     @Override
     public void downloadByFilePath(String filePath, HttpServletResponse response) {
@@ -238,36 +257,39 @@ public class FileServiceImpl implements FileService {
     @Override
     public void downloadByFileId(String fileUuid, HttpServletResponse response) {
         FileModel fileEntity = fileMapper.selectById(fileUuid);
-        boolean exist = false;
-        File file = null;
         if (fileEntity != null) {
             String filePath = fileEntity.getFilePath();
-            file = new File(DirUtil.getFileStoreDir(), filePath);
-            exist = file.exists();
+            File file = new File(DirUtil.getFileStoreDir(), filePath);
+            if (file.exists()) {
+                log.debug("\n====>下载文件：" + file);
+                // 告诉浏览器输出内容为流
+                response.setContentType("application/octet-stream");
+                // 设置响应头，控制浏览器下载该文件
+                try {
+                    response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fileEntity.getFileName(), "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    log.error("{}", e.getMessage(), e);
+                }
+
+                try (FileInputStream fileInputStream = new FileInputStream(file); BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream); BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(response.getOutputStream())) {
+                    FileCopyUtils.copy(bufferedInputStream, bufferedOutputStream);
+                    return;
+                } catch (Exception e) {
+                    log.error("下载异常", e);
+                } finally {
+                }
+            }
         }
 
-        if (exist) {
-            log.debug("\n====>下载文件：" + file);
-            // 告诉浏览器输出内容为流
-            response.setContentType("application/octet-stream");
-            // 设置响应头，控制浏览器下载该文件
-            try {
-                response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fileEntity.getFileName(), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                log.error("{}", e.getMessage(), e);
-            }
+        response.setHeader("Content-Type", "application/json;charset=UTF-8");
+        ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
+    }
 
-            try (FileInputStream fileInputStream = new FileInputStream(file); BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream); BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(response.getOutputStream())) {
-                FileCopyUtils.copy(bufferedInputStream, bufferedOutputStream);
-            } catch (Exception e) {
-                log.error("下载异常", e);
-            } finally {
-            }
-        } else {
-            response.setHeader("Content-Type", "application/json;charset=UTF-8");
-            ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
-        }
-
+    @Override
+    public String fileList(Model model) {
+        List<FileModel> fileModels = fileMapper.selectList(null);
+        model.addAttribute("fileList", fileModels);
+        return "file";
     }
 
     /**
