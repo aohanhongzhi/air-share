@@ -1,11 +1,5 @@
 # air-share
-#### 主页
 
-http://file.bosch-smartlife.com/
-
-或者
-
-http://file.bosch-smartlife.com:8888/index
 
 #### 介绍
 文件分享或者传输中心。可以对标：https://airportal.cn/。
