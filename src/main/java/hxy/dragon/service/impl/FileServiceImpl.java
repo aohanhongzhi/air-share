@@ -174,7 +174,8 @@ public class FileServiceImpl implements FileService {
                         }
                     }
                 } catch (FileUploadException ex) {
-                    log.warn(fileName + "上传文件失败：" + ex.getMessage());
+                    log.warn("{}上传文件失败：", fileName, ex);
+                    response.setStatus(500);
                     return BaseResponse.error("文件上传失败", ex.getMessage());
                 }
                 return BaseResponse.success("文件上传成功", fileUrl);
@@ -183,6 +184,7 @@ public class FileServiceImpl implements FileService {
             }
         } catch (IOException e) {
             log.error(e.getMessage());
+            response.setStatus(500);
             return BaseResponse.error("文件上传失败", e.getMessage());
         }
     }
@@ -234,12 +236,25 @@ public class FileServiceImpl implements FileService {
             File file = new File(DirUtil.getFileStoreDir(), filePath);
             if (file.exists()) {
                 boolean delete = file.delete();
-                if (delete){
+                if (delete) {
                     fileMapper.delete(queryWrapper);
                 }
+            } else {
+                log.warn("文件不存在=>{}。删除失败", DirUtil.getFileStoreDir() + File.separator + filePath);
             }
         }
         return BaseResponse.success();
+    }
+
+    @Override
+    public BaseResponse deleteForDb(String fileUuid) {
+        QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("file_uuid", fileUuid);
+        int delete = fileMapper.delete(queryWrapper);
+        if (delete > 0) {
+            return BaseResponse.success();
+        }
+        return BaseResponse.error();
     }
 
 

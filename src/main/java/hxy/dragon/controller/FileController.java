@@ -36,6 +36,16 @@ public class FileController {
         return fileService.deleteFile(fileUuid);
     }
 
+    /**
+     * 把数据从数据库删除
+     *
+     * @param fileUuid
+     * @return
+     */
+    @DeleteMapping("/file/deleteForDb")
+    public BaseResponse deleteForDb(String fileUuid) {
+        return fileService.deleteForDb(fileUuid);
+    }
 
     /**
      * 文档查询是否已经有相同的了

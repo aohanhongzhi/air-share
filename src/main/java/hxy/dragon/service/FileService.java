@@ -18,6 +18,8 @@ public interface FileService {
 
     BaseResponse deleteFile(String fileUuid);
 
+    BaseResponse deleteForDb(String fileUuid);
+
     BaseResponse deleteFileByMd5(String fileMd5);
 
     void downloadByFilePath(String filePath, HttpServletResponse response);
