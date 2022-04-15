@@ -8,7 +8,18 @@
     <!-- zui -->
     <link rel="stylesheet" href="../css/zui.css">
     <link href="../lib/datagrid/zui.datagrid.min.css" rel="stylesheet">
+
+    <link href="../lib/datatable/zui.datatable.css" rel="stylesheet">
+    <script src="../lib/datatable/zui.datatable.js"></script>
+
+<!--        <style>-->
+<!--            th{-->
+<!--                text-align:center-->
+<!--            }-->
+<!--        </style>-->
 </head>
+
+
 <body>
 <div id="app">
 
@@ -17,61 +28,78 @@
             <li><a href="index">首页</a></li>
             <li class="active"><a href="files">文件</a></li>
         </ul>
-        <!-- 在此处编码你的创意 -->
         <h3>请及时删除你的文件，文件会不定期清理，如果需要保留时长，联系管理员</h3>
 
-        <table border="1" class="datagrid">
+        <table class="datagrid table datatable">
+            <thead>
             <tr>
-                <th>path</th>
-                <th>size(MB)</th>
+                <th>filename</th>
+                <th>size</th>
+                <th>time</th>
                 <th>操作</th>
             </tr>
+            </thead>
+            <tbody>
             <tr th:each="fileEntity:${fileList}">
                 <td><a th:href="@{'/file/download?fileUuid='+${fileEntity.fileUuid}}" target="_blank"
                        th:text="${fileEntity.fileName}"></a></td>
-                <td th:text="${fileEntity.fileSize}"></td>
+                <div th:if="${fileEntity.fileSize}>1073741824">
+                    <td th:text="${#numbers.formatDecimal(fileEntity.fileSize/1073741824,1,'COMMA',0,'POINT')}+GB"
+                        style="padding: 7px"></td>
+                </div>
+                <div th:if="${fileEntity.fileSize}>1048576 and ${fileEntity.fileSize}<=1073741824">
+                    <td th:text="${#numbers.formatDecimal(fileEntity.fileSize/1048576,1,'COMMA',0,'POINT')}+MB"></td>
+                </div>
+                <div th:if="${fileEntity.fileSize}<=1048576">
+                    <td th:text="${#numbers.formatDecimal(fileEntity.fileSize/1024,1,'COMMA',0,'POINT')}+KB"></td>
+                </div>
+
+                <td th:text="${#dates.format(fileEntity.createTime, 'yyyy-MM-dd HH:mm')}"></td>
                 <td>
 
-               <a class="btn btn-sm btn-danger" th:href="@{/file/del(fileUuid=${fileEntity.fileUuid})}"> 删除 </a>
+                    <a class="btn btn-sm btn-danger" th:href="@{/file/del(fileUuid=${fileEntity.fileUuid})}"> 删除 </a>
 
-<!--                <input type="button" value="确认删除"   @click="deleteFile("+${fileEntity.fileUuid}+")"-->
-<!--                           class="btn btn-sm btn-danger"/>-->
-<!--                    </input>-->
                 </td>
             </tr>
+            </tbody>
         </table>
     </div>
 
 </div>
 </div>
-<script src="https://unpkg.com/vue@next"></script>
+<!--<script src="https://unpkg.com/vue@next"></script>-->
 <!-- jQuery (ZUI中的Javascript组件依赖于jQuery) -->
 <script src="../lib/jquery/jquery-3.4.1.min.js"></script>
-<script src="../js/axios.min.js"></script>
+<!--<script src="../js/axios.min.js"></script>-->
 <script src="../lib/datagrid/zui.datagrid.min.js"></script>
-<!--<script src="../js/jquery-1.11.0.min.js"></script>-->
 <!-- ZUI Javascript组件 -->
 <!-- ZUI 标准版压缩后的 JavaScript 文件 -->
 <script src="../js/zui.js"></script>
 <script>
-    Vue.createApp({
-        /* 选项 */
-        created() {
-            console.log("创建vue成功")
-        },
-        methods: {
-            deleteFile(fileUuid) {
-                console.log("vue文件删除"+fileUuid)
-                //     axios({
-                //         method: 'delete',
-                //         url: '/file/delete',
-                //         data: {
-                //             fileUuid: 'Fred'
-                //         }
-                //     });
-            }
-        }
-    }).mount("#app")
+
+    /* 初始化数据表格 */
+    $('table.datatable').datatable();
+
+    // Vue.createApp({
+    //     /* 选项 */
+    //     created() {
+    //         console.log("创建vue成功")
+    //     },
+    //     methods: {
+    //         deleteFile(fileUuid) {
+    //             console.log("vue文件删除" + fileUuid)
+    //             //     axios({
+    //             //         method: 'delete',
+    //             //         url: '/file/delete',
+    //             //         data: {
+    //             //             fileUuid: 'Fred'
+    //             //         }
+    //             //     });
+    //         }
+    //     }
+    // }).mount("#app")
 </script>
+
+
 </body>
 </html>

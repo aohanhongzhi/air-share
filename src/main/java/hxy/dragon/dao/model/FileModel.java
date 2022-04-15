@@ -2,9 +2,10 @@ package hxy.dragon.dao.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import hxy.dragon.entity.enums.FileTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.Date;
 
 /**
  * @author eric
@@ -39,5 +40,8 @@ public class FileModel {
      * 文件大小 Byte
      */
     private long fileSize = 0;
+
+
+    private Date createTime;
 
 }

@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -165,7 +166,8 @@ public class FileServiceImpl implements FileService {
                                 fileModel.setFileName(fileName);
                                 fileModel.setFileMd5(fileUuidName);
                                 fileModel.setFileUuid(uuid);
-                                fileModel.setFileSize(length1);
+                                fileModel.setFileSize(destFile.length() );
+                                fileModel.setCreateTime(new Date());
                                 fileMapper.insert(fileModel);
 
                             } else {
@@ -304,6 +306,10 @@ public class FileServiceImpl implements FileService {
     @Override
     public String fileList(Model model) {
         List<FileModel> fileModels = fileMapper.selectList(null);
+//        if (fileModels != null && fileModels.size() > 0) {
+//            SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'");
+//            f.format(f.format(fileModels))
+//        }
         model.addAttribute("fileList", fileModels);
         return "file";
     }
