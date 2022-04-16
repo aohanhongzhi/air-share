@@ -58,3 +58,11 @@ nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -jar /home/
 ```
 python3 -m http.server -b 192.168.0.118 8080
 ```
+
+
+# 其他类似轮子
+
+https://github.com/beavailable/share
+
+https://gitee.com/folder-share
+
