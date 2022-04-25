@@ -254,9 +254,9 @@ public class FileServiceImpl implements FileService {
         queryWrapper.eq("file_uuid", fileUuid);
         int delete = fileMapper.delete(queryWrapper);
         if (delete > 0) {
-            return BaseResponse.success();
+            return BaseResponse.success("文件删除成功");
         }
-        return BaseResponse.error();
+        return BaseResponse.success("文件已经删除");
     }
 
 
