@@ -60,6 +60,10 @@ python3 -m http.server -b 192.168.0.118 8080
 ```
 
 
+# 学习
+
+[SpringBoot SpringMVC文件下载，大文件断点续传，可以实时播放视频,拖动进度条](https://blog.csdn.net/qq_41389354/article/details/105043312)
+
 # 其他类似轮子
 
 https://github.com/beavailable/share

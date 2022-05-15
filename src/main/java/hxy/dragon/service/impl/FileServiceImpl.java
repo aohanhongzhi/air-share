@@ -10,6 +10,7 @@ import hxy.dragon.util.DateUtil;
 import hxy.dragon.util.ResponseJsonUtil;
 import hxy.dragon.util.file.DirUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.ProgressListener;
@@ -18,7 +19,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import org.springframework.util.FileCopyUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -26,13 +26,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -166,7 +165,7 @@ public class FileServiceImpl implements FileService {
                                 fileModel.setFileName(fileName);
                                 fileModel.setFileMd5(fileUuidName);
                                 fileModel.setFileUuid(uuid);
-                                fileModel.setFileSize(destFile.length() );
+                                fileModel.setFileSize(destFile.length());
                                 fileModel.setCreateTime(new Date());
                                 fileMapper.insert(fileModel);
 
@@ -267,41 +266,133 @@ public class FileServiceImpl implements FileService {
 
     /**
      * https://blog.csdn.net/shiboyuan0410/article/details/115209291
+     * https://blog.csdn.net/qq_41389354/article/details/105043312
      *
      * @param fileUuid
      * @param response
      */
     @Override
-    public void downloadByFileId(String fileUuid, HttpServletResponse response) {
+    public void downloadByFileId(String fileUuid, HttpServletRequest request, HttpServletResponse response, String range) {
         FileModel fileEntity = fileMapper.selectById(fileUuid);
+        boolean fileNotExist = true;
+
         if (fileEntity != null) {
             String filePath = fileEntity.getFilePath();
             File file = new File(DirUtil.getFileStoreDir(), filePath);
             if (file.exists()) {
-                log.debug("\n====>下载文件：" + file);
-                // 告诉浏览器输出内容为流
-                response.setContentType("application/octet-stream");
-                response.setContentLengthLong(file.length());
-                // 设置响应头，控制浏览器下载该文件
-                try {
-                    response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fileEntity.getFileName(), "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    log.error("{}", e.getMessage(), e);
+                fileNotExist = false;
+                log.debug("current request rang:" + range);
+                //开始下载位置
+                long startByte = 0;
+                //结束下载位置
+                long endByte = file.length() - 1;
+                log.debug("文件开始位置：{}，文件结束位置：{}，文件总长度：{}", startByte, endByte, file.length());
+
+                //有range的话
+                if (range != null && range.contains("bytes=") && range.contains("-")) {
+                    range = range.substring(range.lastIndexOf("=") + 1).trim();
+                    String[] ranges = range.split("-");
+                    try {
+                        //判断range的类型
+                        if (ranges.length == 1) {
+                            //类型一：bytes=-2343
+                            if (range.startsWith("-")) {
+                                endByte = Long.parseLong(ranges[0]);
+                            }
+                            //类型二：bytes=2343-
+                            else if (range.endsWith("-")) {
+                                startByte = Long.parseLong(ranges[0]);
+                            }
+                        }
+                        //类型三：bytes=22-2343
+                        else if (ranges.length == 2) {
+                            startByte = Long.parseLong(ranges[0]);
+                            endByte = Long.parseLong(ranges[1]);
+                        } else {
+                            log.error("ranges错误！{}", ranges);
+                        }
+
+                    } catch (NumberFormatException e) {
+                        startByte = 0;
+                        endByte = file.length() - 1;
+                        log.error("Range Occur Error,Message:{}", e.getLocalizedMessage());
+                    }
                 }
 
-                try (FileInputStream fileInputStream = new FileInputStream(file); BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream); BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(response.getOutputStream())) {
-                    FileCopyUtils.copy(bufferedInputStream, bufferedOutputStream);
-                    return;
-                } catch (Exception e) {
-                    log.error("下载异常", e);
+                //要下载的长度
+                long contentLength = endByte - startByte + 1;
+                //文件名
+                String fileName = file.getName();
+                //文件类型
+                String contentType = request.getServletContext().getMimeType(fileName);
+
+                // 解决下载文件时文件名乱码问题
+                byte[] fileNameBytes = fileName.getBytes(StandardCharsets.UTF_8);
+                fileName = new String(fileNameBytes, 0, fileNameBytes.length, StandardCharsets.ISO_8859_1);
+
+                //各种响应头设置
+                //支持断点续传，获取部分字节内容：
+                response.setHeader("Accept-Ranges", "bytes");
+                //http状态码要为206：表示获取部分内容
+                response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+                response.setContentType(contentType);
+                response.setHeader("Content-Type", contentType);
+                //inline表示浏览器直接使用，attachment表示下载，fileName表示下载的文件名
+                response.setHeader("Content-Disposition", "inline;filename=" + fileName);
+                response.setHeader("Content-Length", String.valueOf(contentLength));
+                // Content-Range，格式为：[要下载的开始位置]-[结束位置]/[文件总大小]
+                response.setHeader("Content-Range", "bytes " + startByte + "-" + endByte + "/" + file.length());
+
+                BufferedOutputStream outputStream = null;
+                RandomAccessFile randomAccessFile = null;
+                //已传送数据大小
+                long transmitted = 0;
+                try {
+                    randomAccessFile = new RandomAccessFile(file, "r");
+                    outputStream = new BufferedOutputStream(response.getOutputStream());
+                    byte[] buff = new byte[4096];
+                    int len = 0;
+                    randomAccessFile.seek(startByte);
+                    //坑爹地方四：判断是否到了最后不足4096（buff的length）个byte这个逻辑（(transmitted + len) <= contentLength）要放前面！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+                    //不然会会先读取randomAccessFile，造成后面读取位置出错，找了一天才发现问题所在
+                    while ((transmitted + len) <= contentLength && (len = randomAccessFile.read(buff)) != -1) {
+                        outputStream.write(buff, 0, len);
+                        transmitted += len;
+                    }
+                    //处理不足buff.length部分
+                    if (transmitted < contentLength) {
+                        len = randomAccessFile.read(buff, 0, (int) (contentLength - transmitted));
+                        outputStream.write(buff, 0, len);
+                        transmitted += len;
+                    }
+
+                    outputStream.flush();
+                    response.flushBuffer();
+                    randomAccessFile.close();
+                    log.debug("下载完毕：" + startByte + "-" + endByte + "：" + transmitted);
+                } catch (ClientAbortException e) {
+                    log.warn("用户停止下载：" + startByte + "-" + endByte + "：" + transmitted);
+                    //捕获此异常表示拥护停止下载
+                } catch (IOException e) {
+                    log.error("用户下载IO异常，Message：{}", e.getLocalizedMessage(), e);
                 } finally {
+                    try {
+                        if (randomAccessFile != null) {
+                            randomAccessFile.close();
+                        }
+                    } catch (IOException e) {
+                        log.error("{}", e);
+                    }
+                }///end try
+
+                if (fileNotExist) {
+                    response.setHeader("Content-Type", "application/json;charset=UTF-8");
+                    ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
                 }
             }
         }
-
-        response.setHeader("Content-Type", "application/json;charset=UTF-8");
-        ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
     }
+
 
     @Override
     public String fileList(Model model) {

@@ -24,7 +24,7 @@ public interface FileService {
 
     void downloadByFilePath(String filePath, HttpServletResponse response);
 
-    void downloadByFileId(String fileId, HttpServletResponse response);
+    void downloadByFileId(String fileId,HttpServletRequest request, HttpServletResponse response,String range);
 
     String fileList(Model model);
 }
