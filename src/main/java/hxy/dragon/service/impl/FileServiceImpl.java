@@ -322,7 +322,7 @@ public class FileServiceImpl implements FileService {
                 //要下载的长度
                 long contentLength = endByte - startByte + 1;
                 //文件名
-                String fileName = file.getName();
+                String fileName = fileEntity.getFileName();
                 //文件类型
                 String contentType = request.getServletContext().getMimeType(fileName);
 
