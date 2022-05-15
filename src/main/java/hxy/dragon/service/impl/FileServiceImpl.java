@@ -373,6 +373,7 @@ public class FileServiceImpl implements FileService {
                 } catch (ClientAbortException e) {
                     log.warn("用户停止下载：" + startByte + "-" + endByte + "：" + transmitted);
                     //捕获此异常表示拥护停止下载
+                    log.error("",e);
                 } catch (IOException e) {
                     log.error("用户下载IO异常，Message：{}", e.getLocalizedMessage(), e);
                 } finally {
