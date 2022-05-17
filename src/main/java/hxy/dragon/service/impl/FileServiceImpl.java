@@ -309,7 +309,7 @@ public class FileServiceImpl implements FileService {
                             startByte = Long.parseLong(ranges[0]);
                             endByte = Long.parseLong(ranges[1]);
                         } else {
-                            log.error("ranges错误！{}", ranges);
+                            log.error("ranges错误！{}", range);
                         }
 
                     } catch (NumberFormatException e) {
@@ -325,6 +325,7 @@ public class FileServiceImpl implements FileService {
                 String fileName = fileEntity.getFileName();
                 //文件类型
                 String contentType = request.getServletContext().getMimeType(fileName);
+//                contentType = "application/octet-stream";
 
                 // 解决下载文件时文件名乱码问题
                 byte[] fileNameBytes = fileName.getBytes(StandardCharsets.UTF_8);
@@ -334,7 +335,8 @@ public class FileServiceImpl implements FileService {
                 //支持断点续传，获取部分字节内容：
                 response.setHeader("Accept-Ranges", "bytes");
                 //http状态码要为206：表示获取部分内容
-                response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+//                response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+                response.setStatus(HttpServletResponse.SC_OK);
                 response.setContentType(contentType);
                 response.setHeader("Content-Type", contentType);
                 //inline表示浏览器直接使用，attachment表示下载，fileName表示下载的文件名
@@ -373,7 +375,7 @@ public class FileServiceImpl implements FileService {
                 } catch (ClientAbortException e) {
                     log.warn("用户停止下载：" + startByte + "-" + endByte + "：" + transmitted);
                     //捕获此异常表示拥护停止下载
-                    log.error("",e);
+                    log.error("", e);
                 } catch (IOException e) {
                     log.error("用户下载IO异常，Message：{}", e.getLocalizedMessage(), e);
                 } finally {
@@ -385,12 +387,12 @@ public class FileServiceImpl implements FileService {
                         log.error("{}", e);
                     }
                 }///end try
-
-                if (fileNotExist) {
-                    response.setHeader("Content-Type", "application/json;charset=UTF-8");
-                    ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
-                }
             }
+        }
+
+        if (fileNotExist) {
+            response.setHeader("Content-Type", "application/json;charset=UTF-8");
+            ResponseJsonUtil.responseJson(response, 404, "文件没有找到", null);
         }
     }
 

@@ -74,7 +74,7 @@ public class IndexController {
 
     @RequestMapping("/file/del")
     public String fileDel(String fileUuid) {
-        log.info("{}",fileUuid);
+        log.debug("{}", fileUuid);
         fileService.deleteFile(fileUuid);
         return "redirect:/files";
     }
