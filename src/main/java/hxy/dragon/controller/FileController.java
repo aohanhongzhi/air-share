@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @Slf4j
 public class FileController {
+
     @Autowired
     private FileService fileService;
 
@@ -61,8 +62,8 @@ public class FileController {
      * 文件下载，直接文件地址
      */
     @GetMapping("/file/download")
-    public void download(@RequestParam("fileUuid") String fileUuid,HttpServletRequest request, HttpServletResponse response,// 获取Header里面的Range内容, 可选项, 可为空
+    public void download(@RequestParam("fileUuid") String fileUuid, HttpServletRequest request, HttpServletResponse response,// 获取Header里面的Range内容, 可选项, 可为空
                          @RequestHeader(name = "Range", required = false) String range) {
-        fileService.downloadByFileId(fileUuid,request, response, range);
+        fileService.downloadByFileId(fileUuid, request, response, range);
     }
 }

@@ -267,6 +267,8 @@ public class FileServiceImpl implements FileService {
     /**
      * https://blog.csdn.net/shiboyuan0410/article/details/115209291
      * https://blog.csdn.net/qq_41389354/article/details/105043312
+     * 类似代码
+     * https://github.com/xcbeyond/common-utils/blob/master/src/main/java/com/xcbeyond/common/file/chunk/service/impl/FileServiceImpl.java
      *
      * @param fileUuid
      * @param response
@@ -323,9 +325,8 @@ public class FileServiceImpl implements FileService {
                 long contentLength = endByte - startByte + 1;
                 //文件名
                 String fileName = fileEntity.getFileName();
-                //文件类型
+                //文件类型。不全是application/octet-stream
                 String contentType = request.getServletContext().getMimeType(fileName);
-//                contentType = "application/octet-stream";
 
                 // 解决下载文件时文件名乱码问题
                 byte[] fileNameBytes = fileName.getBytes(StandardCharsets.UTF_8);
@@ -334,7 +335,7 @@ public class FileServiceImpl implements FileService {
                 //各种响应头设置
                 //支持断点续传，获取部分字节内容：
                 response.setHeader("Accept-Ranges", "bytes");
-                //http状态码要为206：表示获取部分内容
+                //http状态码要为206：表示获取部分内容。会导致Chrome和Edge无法下载
 //                response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.setContentType(contentType);
