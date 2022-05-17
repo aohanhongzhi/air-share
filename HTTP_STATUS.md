@@ -5,9 +5,11 @@
 
 [FileServiceImpl](src/main/java/hxy/dragon/service/impl/FileServiceImpl.java)
 
-测试出现一个问题，就是火狐，夸克浏览器能正常断点下载，没有问题。但是Chrome和Edge就不可以了。报下面错误。
+测试出现一个问题:对于PDF，mp3文件，图片文件都可以正常打开。但是其他文件
+就是火狐，夸克浏览器能正常断点下载，没有问题。但是Chrome和Edge就不可以了。报下面错误。
 
-![img.png](img.png)
+
+![img.png](cantdownload.png)
 
 同时服务器报错如下：
 
