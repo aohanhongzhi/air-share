@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @Slf4j
 public class FileController {
+
     @Autowired
     private FileService fileService;
 
@@ -60,7 +62,8 @@ public class FileController {
      * 文件下载，直接文件地址
      */
     @GetMapping("/file/download")
-    public void download(@RequestParam("fileUuid") String fileUuid, HttpServletResponse response) {
-        fileService.downloadByFileId(fileUuid, response);
+    public void download(@RequestParam("fileUuid") String fileUuid, HttpServletRequest request, HttpServletResponse response,// 获取Header里面的Range内容, 可选项, 可为空
+                         @RequestHeader(name = "Range", required = false) String range) {
+        fileService.downloadByFileId(fileUuid, request, response, range);
     }
 }
