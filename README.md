@@ -34,7 +34,7 @@ ssh insite@insite.cupb.top
 ```
 上传到服务器
 ```shell
-scp build/libs/air-share-0.0.1-SNAPSHOT.jar insite@insite.cupb.top:/home/insite/app/
+scp build/libs/air-share-0.0.1-SNAPSHOT.jar insite@file.cupb.top:/home/insite/app/
 ```
 上传数据库
 ```shell
