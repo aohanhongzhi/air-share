@@ -328,6 +328,10 @@ public class FileServiceImpl implements FileService {
                 //文件类型。不全是application/octet-stream
                 String contentType = request.getServletContext().getMimeType(fileName);
 
+                if (contentType == null) {
+                    contentType = "application/octet-stream;charset=utf-8";
+                }
+
                 // 解决下载文件时文件名乱码问题
                 byte[] fileNameBytes = fileName.getBytes(StandardCharsets.UTF_8);
                 fileName = new String(fileNameBytes, 0, fileNameBytes.length, StandardCharsets.ISO_8859_1);
