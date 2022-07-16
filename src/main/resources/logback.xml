@@ -104,21 +104,79 @@
     </appender>
 
 
-    <!--    这里的level并没有生效，原因是被覆盖了 https://www.cnblogs.com/goodAndyxublog/p/14827543.html -->
+    <!-- 读取 application.properties 中的 log.level 属性，如果没有配置，默认 INFO -->
+    <springProperty name="LOG_LEVEL" source="log.level" defaultValue="INFO"/>
+
+    <!--    这里的level并没有生效，原因是被覆盖了。如果yaml等配置文件里没有申明，那么这里就是有效的 https://www.cnblogs.com/goodAndyxublog/p/14827543.html -->
     <root level="info">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="DINGTALK"/>
         <appender-ref ref="INFO_FILE"/>
         <appender-ref ref="WARN_FILE"/>
         <appender-ref ref="ERROR_FILE"/>
     </root>
 
-    <logger name="hxy.dragon.*" level="info" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="DEBUG_FILE"/>
-        <appender-ref ref="INFO_FILE"/>
-        <appender-ref ref="WARN_FILE"/>
-        <appender-ref ref="ERROR_FILE"/>
-    </logger>
+    <springProfile name="dev">
+        <!-- 开发环境时激活 -->
+        <root level="info">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <logger name="hxy.dragon.*" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="INFO_FILE"/>
+            <appender-ref ref="WARN_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="prod">
+        <!-- 生产环境时激活 -->
+        <root level="info">
+            <appender-ref ref="DINGTALK"/>
+            <appender-ref ref="INFO_FILE"/>
+            <appender-ref ref="WARN_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+        <logger name="hxy.dragon.*" level="INFO" additivity="false">
+            <appender-ref ref="DEBUG_FILE"/>
+            <appender-ref ref="INFO_FILE"/>
+            <appender-ref ref="WARN_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="beta">
+        <!-- 线上测试环境时激活 -->
+        <root level="info">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="DEBUG_FILE"/>
+            <appender-ref ref="INFO_FILE"/>
+            <appender-ref ref="WARN_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+        <logger name="hxy.dragon.*" level="INFO" additivity="false">
+            <appender-ref ref="DEBUG_FILE"/>
+            <appender-ref ref="INFO_FILE"/>
+            <appender-ref ref="WARN_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="default">
+        <!-- 默认环境时激活 -->
+        <root level="info">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="DEBUG_FILE"/>
+            <appender-ref ref="INFO_FILE"/>
+            <appender-ref ref="WARN_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+        <logger name="hxy.dragon.*" level="INFO" additivity="false">
+            <appender-ref ref="DEBUG_FILE"/>
+            <appender-ref ref="INFO_FILE"/>
+            <appender-ref ref="WARN_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </logger>
+    </springProfile>
+
+
 
 </configuration>
