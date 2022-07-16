@@ -1,5 +1,5 @@
 ### 从数据库删除数据
-DELETE {{host}}/file/deleteForDb?fileUuid=o_1g0j6lthp5ki8ke15ei1h51q2pa
+DELETE {{host}}/file/deleteForDb?fileUuid=o_1g620fe4p1qmr9en1g9a1ajg1md8a
 
 
 ###
