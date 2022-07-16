@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * @author eric
@@ -30,7 +31,8 @@ public class DirUtil implements InitializingBean {
      * 文件存储的文件夹
      */
 
-    private static String fileStoreDir = getUserDir() + File.separator + "file";
+    private static String deaultFileStoreDir = getUserDir() + File.separator + "file";
+    private static String fileStoreDir;
 
     public static String getFileStoreDir() {
         return fileStoreDir;
@@ -41,6 +43,8 @@ public class DirUtil implements InitializingBean {
     public void setFileStoreDir(String fileStoreDir) {
         if (fileStoreDir != null && fileStoreDir.trim().length() > 0) {
             DirUtil.fileStoreDir = fileStoreDir;
+        } else {
+            DirUtil.fileStoreDir = deaultFileStoreDir;
         }
     }
 
@@ -53,10 +57,25 @@ public class DirUtil implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         String fileStoreDir = DirUtil.getFileStoreDir();
+        String currentDir = fileStoreDir;
         File fileFolder = new File(fileStoreDir);
         if (!fileFolder.exists()) {
-            fileFolder.mkdirs();
-            log.info("\n====>成功创建新文件夹{}", fileStoreDir);
+            boolean mkdirs = fileFolder.mkdirs();
+            if (mkdirs) {
+                log.info("\n====>成功创建新文件夹{}", currentDir);
+            } else {
+                currentDir = deaultFileStoreDir;
+                fileFolder = new File(deaultFileStoreDir);
+                if (!fileFolder.exists()) {
+                    mkdirs = fileFolder.mkdirs();
+                    if (mkdirs) {
+                        log.info("\n====>成功创建新文件夹{}", currentDir);
+                    } else {
+                        throw new FileNotFoundException("文件夹创建失败");
+                    }
+                }
+            }
         }
+        log.info("\n====>当前存储文件夹 {}", currentDir);
     }
 }
