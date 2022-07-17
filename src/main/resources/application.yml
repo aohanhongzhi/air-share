@@ -17,3 +17,11 @@ logging:
     hxy.dragon: debug
 server:
   port: 8888
+
+info:
+  build:
+    artifact: hxy.dragon
+    name: base-server
+    version: 0.0.11_20200831
+    description: base-server，prod环境
+    current: 当前第2001次启动
