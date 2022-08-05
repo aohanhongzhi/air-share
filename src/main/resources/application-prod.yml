@@ -17,3 +17,6 @@ logging:
     hxy.dragon: debug
 server:
   port: 8888
+
+mybatis-plus:
+  log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
