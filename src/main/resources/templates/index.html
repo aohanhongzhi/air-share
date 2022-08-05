@@ -77,7 +77,7 @@
     $('#uploaderExample').uploader({
         autoUpload: true, // 当选择文件后立即自动进行上传操作
         prevent_duplicates: true, // 阻止重复文件上传
-        chunk_size: '2mb',
+        chunk_size: '4mb',
         url: '/file/upload', // 文件上传提交地址
         responseHandler: function (responseObject, file) {
             // alert(file.files[0].name)
