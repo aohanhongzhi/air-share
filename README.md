@@ -57,6 +57,52 @@ nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -XX:+HeapDu
 docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v  /mnt/resource/data/docker/nginx/www:/usr/share/nginx -v /mnt/resource/data/docker/nginx/config/:/etc/nginx/ nginx
 ```
 
+```nginx配置
+server {
+    listen       80;
+    listen  [::]:80;
+    server_name file.bosch-smartlife.com;
+
+    location / {
+        #proxy_set_header HOST $host;
+        #proxy_set_header X-Forwarded-Proto $scheme;
+        #proxy_set_header X-Real-IP $remote_addr;
+        #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_pass http://139.217.230.42:8888;
+        proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
+        #proxy_set_header Host $host:${server_port};
+   }
+}
+
+server {
+    listen       443 ssl;
+    listen  [::]:443;
+    server_name file.bosch-smartlife.com;
+
+    location / {
+        #配置反向代理地址
+        proxy_pass http://139.217.230.42:8888;
+        index  index.html index.htm;
+        #proxy_redirect off;
+        #proxy_set_header Host $http_host;
+        #proxy_set_header X-Real-IP $remote_addr;
+        #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+   }
+    error_page 401 403 404 /40x.html;
+        location = /40x.html {
+    }
+
+    error_page 500 502 503 504 /50x.-html;
+        location = /50x.html {
+    }
+
+   ssl_certificate /etc/nginx/conf.d/bosch-ssl/bosch-smartlife.com.pem;
+   ssl_certificate_key /etc/nginx/conf.d/bosch-ssl/bosch-smartlife.com.key;
+}
+
+```
+
 
 
 # TODO 
