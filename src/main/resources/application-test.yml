@@ -1,0 +1,22 @@
+spring:
+  servlet:
+    multipart:
+      enabled: false
+  datasource:
+    url: jdbc:sqlite:airshare.db
+    driver-class-name: org.sqlite.JDBC
+
+hxy:
+  print:
+    file : /upload-file
+    absolute-file-path: /mnt/resource/data/air-share # 如果绝对地址为空，那么就会采用当前用户下的一个默认地址，具体见代码
+
+logging:
+  level:
+    root: info
+    hxy.dragon: debug
+server:
+  port: 8888
+
+mybatis-plus:
+  log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

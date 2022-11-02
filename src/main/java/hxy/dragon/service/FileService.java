@@ -26,5 +26,5 @@ public interface FileService {
 
     void downloadByFileId(String fileId,HttpServletRequest request, HttpServletResponse response,String range);
 
-    String fileList(Model model);
+    String fileList(Model model,HttpServletRequest serverRequest);
 }
