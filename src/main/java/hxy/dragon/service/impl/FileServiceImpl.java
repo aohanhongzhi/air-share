@@ -410,6 +410,7 @@ public class FileServiceImpl implements FileService {
     public String fileList(Model model, HttpServletRequest serverRequest) {
         String serverName = serverRequest.getServerName();
         String remoteAddr = serverRequest.getRemoteAddr();
+        String code = serverRequest.getParameter("code");
         log.warn("remoteAddr: " + remoteAddr);
 
         LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
@@ -417,8 +418,16 @@ public class FileServiceImpl implements FileService {
             log.warn("域名{}", serverName);
             lambdaQueryWrapper.eq(FileModel::getServerName, serverName);
         }
+        List<FileModel> fileModels = null;
 
-        List<FileModel> fileModels = fileMapper.selectList(lambdaQueryWrapper);
+        if ("file.cupb.top".equals(serverName)) {
+            if (code != null && "111".equals(code)) {
+                fileModels = fileMapper.selectList(lambdaQueryWrapper);
+            }
+        } else {
+            fileModels = fileMapper.selectList(lambdaQueryWrapper);
+        }
+
 //        if (fileModels != null && fileModels.size() > 0) {
 //            SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'");
 //            f.format(f.format(fileModels))
