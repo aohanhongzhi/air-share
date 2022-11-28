@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -419,9 +420,11 @@ public class FileServiceImpl implements FileService {
             lambdaQueryWrapper.eq(FileModel::getServerName, serverName);
         }
         List<FileModel> fileModels = null;
+        LocalDate todaysDate = LocalDate.now();
+        int dayOfMonth = todaysDate.getDayOfMonth();
 
         if ("file.cupb.top".equals(serverName)) {
-            if (code != null && "111".equals(code)) {
+            if (code != null && String.valueOf(dayOfMonth).equals(code)) {
                 fileModels = fileMapper.selectList(lambdaQueryWrapper);
             }
         } else {
