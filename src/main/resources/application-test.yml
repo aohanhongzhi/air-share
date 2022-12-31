@@ -9,7 +9,7 @@ spring:
 hxy:
   print:
     file : /upload-file
-    absolute-file-path: /mnt/resource/data/air-share # 如果绝对地址为空，那么就会采用当前用户下的一个默认地址，具体见代码
+    absolute-file-path: /home/insite/Project/Java/air-share # 如果绝对地址为空，那么就会采用当前用户下的一个默认地址，具体见代码
 
 logging:
   level:
