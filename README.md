@@ -5,9 +5,9 @@
 文件分享或者传输中心。可以对标：https://airportal.cn/。
 私有化部署。
 
-![img.png](index.png)
+![img.png](asset/index.png)
 
-![img_1.png](file.png)
+![img_1.png](asset/file.png)
 
 #### 软件架构 
 软件架构说明
@@ -64,6 +64,20 @@ docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v  /mnt/resource/data/dock
 
 docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v  /mnt/resource/data/docker/nginx/www:/usr/share/nginx -v /mnt/resource/data/docker/nginx/config/:/etc/nginx/ nginx
 
+
+服务器内存占用
+
+![img.png](asset/server-mem.png)
+
+400720KB / 1024 = 391MB
+
+也就是air-share启动的时候占用了 391MB的内存，显然这么个小程序占用这么大的内存着实有点浪费了，这也是SpringBoot非常占用内存的名声来源了。
+
+```shell
+ps aux |grep air
+```
+
+![img.png](asset/ps-aux.png)
 
 ```nginx配置
 server {

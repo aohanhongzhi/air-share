@@ -9,7 +9,7 @@
 就是火狐，夸克浏览器能正常断点下载，没有问题。但是Chrome和Edge就不可以了。报下面错误。
 
 
-![img.png](cantdownload.png)
+![img.png](asset/cantdownload.png)
 
 同时服务器报错如下：
 
@@ -96,4 +96,4 @@ Caused by: java.io.IOException: Connection reset by peer
 ```
 
 经过尝试，仔细分析，最终定位出来是http协议的http_status设置有问题。改成200即可，可能是Chrome和Edge不支持206，具体有待调查。
-![img_1.png](http_status.png)
+![img_1.png](asset/http_status.png)
