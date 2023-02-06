@@ -1,6 +1,7 @@
 package hxy.dragon.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import hxy.dragon.dao.mapper.FileMapper;
 import hxy.dragon.dao.model.FileModel;
@@ -32,6 +33,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -159,6 +161,8 @@ public class FileServiceImpl implements FileService {
                                 if (fileName.lastIndexOf(".") != -1) {
                                     suffixName = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
                                 }
+                                String serverName = request.getServerName();
+
 
                                 FileModel fileModel = new FileModel();
                                 fileModel.setFilePath(filePath);
@@ -167,6 +171,7 @@ public class FileServiceImpl implements FileService {
                                 fileModel.setFileUuid(uuid);
                                 fileModel.setFileSize(destFile.length());
                                 fileModel.setCreateTime(new Date());
+                                fileModel.setServerName(serverName);
                                 fileMapper.insert(fileModel);
 
                             } else {
@@ -403,8 +408,29 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public String fileList(Model model) {
-        List<FileModel> fileModels = fileMapper.selectList(null);
+    public String fileList(Model model, HttpServletRequest serverRequest) {
+        String serverName = serverRequest.getServerName();
+        String remoteAddr = serverRequest.getRemoteAddr();
+        String code = serverRequest.getParameter("code");
+        log.warn("remoteAddr: " + remoteAddr);
+
+        LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
+        if (serverName != null) {
+            log.warn("域名{}", serverName);
+            lambdaQueryWrapper.eq(FileModel::getServerName, serverName);
+        }
+        List<FileModel> fileModels = null;
+        LocalDate todaysDate = LocalDate.now();
+        int dayOfMonth = todaysDate.getDayOfMonth();
+
+        if ("file.cupb.top".equals(serverName)) {
+            if (code != null && String.valueOf(dayOfMonth).equals(code)) {
+                fileModels = fileMapper.selectList(lambdaQueryWrapper);
+            }
+        } else {
+            fileModels = fileMapper.selectList(lambdaQueryWrapper);
+        }
+
 //        if (fileModels != null && fileModels.size() > 0) {
 //            SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'");
 //            f.format(f.format(fileModels))

@@ -5,6 +5,8 @@ spring:
   datasource:
     url: jdbc:sqlite:airshare.db
     driver-class-name: org.sqlite.JDBC
+  profiles:
+    active: prod
 
 hxy:
   print:

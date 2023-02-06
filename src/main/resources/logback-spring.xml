@@ -20,6 +20,9 @@
     <appender name="DINGTALK" class="hxy.dragon.extend.LogbackDingTalkAppender">
     </appender>
 
+    <!-- 监听器，指定日志文件存放目录 -->
+    <contextListener class="hxy.dragon.config.CustomLogContextListener" />
+
 
     <!-- debug输出到文件 -->
     <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -115,6 +118,19 @@
     </root>
 
     <springProfile name="dev">
+        <!-- 开发环境时激活 -->
+        <root level="info">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <logger name="hxy.dragon.*" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="INFO_FILE"/>
+            <appender-ref ref="WARN_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="test">
         <!-- 开发环境时激活 -->
         <root level="info">
             <appender-ref ref="CONSOLE"/>

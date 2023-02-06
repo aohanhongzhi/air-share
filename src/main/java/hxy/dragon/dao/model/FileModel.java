@@ -42,6 +42,12 @@ public class FileModel {
     private long fileSize = 0;
 
 
+    /**
+     * 访问域名
+     */
+    private String serverName;
+
+
     private Date createTime;
 
 }

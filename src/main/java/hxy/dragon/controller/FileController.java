@@ -2,6 +2,7 @@ package hxy.dragon.controller;
 
 import hxy.dragon.entity.reponse.BaseResponse;
 import hxy.dragon.service.FileService;
+import hxy.dragon.util.DiskUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -30,7 +31,14 @@ public class FileController {
      */
     @PostMapping("/file/upload")
     public BaseResponse upload(HttpServletRequest request, HttpServletResponse response) {
-        return fileService.uploadFile(request, response);
+        long diskinfo = DiskUtil.getDiskInfo();
+        if (diskinfo < 2) {
+            // 经过实际测试这个获取的是系统盘符的大小，不是数据盘的大小。但是能有效检测系统存储满了导致崩溃。
+            // 防止恶意上传导致服务器崩了（可能阻止不了）
+            return BaseResponse.error("服务器空间不足了");
+        } else {
+            return fileService.uploadFile(request, response);
+        }
     }
 
     @DeleteMapping("/file/delete")
