@@ -24,15 +24,10 @@ public class IndexController {
         return "index";
     }
 
-    @RequestMapping("/test")
-    public String test() {
-        return "hello";
-    }
-
     @Resource
     private FileService fileService;
 
-    @RequestMapping("/file")
+//    @RequestMapping("/file")
     @Deprecated
     public String file(Model model) {
         List<FileModel> list = new ArrayList<>();
