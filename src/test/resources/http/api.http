@@ -1,6 +1,6 @@
 ### 从数据库删除数据
-DELETE {{host}}/file/deleteForDb?fileUuid=o_1g620fe4p1qmr9en1g9a1ajg1md8a
+DELETE {{host}}/file/deleteForDb?fileUuid=o_1gb9p2ato17a9j23tbgbpd9q0c
 
 
 ###
-#http://file.bosch-smartlife.com/file/download?fileUuid=o_1g0j6lthp5ki8ke15ei1h51q2pa
+DELETE  http://file.bosch-smartlife.com/file/download?fileUuid=o_1gb9p2ato17a9j23tbgbpd9q0c
