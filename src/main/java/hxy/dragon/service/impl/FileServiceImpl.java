@@ -3,6 +3,8 @@ package hxy.dragon.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import hxy.dragon.dao.mapper.FileMapper;
 import hxy.dragon.dao.model.FileModel;
 import hxy.dragon.entity.reponse.BaseResponse;
@@ -430,7 +432,7 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public String fileList(Model model, HttpServletRequest serverRequest) {
+    public String filePageList(Model model, HttpServletRequest serverRequest) {
         String serverName = serverRequest.getServerName();
         String remoteAddr = serverRequest.getRemoteAddr();
         String code = serverRequest.getParameter("code");
@@ -462,8 +464,12 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public BaseResponse fileList(int pageSize, int pageNum) {
-        return null;
+    public BaseResponse filePageList(int pageSize, int pageNum) {
+
+        IPage page = new Page(pageNum, pageSize);
+        IPage page1 = fileMapper.selectPage(page, null);
+
+        return BaseResponse.success(page1);
     }
 
     /**

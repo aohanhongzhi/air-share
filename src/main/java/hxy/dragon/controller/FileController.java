@@ -47,6 +47,11 @@ public class FileController {
         return fileService.deleteFile(fileUuid);
     }
 
+    @GetMapping("/file/list")
+    public BaseResponse listFile(int pageSize, int pageNum) {
+        return fileService.filePageList(pageSize, pageNum);
+    }
+
     /**
      * 把数据从数据库删除
      *

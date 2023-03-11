@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.function.ServerRequest;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -66,7 +65,7 @@ public class IndexController {
 
     @RequestMapping("/files")
     public String files(Model model, HttpServletRequest serverRequest) {
-        return fileService.fileList(model, serverRequest);
+        return fileService.filePageList(model, serverRequest);
     }
 
     @RequestMapping("/file/del")

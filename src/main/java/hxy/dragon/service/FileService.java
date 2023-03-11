@@ -26,7 +26,7 @@ public interface FileService {
 
     void downloadByFileId(String fileId,HttpServletRequest request, HttpServletResponse response,String range);
 
-    String fileList(Model model,HttpServletRequest serverRequest);
+    String filePageList(Model model, HttpServletRequest serverRequest);
 
-    BaseResponse fileList(int pageSize,int pageNum);
+    BaseResponse filePageList(int pageSize, int pageNum);
 }
