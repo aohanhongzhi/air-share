@@ -35,7 +35,7 @@ public class DiskUtil {
                 float useRate = (float) ((freeSpace * 1.0 / totalSpace) * 100);
                 log.info("总容量： " + transformation(totalSpace));
                 log.info("已经使用： " + transformation(freeSpace));
-                log.warn("剩余容量： " + transformation(usableSpace));
+                log.info("剩余容量： " + transformation(usableSpace));
                 log.info("使用率： " + Double.parseDouble(df.format(useRate)) + "%   ");
             }
         } catch (Exception e) {

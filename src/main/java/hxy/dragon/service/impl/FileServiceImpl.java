@@ -106,18 +106,33 @@ public class FileServiceImpl implements FileService {
                         if ("uuid".equals(name)) {
                             uuid = Streams.asString(input);
                             continue;
+                        } else if ("identifier".equals(name)) {
+                            uuid = Streams.asString(input);
+                            continue;
                         }
                         if ("name".equals(name)) {
                             // 这个地方是依据文件流得到信息，虽然Servlet响应多次，但是死上传过来的流组成的文件是整体的。
                             // &不能在get方法中，所以下载时候可能无法找到文件
                             fileName = Streams.asString(input).replace("&", "");
                             continue;
+                        } else if ("relativePath".equals(name)) {
+                            // 这个地方是依据文件流得到信息，虽然Servlet响应多次，但是死上传过来的流组成的文件是整体的。
+                            // &不能在get方法中，所以下载时候可能无法找到文件
+                            fileName = Streams.asString(input).replace("&", "");
+                            continue;
                         }
+
                         if ("chunk".equals(name)) {
+                            chunk = Integer.valueOf(Streams.asString(input));
+                            continue;
+                        } else if ("chunkNumber".equals(name)) {
                             chunk = Integer.valueOf(Streams.asString(input));
                             continue;
                         }
                         if ("chunks".equals(name)) {
+                            chunks = Integer.valueOf(Streams.asString(input));
+                            continue;
+                        } else if ("totalChunks".equals(name)) {
                             chunks = Integer.valueOf(Streams.asString(input));
                             continue;
                         }
@@ -145,6 +160,13 @@ public class FileServiceImpl implements FileService {
                                 log.warn("\n====>文件已经存在了，马上删除。{}", destFile.exists());
                                 destFile.delete();
                                 destFile = new File(DirUtil.getFileStoreDir(), fileUuidName);
+                            }
+
+                            // 解决文件夹上传问题
+                            File parentFile = destFile.getParentFile();
+                            if (!parentFile.exists()) {
+                                // 新建父级文件夹
+                                parentFile.mkdirs();
                             }
 
                             appendFile(input, destFile);
