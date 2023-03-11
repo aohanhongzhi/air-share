@@ -99,6 +99,7 @@ public class FileServiceImpl implements FileService {
 
                     // 如果下面这行代码获取的fileList为空请检查配置文件 spring.servlet.multipart.enabled=false https://www.cnblogs.com/tinya/p/9626710.html
                     @SuppressWarnings("unchecked") List<FileItem> fileList = upload.parseRequest(request);
+                    boolean newUpload = false;
 
                     Iterator<FileItem> it = fileList.iterator();
                     while (it.hasNext()) {
@@ -124,11 +125,13 @@ public class FileServiceImpl implements FileService {
                             continue;
                         }
 
+
                         if ("chunk".equals(name)) {
                             chunk = Integer.valueOf(Streams.asString(input));
                             continue;
                         } else if ("chunkNumber".equals(name)) {
                             chunk = Integer.valueOf(Streams.asString(input));
+                            newUpload = true;
                             continue;
                         }
                         if ("chunks".equals(name)) {
@@ -136,6 +139,8 @@ public class FileServiceImpl implements FileService {
                             continue;
                         } else if ("totalChunks".equals(name)) {
                             chunks = Integer.valueOf(Streams.asString(input));
+                            newUpload = true;
+
                             continue;
                         }
                         // 处理上传文件内容
@@ -173,7 +178,8 @@ public class FileServiceImpl implements FileService {
 
                             appendFile(input, destFile);
 
-                            if (chunk == chunks - 1) {
+
+                            if ((chunk == chunks - 1) || (newUpload && chunk == chunks)) {
                                 long length1 = destFile.length() / 1024 / 1024;
                                 log.info("\n====>文件上传成功：{} 文件大小：{} MB", destFile.getAbsolutePath(), length1);
 
@@ -196,7 +202,10 @@ public class FileServiceImpl implements FileService {
                                 fileModel.setFileSize(destFile.length());
                                 fileModel.setCreateTime(new Date());
                                 fileModel.setServerName(serverName);
-                                fileMapper.insert(fileModel);
+                                int insert = fileMapper.insert(fileModel);
+                                if (insert <= 0) {
+                                    log.error("插入数据库失败 {}", fileModel);
+                                }
 
                             } else {
 //                                log.debug("\n====>还剩[" + (chunks - 1 - chunk) + "]个块文件");
@@ -261,6 +270,13 @@ public class FileServiceImpl implements FileService {
         QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("file_uuid", fileUuid);
         FileModel fileModel = fileMapper.selectOne(queryWrapper);
+        if (fileModel == null) {
+            queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("id", fileUuid);
+            fileModel = fileMapper.selectOne(queryWrapper);
+        }
+
+
         if (fileModel != null) {
             String filePath = fileModel.getFilePath();
             File file = new File(DirUtil.getFileStoreDir(), filePath);
@@ -268,12 +284,17 @@ public class FileServiceImpl implements FileService {
                 boolean delete = file.delete();
                 if (delete) {
                     fileMapper.delete(queryWrapper);
+                    return BaseResponse.success();
                 }
             } else {
-                log.warn("文件不存在=>{}。删除失败", DirUtil.getFileStoreDir() + File.separator + filePath);
+                log.warn("文件不存在=>{}。直接从数据库删除", DirUtil.getFileStoreDir() + File.separator + filePath);
+                fileMapper.delete(queryWrapper);
+                return BaseResponse.success();
             }
+        } else {
+            return BaseResponse.error("数据库没有记录");
         }
-        return BaseResponse.success();
+        return BaseResponse.error();
     }
 
     @Override

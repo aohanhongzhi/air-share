@@ -13,6 +13,8 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class FileModel {
+
+    private Integer id;
     /**
      * 文件的uuid事主键
      * 主键，存在就更新，不存在就插入
