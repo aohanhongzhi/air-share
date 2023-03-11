@@ -461,6 +461,11 @@ public class FileServiceImpl implements FileService {
         return "file";
     }
 
+    @Override
+    public BaseResponse fileList(int pageSize, int pageNum) {
+        return null;
+    }
+
     /**
      * 合成文件
      *
