@@ -1,5 +1,7 @@
 package hxy.dragon.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import hxy.dragon.dao.model.FileModel;
 import hxy.dragon.entity.reponse.BaseResponse;
 import hxy.dragon.service.FileService;
 import hxy.dragon.util.DiskUtil;
@@ -45,20 +47,21 @@ public class FileController {
     }
 
     @GetMapping("/file/upload")
-    public BaseResponse uploadGet(HttpServletRequest request, HttpServletResponse response) {
-        long diskinfo = DiskUtil.getDiskInfo();
-        log.info("upload disk free size  {}", diskinfo);
-        if (diskinfo < 5) {
-            // 经过实际测试这个获取的是系统盘符的大小，不是数据盘的大小。但是能有效检测系统存储满了导致崩溃。
-            // 防止恶意上传导致服务器崩了（可能阻止不了）
-            return BaseResponse.error("服务器空间不足了");
+    public BaseResponse uploadGet(String identifier) {
+        LambdaQueryWrapper<FileModel> objectLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        objectLambdaQueryWrapper.eq(FileModel::getFileUuid, identifier);
+        objectLambdaQueryWrapper.last("limit 1");
+        FileModel fileModel = fileService.getOne(objectLambdaQueryWrapper);
+        Map<String, Object> hashMap = new HashMap<String, Object>();
+        if (fileModel == null) {
+            hashMap.put("skipUpload", false);
         } else {
-//            return fileService.uploadFile(request, response);
-            Map<String,Object> hashMap = new HashMap<String,Object>();
-            hashMap.put("skipUpload",false);
-            hashMap.put("uploaded",0);
-            return BaseResponse.success(hashMap);
+            log.info("文件已经存在了，不接收再次上传md5 {} ,file {}", identifier, fileModel);
+            hashMap.put("skipUpload", true);
         }
+        hashMap.put("uploaded", 0);
+        return BaseResponse.success(hashMap);
+
     }
 
     @DeleteMapping("/file/delete")

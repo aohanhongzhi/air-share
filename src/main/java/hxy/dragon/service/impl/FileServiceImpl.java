@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hxy.dragon.dao.mapper.FileMapper;
 import hxy.dragon.dao.model.FileModel;
 import hxy.dragon.entity.reponse.BaseResponse;
@@ -47,7 +50,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class FileServiceImpl implements FileService {
+public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implements FileService {
 
     private static final int BUFFER_SIZE = 100 * 1024;
 
@@ -179,7 +182,7 @@ public class FileServiceImpl implements FileService {
                             appendFile(input, destFile);
 
 
-                            if ((chunk == chunks - 1) || (newUpload && chunk == chunks)) {
+                            if (((chunk == chunks - 1) && !newUpload) || (newUpload && chunk == chunks)) {
                                 long length1 = destFile.length() / 1024 / 1024;
                                 log.info("\n====>文件上传成功：{} 文件大小：{} MB", destFile.getAbsolutePath(), length1);
 
@@ -271,30 +274,64 @@ public class FileServiceImpl implements FileService {
         queryWrapper.eq("file_uuid", fileUuid);
         FileModel fileModel = fileMapper.selectOne(queryWrapper);
         if (fileModel == null) {
-            queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("id", fileUuid);
-            fileModel = fileMapper.selectOne(queryWrapper);
-        }
+            if (fileUuid != null) {
+                if (fileUuid.startsWith("[") && fileUuid.endsWith("]")) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    try {
+                        Integer[] ids = objectMapper.readValue(fileUuid, Integer[].class);
+                        for (Integer id : ids) {
+                            queryWrapper = new QueryWrapper<>();
+                            queryWrapper.eq("id", id);
+                            fileModel = fileMapper.selectOne(queryWrapper);
+                            if (fileModel != null) {
+                                deleteFile(fileModel);
+                            } else {
+//                                return BaseResponse.error("数据库没有记录");
+                            }
+                        }
 
+                        return BaseResponse.success("批量删除成功");
 
-        if (fileModel != null) {
-            String filePath = fileModel.getFilePath();
-            File file = new File(DirUtil.getFileStoreDir(), filePath);
-            if (file.exists()) {
-                boolean delete = file.delete();
-                if (delete) {
-                    fileMapper.delete(queryWrapper);
-                    return BaseResponse.success();
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                } else {
+                    queryWrapper = new QueryWrapper<>();
+                    queryWrapper.eq("id", fileUuid);
+                    fileModel = fileMapper.selectOne(queryWrapper);
+                    if (fileModel != null) {
+                        boolean b = deleteFile(fileModel);
+                        if (b) {
+                            return BaseResponse.success("删除成功");
+                        }
+                    } else {
+                        return BaseResponse.error("数据库没有记录");
+                    }
                 }
-            } else {
-                log.warn("文件不存在=>{}。直接从数据库删除", DirUtil.getFileStoreDir() + File.separator + filePath);
-                fileMapper.delete(queryWrapper);
-                return BaseResponse.success();
             }
-        } else {
-            return BaseResponse.error("数据库没有记录");
         }
         return BaseResponse.error();
+    }
+
+    private boolean deleteFile(FileModel fileModel) {
+        String filePath = fileModel.getFilePath();
+        File file = new File(DirUtil.getFileStoreDir(), filePath);
+        QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", fileModel.getId());
+        if (file.exists()) {
+            boolean delete = file.delete();
+            if (delete) {
+
+                fileMapper.delete(queryWrapper);
+                return true;
+            }
+        } else {
+            log.warn("文件不存在=>{}。直接从数据库删除", DirUtil.getFileStoreDir() + File.separator + filePath);
+            fileMapper.delete(queryWrapper);
+            return true;
+        }
+        return false;
     }
 
     @Override
