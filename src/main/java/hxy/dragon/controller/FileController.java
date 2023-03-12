@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -39,6 +41,23 @@ public class FileController {
             return BaseResponse.error("服务器空间不足了");
         } else {
             return fileService.uploadFile(request, response);
+        }
+    }
+
+    @GetMapping("/file/upload")
+    public BaseResponse uploadGet(HttpServletRequest request, HttpServletResponse response) {
+        long diskinfo = DiskUtil.getDiskInfo();
+        log.info("upload disk free size  {}", diskinfo);
+        if (diskinfo < 5) {
+            // 经过实际测试这个获取的是系统盘符的大小，不是数据盘的大小。但是能有效检测系统存储满了导致崩溃。
+            // 防止恶意上传导致服务器崩了（可能阻止不了）
+            return BaseResponse.error("服务器空间不足了");
+        } else {
+//            return fileService.uploadFile(request, response);
+            Map<String,Object> hashMap = new HashMap<String,Object>();
+            hashMap.put("skipUpload",false);
+            hashMap.put("uploaded",0);
+            return BaseResponse.success(hashMap);
         }
     }
 
@@ -76,7 +95,8 @@ public class FileController {
      * 文件下载，直接文件地址
      */
     @GetMapping("/file/download")
-    public void download(@RequestParam("fileUuid") String fileUuid, HttpServletRequest request, HttpServletResponse response,// 获取Header里面的Range内容, 可选项, 可为空
+    public void download(@RequestParam("fileUuid") String fileUuid, HttpServletRequest request, HttpServletResponse
+            response,// 获取Header里面的Range内容, 可选项, 可为空
                          @RequestHeader(name = "Range", required = false) String range) {
         fileService.downloadByFileId(fileUuid, request, response, range);
     }
