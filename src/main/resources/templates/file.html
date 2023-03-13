@@ -57,7 +57,7 @@
                 <td th:text="${#dates.format(fileEntity.createTime, 'yyyy-MM-dd HH:mm')}"></td>
                 <td>
 
-                    <a class="btn btn-sm btn-danger" th:href="@{/file/del(fileUuid=${fileEntity.fileUuid})}"> 删除 </a>
+                    <a class="btn btn-sm btn-danger" th:href="@{/file/del(fileUuid=${fileEntity.id})}"> 删除 </a>
 
                 </td>
             </tr>

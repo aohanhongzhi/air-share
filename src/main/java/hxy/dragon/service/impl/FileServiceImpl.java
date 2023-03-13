@@ -283,47 +283,38 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
     @Override
     public BaseResponse deleteFile(String fileUuid) {
-        QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("file_uuid", fileUuid);
-        FileModel fileModel = fileMapper.selectOne(queryWrapper);
-        if (fileModel == null) {
-            if (fileUuid != null) {
-                if (fileUuid.startsWith("[") && fileUuid.endsWith("]")) {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    try {
-                        Integer[] ids = objectMapper.readValue(fileUuid, Integer[].class);
-                        for (Integer id : ids) {
-                            queryWrapper = new QueryWrapper<>();
-                            queryWrapper.eq("id", id);
-                            fileModel = fileMapper.selectOne(queryWrapper);
-                            if (fileModel != null) {
-                                deleteFile(fileModel);
-                            } else {
-//                                return BaseResponse.error("数据库没有记录");
-                            }
-                        }
 
-                        return BaseResponse.success("批量删除成功");
-
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                } else {
-                    queryWrapper = new QueryWrapper<>();
-                    queryWrapper.eq("id", fileUuid);
-                    fileModel = fileMapper.selectOne(queryWrapper);
+        if (fileUuid.startsWith("[") && fileUuid.endsWith("]")) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                Integer[] ids = objectMapper.readValue(fileUuid, Integer[].class);
+                for (Integer id : ids) {
+                    QueryWrapper queryWrapper = new QueryWrapper<>();
+                    queryWrapper.eq("id", id);
+                    FileModel fileModel = fileMapper.selectOne(queryWrapper);
                     if (fileModel != null) {
-                        boolean b = deleteFile(fileModel);
-                        if (b) {
-                            return BaseResponse.success("删除成功");
-                        }
+                        deleteFile(fileModel);
                     } else {
-                        return BaseResponse.error("数据库没有记录");
                     }
                 }
+                return BaseResponse.success("批量删除成功");
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            QueryWrapper queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("id", fileUuid);
+            FileModel fileModel = fileMapper.selectOne(queryWrapper);
+            if (fileModel != null) {
+                boolean b = deleteFile(fileModel);
+                if (b) {
+                    return BaseResponse.success("删除成功");
+                }
+            } else {
+                return BaseResponse.error("数据库没有记录");
             }
         }
+
         return BaseResponse.error();
     }
 
@@ -335,7 +326,6 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         if (file.exists()) {
             boolean delete = file.delete();
             if (delete) {
-
                 fileMapper.delete(queryWrapper);
                 return true;
             }

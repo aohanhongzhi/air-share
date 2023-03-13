@@ -64,6 +64,10 @@ public class FileController {
 
     }
 
+    /**
+     * @param fileUuid 传过来的实际是id，就是id，也不是主键！
+     * @return
+     */
     @DeleteMapping("/file/delete")
     public BaseResponse delete(@RequestBody String fileUuid) {
         return fileService.deleteFile(fileUuid);
