@@ -176,7 +176,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                             File parentFile = destFile.getParentFile();
                             if (!parentFile.exists()) {
                                 // 新建父级文件夹
-                                parentFile.mkdirs();
+                                boolean mkdirs = parentFile.mkdirs();
+                                if (!mkdirs) {
+                                    log.error("Could not create directory {}", parentFile);
+                                }
                             }
 
                             appendFile(input, destFile);
@@ -525,7 +528,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
     public BaseResponse filePageList(int pageSize, int pageNum) {
 
         IPage page = new Page(pageNum, pageSize);
-        IPage page1 = fileMapper.selectPage(page, null);
+        QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("create_time");
+        IPage page1 = fileMapper.selectPage(page, queryWrapper);
 
         return BaseResponse.success(page1);
     }
