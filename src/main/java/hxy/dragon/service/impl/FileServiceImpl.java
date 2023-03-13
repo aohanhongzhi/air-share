@@ -76,7 +76,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 String fileName = "";
                 String uuid = "";
                 String fileUuidName = "";
-                Integer chunk = 0, chunks = 0;
+                Integer chunk = 0, chunks = 0, currentChunkSize = 0;
 
                 DiskFileItemFactory diskFactory = new DiskFileItemFactory();
                 // threshold 极限、临界值，即硬盘缓存 1M
@@ -109,6 +109,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                         FileItem item = it.next();
                         String name = item.getFieldName();
                         InputStream input = item.getInputStream();
+                        if ("currentChunkSize".equals(name)) {
+                            currentChunkSize = Integer.valueOf(Streams.asString(input));
+                            continue;
+                        }
                         if ("uuid".equals(name)) {
                             uuid = Streams.asString(input);
                             continue;
@@ -166,7 +170,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                             File destFile = new File(dirPath, fileUuidName);
                             String filePath = DateUtil.getNowDate() + File.separator + fileUuidName;
 
-                            if (chunk == 0 && destFile.exists()) {
+                            if ((chunk == 0 || (chunk == 1 && newUpload)) && destFile.exists()) {
                                 log.warn("\n====>文件已经存在了，马上删除。{}", destFile.exists());
                                 destFile.delete();
                                 destFile = new File(DirUtil.getFileStoreDir(), fileUuidName);
@@ -182,8 +186,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                                 }
                             }
 
-                            appendFile(input, destFile);
-
+                            appendFile(input, destFile, currentChunkSize);
 
                             if (((chunk.equals(chunks - 1)) && !newUpload) || (newUpload && chunk.equals(chunks))) {
                                 long length1 = destFile.length() / 1024 / 1024;
@@ -553,20 +556,27 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
      *
      * @param in
      * @param destFile
+     * @param currentChunkSize 这个大小需要与前端拆分的大小一致
      */
-    private void appendFile(InputStream in, File destFile) {
+    private void appendFile(InputStream in, File destFile, int currentChunkSize) {
         OutputStream out = null;
+        if (currentChunkSize <= 0) {
+            currentChunkSize = BUFFER_SIZE;
+        }
+
         try {
             // plupload 配置了chunk的时候新上传的文件append到文件末尾
             if (destFile.exists()) {
-                out = new BufferedOutputStream(new FileOutputStream(destFile, true), BUFFER_SIZE);
+                out = new BufferedOutputStream(new FileOutputStream(destFile, true), currentChunkSize);
             } else {
-                out = new BufferedOutputStream(new FileOutputStream(destFile), BUFFER_SIZE);
+                out = new BufferedOutputStream(new FileOutputStream(destFile), currentChunkSize);
             }
-            in = new BufferedInputStream(in, BUFFER_SIZE);
+
+
+            in = new BufferedInputStream(in, currentChunkSize);
 
             int len = 0;
-            byte[] buffer = new byte[BUFFER_SIZE];
+            byte[] buffer = new byte[currentChunkSize];
             while ((len = in.read(buffer)) > 0) {
                 out.write(buffer, 0, len);
             }
