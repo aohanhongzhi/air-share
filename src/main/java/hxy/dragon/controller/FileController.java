@@ -36,8 +36,8 @@ public class FileController {
     @PostMapping("/file/upload")
     public BaseResponse upload(HttpServletRequest request, HttpServletResponse response) {
         long diskinfo = DiskUtil.getDiskInfo();
-        log.info("upload disk free size  {}", diskinfo);
         if (diskinfo < 5) {
+            log.warn("upload disk free size  {}", diskinfo);
             // 经过实际测试这个获取的是系统盘符的大小，不是数据盘的大小。但是能有效检测系统存储满了导致崩溃。
             // 防止恶意上传导致服务器崩了（可能阻止不了）
             return BaseResponse.error("服务器空间不足了");

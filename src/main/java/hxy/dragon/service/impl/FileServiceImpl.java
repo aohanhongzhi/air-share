@@ -185,7 +185,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                             appendFile(input, destFile);
 
 
-                            if (((chunk == chunks - 1) && !newUpload) || (newUpload && chunk == chunks)) {
+                            if (((chunk.equals(chunks - 1)) && !newUpload) || (newUpload && chunk.equals(chunks))) {
                                 long length1 = destFile.length() / 1024 / 1024;
                                 log.info("\n====>文件上传成功：{} 文件大小：{} MB", destFile.getAbsolutePath(), length1);
 
@@ -211,10 +211,16 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                                 int insert = fileMapper.insert(fileModel);
                                 if (insert <= 0) {
                                     log.error("插入数据库失败 {}", fileModel);
+                                } else {
+                                    log.info("成功上传文件，存入数据库{}", fileModel);
                                 }
 
                             } else {
-//                                log.debug("\n====>还剩[" + (chunks - 1 - chunk) + "]个块文件");
+                                if (newUpload) {
+                                    log.debug("====>还剩[" + (chunks - chunk) + "]个块文件");
+                                } else {
+                                    log.debug("====>还剩[" + (chunks - 1 - chunk) + "]个块文件");
+                                }
                             }
                         }
                     }
