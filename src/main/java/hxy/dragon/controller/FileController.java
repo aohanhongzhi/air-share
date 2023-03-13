@@ -88,7 +88,7 @@ public class FileController {
     /**
      * 文档查询是否已经有相同的了
      */
-    @GetMapping("/api/file/exsit")
+    @GetMapping("/file/exsit")
     public BaseResponse exsit(String uuid, String md5) {
         return fileService.fileMd5Check(uuid, md5);
     }

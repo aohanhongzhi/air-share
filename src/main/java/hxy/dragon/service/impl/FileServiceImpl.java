@@ -246,7 +246,17 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 //        } else {
 //            return BaseResponse.error("没有该md5");
 //        }
-        return BaseResponse.success();
+
+        FileModel fileEntity = fileMapper.selectById(uuid);
+
+        if (fileEntity != null) {
+            String filePath = fileEntity.getFilePath();
+            File file = new File(DirUtil.getFileStoreDir(), filePath);
+            if (file.exists()) {
+                return BaseResponse.success("实体文件不存在");
+            }
+        }
+        return BaseResponse.error("文件不存在");
     }
 
     @Override
