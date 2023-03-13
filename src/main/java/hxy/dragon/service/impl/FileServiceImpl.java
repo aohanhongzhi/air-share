@@ -525,12 +525,19 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
     }
 
     @Override
-    public BaseResponse filePageList(int pageSize, int pageNum) {
-
+    public BaseResponse filePageList(int pageSize, int pageNum, HttpServletRequest serverRequest) {
+        String serverName = serverRequest.getServerName();
+        String remoteAddr = serverRequest.getRemoteAddr();
+        String code = serverRequest.getParameter("code");
+        log.warn("remoteAddr: " + remoteAddr + ",serverName" + serverName + ",code=" + code);
+        LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
+        if (serverName != null) {
+            log.warn("域名{}", serverName);
+            lambdaQueryWrapper.eq(FileModel::getServerName, serverName);
+        }
         IPage page = new Page(pageNum, pageSize);
-        QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("create_time");
-        IPage page1 = fileMapper.selectPage(page, queryWrapper);
+        lambdaQueryWrapper.orderByDesc(FileModel::getCreateTime);
+        IPage page1 = fileMapper.selectPage(page, lambdaQueryWrapper);
 
         return BaseResponse.success(page1);
     }

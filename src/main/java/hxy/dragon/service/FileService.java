@@ -30,5 +30,5 @@ public interface FileService extends IService<FileModel> {
 
     String filePageList(Model model, HttpServletRequest serverRequest);
 
-    BaseResponse filePageList(int pageSize, int pageNum);
+    BaseResponse filePageList(int pageSize, int pageNum,HttpServletRequest serverRequest);
 }
