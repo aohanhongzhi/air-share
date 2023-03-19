@@ -32,7 +32,7 @@ public class DiskUtil {
                 long freeSpace = totalSpace - usableSpace;
                 // 获取使用率
                 float useRate = (float) ((freeSpace * 1.0 / totalSpace) * 100);
-                log.debug("盘符" + file.getCanonicalPath() + "   总容量： " + transformation(totalSpace) + ",已经使用： " + transformation(freeSpace) + ",剩余容量： " + transformation(usableSpace) + ",使用率： " + Double.parseDouble(df.format(useRate)) + "%   ");
+//                log.debug("盘符" + file.getCanonicalPath() + "   总容量： " + transformation(totalSpace) + ",已经使用： " + transformation(freeSpace) + ",剩余容量： " + transformation(usableSpace) + ",使用率： " + Double.parseDouble(df.format(useRate)) + "%   ");
             }
         } catch (Exception e) {
             log.error(e.getMessage());

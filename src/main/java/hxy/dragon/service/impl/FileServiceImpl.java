@@ -170,11 +170,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                             File destFile = new File(dirPath, fileUuidName);
                             String filePath = DateUtil.getNowDate() + File.separator + fileUuidName;
 
-                            if ((chunk == 0 || (chunk == 1 && newUpload)) && destFile.exists()) {
-                                log.warn("\n====>文件已经存在了，马上删除。{}", destFile.exists());
-                                destFile.delete();
-                                destFile = new File(DirUtil.getFileStoreDir(), fileUuidName);
-                            }
+//                            if ((chunk == 0 || (chunk == 1 && newUpload)) && destFile.exists()) {
+//                                log.warn("\n====>文件已经存在了，马上删除。{}", destFile.exists());
+//                                destFile.delete();
+//                                destFile = new File(DirUtil.getFileStoreDir(), fileUuidName);
+//                            }
 
                             // 解决文件夹上传问题
                             File parentFile = destFile.getParentFile();
@@ -220,9 +220,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
                             } else {
                                 if (newUpload) {
-                                    log.debug("====>还剩[" + (chunks - chunk) + "]个块文件");
+                                    log.debug("====>当前chunk=[{}] ,还剩[" + (chunks - chunk) + "]个块文件", chunk);
                                 } else {
-                                    log.debug("====>还剩[" + (chunks - 1 - chunk) + "]个块文件");
+                                    log.debug("====>当前chunk=[{}] ,还剩[" + (chunks - 1 - chunk) + "]个块文件", chunk);
                                 }
                             }
                         }
@@ -552,11 +552,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
     }
 
     /**
-     * 合成文件
+     * 合成文件， FIXME 这个算同步合成，不能处理并发上传！！！
      *
      * @param in
      * @param destFile
-     * @param currentChunkSize 这个大小需要与前端拆分的大小一致
+     * @param currentChunkSize 这个大小需要与前端拆分的大小一致!
      */
     private void appendFile(InputStream in, File destFile, int currentChunkSize) {
         OutputStream out = null;
