@@ -170,11 +170,15 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                             File destFile = new File(dirPath, fileUuidName);
                             String filePath = DateUtil.getNowDate() + File.separator + fileUuidName;
 
-//                            if ((chunk == 0 || (chunk == 1 && newUpload)) && destFile.exists()) {
-//                                log.warn("\n====>文件已经存在了，马上删除。{}", destFile.exists());
-//                                destFile.delete();
-//                                destFile = new File(DirUtil.getFileStoreDir(), fileUuidName);
-//                            }
+                            if (!newUpload) {
+                                // 新的上传方式不需要这个文件删除，因为 如果文件已经存在了，那么就不需要上传了，如果文件不存在，那么直接可以上传，所以也不会走到这个删除的地方。
+                                // 主要是因为新的前端并发上传时候，顺序乱了。导致序号1并不是最先上传的一块。虽然去掉了并发，保证了顺序，但是按照上述业务逻辑确实已经没必要了。
+                                if (chunk == 0 && destFile.exists()) {
+                                    log.warn("\n====>文件已经存在了，马上删除。{}", destFile.exists());
+                                    destFile.delete();
+                                    destFile = new File(DirUtil.getFileStoreDir(), fileUuidName);
+                                }
+                            }
 
                             // 解决文件夹上传问题
                             File parentFile = destFile.getParentFile();
