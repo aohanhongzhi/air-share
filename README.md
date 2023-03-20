@@ -1,5 +1,14 @@
 # air-share
 
+### 热重启
+
+https://github.com/HotswapProjects/HotswapAgent
+
+VM 参数
+
+```shell
+-XX:+AllowEnhancedClassRedefinition -XX:HotswapAgent=fatjar
+```
 
 #### 介绍
 文件分享或者传输中心。可以对标：https://airportal.cn/。
