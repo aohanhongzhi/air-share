@@ -55,7 +55,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
     private static final int BUFFER_SIZE = 100 * 1024;
 
     @Resource
-    FileMapper fileMapper;
+    private FileMapper fileMapper;
 
     /**
      * 文件分片上传，速度很快
