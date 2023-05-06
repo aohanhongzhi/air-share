@@ -21,6 +21,9 @@ public class DirUtil implements InitializingBean {
 
     private static final Logger log = LoggerFactory.getLogger(DirUtil.class);
 
+    @Value("${spring.profiles.active}")
+    String activeProfiles;
+
     public static String getUserDir() {
         // 当前用户目录或者配置目录，再者数据库配置目录
         String property = System.getProperty("user.dir");
@@ -39,10 +42,13 @@ public class DirUtil implements InitializingBean {
     }
 
     @Value("${hxy.print.absolute-file-path}")
-    @Profile("prod")
     public void setFileStoreDir(String fileStoreDir) {
-        if (fileStoreDir != null && fileStoreDir.trim().length() > 0) {
-            DirUtil.fileStoreDir = fileStoreDir;
+        if ("prod".equals(activeProfiles) || "beta".equals(activeProfiles)) {
+            if (fileStoreDir != null && fileStoreDir.trim().length() > 0) {
+                DirUtil.fileStoreDir = fileStoreDir;
+            } else {
+                DirUtil.fileStoreDir = deaultFileStoreDir;
+            }
         } else {
             DirUtil.fileStoreDir = deaultFileStoreDir;
         }

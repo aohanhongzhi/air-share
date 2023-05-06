@@ -153,7 +153,14 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                         // 处理上传文件内容
                         if (!item.isFormField()) {
 
-                            fileUuidName = uuid + fileName;
+                            // 文件路径一定不要用绝对路径
+                            String suffixName = "unknown";
+                            // 获取文件的后缀名,后缀名有可能为空
+                            if (fileName.lastIndexOf(".") != -1) {
+                                suffixName = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
+                            }
+
+                            fileUuidName = uuid + suffixName;
 
                             // TODO 重复文件存储管理，文件size获取。先要完成上传之后再次判断是否
                             // 最好的解决方案就是前端就获取文件得md5.这样后端直接以这个md5存储文件，一旦存在就不需要重复存储了。这样就需要zui去获取文件md5值
@@ -198,12 +205,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
                                 fileUrl = "file/" + filePath;
 
-                                // 文件路径一定不要用绝对路径
-                                String suffixName = "unknown";
-                                // 获取文件的后缀名,后缀名有可能为空
-                                if (fileName.lastIndexOf(".") != -1) {
-                                    suffixName = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-                                }
+
                                 String serverName = request.getServerName();
 
 
@@ -495,7 +497,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                         log.error("{}", e);
                     }
                 }///end try
+            } else {
+                log.error("数据库有记录，但是文件不存在。AbsoluteFilePath={}", file.getAbsoluteFile());
             }
+        } else {
+            log.error("数据库没有记录，fileUuid={}", fileUuid);
         }
 
         if (fileNotExist) {
@@ -510,6 +516,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         String serverName = serverRequest.getServerName();
         String remoteAddr = serverRequest.getRemoteAddr();
         String code = serverRequest.getParameter("code");
+        if (code == null) {
+            code = serverRequest.getParameter("c");
+        }
         log.warn("remoteAddr: " + remoteAddr);
 
         LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
