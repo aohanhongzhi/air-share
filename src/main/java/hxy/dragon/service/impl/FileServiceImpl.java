@@ -519,7 +519,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         if (code == null) {
             code = serverRequest.getParameter("c");
         }
-        log.warn("remoteAddr: " + remoteAddr);
+        if (log.isDebugEnabled()) {
+            log.debug("remoteAddr: " + remoteAddr);
+        }
 
         LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
         if (serverName != null) {
