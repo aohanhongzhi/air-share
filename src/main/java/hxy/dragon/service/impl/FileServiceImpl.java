@@ -345,7 +345,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 return true;
             }
         } else {
-            log.warn("文件不存在=>{}。直接从数据库删除", DirUtil.getFileStoreDir() + File.separator + filePath);
+            log.warn("文件[{}]不存在=>{}。直接从数据库删除", fileModel.getFileName(), DirUtil.getFileStoreDir() + File.separator + filePath);
             fileMapper.delete(queryWrapper);
             return true;
         }
@@ -553,7 +553,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         String serverName = serverRequest.getServerName();
         String remoteAddr = serverRequest.getRemoteAddr();
         String code = serverRequest.getParameter("code");
-        log.warn("remoteAddr: " + remoteAddr + ",serverName" + serverName + ",code=" + code);
+        log.debug("remoteAddr: " + remoteAddr + ",serverName" + serverName + ",code=" + code);
         LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
         if (serverName != null) {
             log.warn("域名{}", serverName);
@@ -573,7 +573,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
      * @param destFile
      * @param currentChunkSize 这个大小需要与前端拆分的大小一致!
      */
-    private void appendFile(InputStream in, File destFile, int currentChunkSize) {
+    private void appendFile(InputStream in, File destFile, int currentChunkSize) throws IOException {
         OutputStream out = null;
         if (currentChunkSize <= 0) {
             currentChunkSize = BUFFER_SIZE;
@@ -596,7 +596,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 out.write(buffer, 0, len);
             }
         } catch (Exception e) {
-            log.error("", e);
+            // 接着网上抛，然后传输到前端
+            throw e;
         } finally {
             try {
                 if (null != in) {
