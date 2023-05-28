@@ -76,11 +76,20 @@ docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v  /mnt/resource/data/dock
 
 服务器内存占用
 
+第一次观察
+
 ![img.png](asset/server-mem.png)
 
 400720KB / 1024 = 391MB
 
+第二次观察
+
+![img.png](asset/server-memory.png)
+
+484202KB / 1024 = 472MB
+
 也就是air-share启动的时候占用了 391MB的内存，显然这么个小程序占用这么大的内存着实有点浪费了，这也是SpringBoot非常占用内存的名声来源了。
+
 
 ```shell
 ps aux |grep air
