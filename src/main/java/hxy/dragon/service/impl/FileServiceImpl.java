@@ -549,7 +549,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
     }
 
     @Override
-    public BaseResponse filePageList(int pageSize, int pageNum, HttpServletRequest serverRequest) {
+    public BaseResponse filePageList(int pageSize, int pageNum, String searchValue, HttpServletRequest serverRequest) {
         String serverName = serverRequest.getServerName();
         String remoteAddr = serverRequest.getRemoteAddr();
         String code = serverRequest.getParameter("code");
@@ -561,6 +561,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         }
         IPage page = new Page(pageNum, pageSize);
         lambdaQueryWrapper.orderByDesc(FileModel::getCreateTime);
+
+        if (searchValue != null && !"null".equals(searchValue) && !"nil".equals(searchValue) && searchValue.length() > 0) {
+            lambdaQueryWrapper.like(searchValue != null && searchValue.length() > 0, FileModel::getFileName, searchValue);
+        }
+
         IPage page1 = fileMapper.selectPage(page, lambdaQueryWrapper);
 
         return BaseResponse.success(page1);
