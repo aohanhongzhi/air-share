@@ -23,7 +23,7 @@ DELETE  http://file.bosch-smartlife.com/file/download?fileUuid=o_1gb9p2ato17a9j2
 #  -H 'sec-ch-ua-platform: "macOS"'
 #  --compressed
 # &searchValue=
-GET {{host}}/file/list?pageNum=1&pageSize=20&searchValue=null
+GET {{host}}/file/list?pageNum=1&pageSize=20&searchValue=oop
 Accept: application/json, text/plain, */*
 Accept-Language: en-US,en;q=0.9
 Connection: keep-alive
