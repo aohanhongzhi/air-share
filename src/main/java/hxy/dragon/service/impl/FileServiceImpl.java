@@ -76,6 +76,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 String fileName = "";
                 String uuid = "";
                 String fileUuidName = "";
+                String fileMd5 = "";
                 Integer chunk = 0, chunks = 0, currentChunkSize = 0;
 
                 DiskFileItemFactory diskFactory = new DiskFileItemFactory();
@@ -118,6 +119,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                             continue;
                         } else if ("identifier".equals(name)) {
                             uuid = Streams.asString(input);
+                            fileMd5 = uuid;// 这里上传的就是md5
                             continue;
                         }
                         if ("name".equals(name)) {
@@ -212,7 +214,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                                 FileModel fileModel = new FileModel();
                                 fileModel.setFilePath(filePath);
                                 fileModel.setFileName(fileName);
-                                fileModel.setFileMd5(fileUuidName);
+                                fileModel.setFileMd5(fileMd5);
                                 fileModel.setFileUuid(uuid);
                                 fileModel.setFileSize(destFile.length());
                                 fileModel.setCreateTime(new Date());
@@ -268,7 +270,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             String filePath = fileEntity.getFilePath();
             File file = new File(DirUtil.getFileStoreDir(), filePath);
             if (file.exists()) {
-                return BaseResponse.success("实体文件不存在");
+                return BaseResponse.success("实体文件存在");
+            } else {
+                return BaseResponse.error("实体文件不存在");
             }
         }
         return BaseResponse.error("文件不存在");
