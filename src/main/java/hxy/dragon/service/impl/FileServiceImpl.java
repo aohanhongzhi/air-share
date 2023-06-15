@@ -443,7 +443,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
                 // 解决下载文件时文件名乱码问题
                 byte[] fileNameBytes = fileName.getBytes(StandardCharsets.UTF_8);
-                fileName = new String(fileNameBytes, 0, fileNameBytes.length, StandardCharsets.ISO_8859_1);
+                fileName = new String(fileNameBytes, StandardCharsets.ISO_8859_1);
 
                 //各种响应头设置
                 //支持断点续传，获取部分字节内容：
@@ -452,7 +452,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 //                response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.setContentType(contentType);
-                response.setHeader("Content-Type", contentType);
+//                response.setHeader("Content-Type", contentType);
                 //inline表示浏览器直接使用，attachment表示下载，fileName表示下载的文件名
                 response.setHeader("Content-Disposition", "inline;filename=" + fileName);
                 response.setHeader("Content-Length", String.valueOf(contentLength));
@@ -544,10 +544,6 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             fileModels = fileMapper.selectList(lambdaQueryWrapper);
         }
 
-//        if (fileModels != null && fileModels.size() > 0) {
-//            SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'");
-//            f.format(f.format(fileModels))
-//        }
         model.addAttribute("fileList", fileModels);
         return "file";
     }
