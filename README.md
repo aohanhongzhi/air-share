@@ -106,6 +106,10 @@ ps aux |grep air
 
 ![img.png](asset/ps-aux.png)
 
+下图是 air-share(SpringBoot)和[filebrowser](https://github.com/filebrowser/filebrowser)(Go)的对比。filebrowser的功能要比air-share更加丰富，但是内存只有26分之一。
+
+![img.png](img.png)
+
 ```nginx配置
 server {
     listen       80;
