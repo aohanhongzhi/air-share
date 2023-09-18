@@ -203,7 +203,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
                             if (((chunk.equals(chunks - 1)) && !newUpload) || (newUpload && chunk.equals(chunks))) {
                                 long length1 = destFile.length() / 1024 / 1024;
-                                log.info("\n====>文件上传成功：{} 文件大小：{} MB", destFile.getAbsolutePath(), length1);
+                                log.info("\n====>文件上传成功：{} 文件名: {} 文件大小：{} MB ", destFile.getAbsolutePath(), fileName, length1);
 
                                 fileUrl = "file/" + filePath;
 
