@@ -20,3 +20,8 @@ server:
 
 mybatis-plus:
   log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# https://gitee.com/huoyo/ko-time
+ko-time:
+  pointcut: execution(public * hxy.dragon..*.*(..))
+  #  context-path: http://localhost:8080/koTime

@@ -192,4 +192,6 @@ https://gitee.com/folder-share
 
 http://localhost:8888/koTime
 
+http://files.cupb.top/api/koTime
+
 ![img_1.png](asset/kotime.png)
