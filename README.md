@@ -9,6 +9,11 @@ https://github.com/filebrowser/filebrowser
 
 https://filebrowser.org
 
+
+线上部署
+
+http://disk.cupb.top/
+
 ### 热重启
 
 https://github.com/HotswapProjects/HotswapAgent
