@@ -108,7 +108,7 @@ ps aux |grep air
 
 下图是 air-share(SpringBoot)和[filebrowser](https://github.com/filebrowser/filebrowser)(Go)的对比。filebrowser的功能要比air-share更加丰富，但是内存只有26分之一。
 
-![img.png](img.png)
+![img.png](asset/memory.png)
 
 ```nginx配置
 server {
@@ -181,3 +181,10 @@ https://github.com/beavailable/share
 https://gitee.com/folder-share
 
 /media/data/data/air-share/air-share/2022-12-15
+
+
+# 性能监控
+
+http://localhost:8888/koTime
+
+![img_1.png](asset/kotime.png)

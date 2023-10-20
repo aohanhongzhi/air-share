@@ -35,6 +35,10 @@ repositories {
 }
 
 dependencies {
+    implementation 'cn.langpy:ko-time:2.4.2'
+    implementation 'org.aspectj:aspectjrt:1.9.20.1'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation('org.springframework.boot:spring-boot-starter-web')
 

@@ -27,3 +27,8 @@ info:
     version: 0.0.11_20200831
     description: base-server，prod环境
     current: 当前第2001次启动
+
+# https://gitee.com/huoyo/ko-time
+ko-time:
+  pointcut: execution(public * hxy.dragon..*.*(..))
+#  context-path: http://localhost:8080/koTime
