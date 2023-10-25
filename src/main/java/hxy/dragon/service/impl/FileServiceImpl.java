@@ -536,7 +536,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         LocalDate todaysDate = LocalDate.now();
         int dayOfMonth = todaysDate.getDayOfMonth();
 
-        if ("file.cupb.top".equals(serverName)) {
+        if ("newfile.cupb.top".equals(serverName)) {
             if (code != null && String.valueOf(dayOfMonth).equals(code)) {
                 fileModels = fileMapper.selectList(lambdaQueryWrapper);
             }
