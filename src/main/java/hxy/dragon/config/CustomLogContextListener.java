@@ -70,6 +70,15 @@ public class CustomLogContextListener extends ContextAwareBase implements Logger
             logPath = currentPath + File.separator + "logs";
         }
 
+        // 判断文件夹是否存在，不存在需要新建
+        File file = new File(logPath);
+        if (!file.exists()) {
+            boolean mkdirs = file.mkdirs();
+            if (mkdirs) {
+                System.out.println("日志存储路径创建成功 " + logPath);
+            }
+        }
+
         System.out.println("日志存储路径 " + logPath);
         System.setProperty(LOG_PAHT_KEY, logPath);
         Context context = getContext();

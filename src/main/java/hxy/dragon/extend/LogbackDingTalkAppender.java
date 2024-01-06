@@ -43,17 +43,19 @@ public class LogbackDingTalkAppender extends UnsynchronizedAppenderBase<ILogging
         }
         switch (level.toInt()) {
             case Level.ERROR_INT:
-                // 发送到钉钉
-                ConcurrentHashMap<String, Object> postBody = new ConcurrentHashMap<>();
-                long timeStamp = eventObject.getTimeStamp();
+                if (false) {
+                    // 发送到钉钉
+                    ConcurrentHashMap<String, Object> postBody = new ConcurrentHashMap<>();
+                    long timeStamp = eventObject.getTimeStamp();
 
-                // 专属业务日志名字，不同业务响应等级划分
-                String loggerName = eventObject.getLoggerName();
-                String msg = String.format("时间：%s,级别:%s,原因%s", timeStamp, eventObject.getLevel(), eventObject.getFormattedMessage());
-                postBody.put("title", loggerName);
-                postBody.put("msg", msg);
-                String s = http.async("api/dingtalk/v1/notice").setBodyPara(postBody).bodyType(OkHttps.JSON).post().getResult().getBody().toString();
-                log.debug("钉钉返回信息{}", s);
+                    // 专属业务日志名字，不同业务响应等级划分
+                    String loggerName = eventObject.getLoggerName();
+                    String msg = String.format("时间：%s,级别:%s,原因%s", timeStamp, eventObject.getLevel(), eventObject.getFormattedMessage());
+                    postBody.put("title", loggerName);
+                    postBody.put("msg", msg);
+                    String s = http.async("api/dingtalk/v1/notice").setBodyPara(postBody).bodyType(OkHttps.JSON).post().getResult().getBody().toString();
+                    log.debug("钉钉返回信息{}", s);
+                }
                 break;
             case Level.WARN_INT:
             case Level.INFO_INT:
