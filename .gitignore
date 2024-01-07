@@ -40,3 +40,4 @@ out/
 
 file/
 airshare.db
+.DS_Store

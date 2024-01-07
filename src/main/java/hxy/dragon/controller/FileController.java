@@ -75,6 +75,12 @@ public class FileController {
 
     @GetMapping("/file/list")
     public BaseResponse listFile(Integer pageSize, Integer pageNum, @RequestParam(required = false) String searchValue, HttpServletRequest serverRequest) {
+        if (pageNum == null || pageNum == 0) {
+            pageNum = 1;
+        }
+        if (pageSize == null || pageSize == 0) {
+            pageSize = 10;
+        }
         return fileService.filePageList(pageSize, pageNum, searchValue, serverRequest);
     }
 
