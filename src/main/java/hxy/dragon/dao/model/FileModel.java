@@ -13,15 +13,17 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class FileModel {
+
+    private Integer id;
     /**
-     * 文件的uuid事主键
+     * 文件的uuid是主键。 air-share是随意新建的，airshare-plus是文件md5值
      * 主键，存在就更新，不存在就插入
      */
     @TableId(type = IdType.AUTO)
     private String fileUuid;
 
     /**
-     * 文件md5值
+     * 文件md5值，目前新的 air-share-plus支持 md5，旧版本没有md5
      */
     private String fileMd5;
 

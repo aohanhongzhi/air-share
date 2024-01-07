@@ -1,5 +1,7 @@
 package hxy.dragon.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import hxy.dragon.dao.model.FileModel;
 import hxy.dragon.entity.reponse.BaseResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -11,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author eric
  */
 @Service
-public interface FileService {
+public interface FileService extends IService<FileModel> {
     BaseResponse uploadFile(HttpServletRequest request, HttpServletResponse response);
 
     BaseResponse fileMd5Check(String uuid, String md5);
@@ -26,5 +28,7 @@ public interface FileService {
 
     void downloadByFileId(String fileId,HttpServletRequest request, HttpServletResponse response,String range);
 
-    String fileList(Model model,HttpServletRequest serverRequest);
+    String filePageList(Model model, HttpServletRequest serverRequest);
+
+    BaseResponse filePageList(int pageSize, int pageNum,String searchValue,HttpServletRequest serverRequest);
 }

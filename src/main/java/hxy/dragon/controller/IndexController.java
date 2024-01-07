@@ -1,13 +1,15 @@
 package hxy.dragon.controller;
 
 import hxy.dragon.dao.model.FileModel;
+import hxy.dragon.entity.reponse.BaseResponse;
 import hxy.dragon.service.FileService;
 import hxy.dragon.util.file.DirUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.function.ServerRequest;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -19,20 +21,15 @@ import java.util.List;
 @Controller
 public class IndexController {
 
-    @RequestMapping(path = {"/index", "/"})
+    @RequestMapping(path = {"/index", "/","/index.html"})
     public String index() {
         return "index";
-    }
-
-    @RequestMapping("/test")
-    public String test() {
-        return "hello";
     }
 
     @Resource
     private FileService fileService;
 
-    @RequestMapping("/file")
+    //    @RequestMapping("/file")
     @Deprecated
     public String file(Model model) {
         List<FileModel> list = new ArrayList<>();
@@ -71,7 +68,7 @@ public class IndexController {
 
     @RequestMapping("/files")
     public String files(Model model, HttpServletRequest serverRequest) {
-        return fileService.fileList(model, serverRequest);
+        return fileService.filePageList(model, serverRequest);
     }
 
     @RequestMapping("/file/del")
@@ -79,5 +76,11 @@ public class IndexController {
         log.debug("{}", fileUuid);
         fileService.deleteFile(fileUuid);
         return "redirect:/files";
+    }
+
+    @GetMapping("/build")
+    @ResponseBody
+    public BaseResponse rebuild() {
+        return BaseResponse.error("5");
     }
 }

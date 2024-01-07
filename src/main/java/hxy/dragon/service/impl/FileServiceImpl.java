@@ -3,6 +3,11 @@ package hxy.dragon.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hxy.dragon.dao.mapper.FileMapper;
 import hxy.dragon.dao.model.FileModel;
 import hxy.dragon.entity.reponse.BaseResponse;
@@ -45,12 +50,12 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class FileServiceImpl implements FileService {
+public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implements FileService {
 
     private static final int BUFFER_SIZE = 100 * 1024;
 
     @Resource
-    FileMapper fileMapper;
+    private FileMapper fileMapper;
 
     /**
      * 文件分片上传，速度很快
@@ -71,7 +76,8 @@ public class FileServiceImpl implements FileService {
                 String fileName = "";
                 String uuid = "";
                 String fileUuidName = "";
-                Integer chunk = 0, chunks = 0;
+                String fileMd5 = "";
+                Integer chunk = 0, chunks = 0, currentChunkSize = 0;
 
                 DiskFileItemFactory diskFactory = new DiskFileItemFactory();
                 // threshold 极限、临界值，即硬盘缓存 1M
@@ -97,14 +103,23 @@ public class FileServiceImpl implements FileService {
 
                     // 如果下面这行代码获取的fileList为空请检查配置文件 spring.servlet.multipart.enabled=false https://www.cnblogs.com/tinya/p/9626710.html
                     @SuppressWarnings("unchecked") List<FileItem> fileList = upload.parseRequest(request);
+                    boolean newUpload = false;
 
                     Iterator<FileItem> it = fileList.iterator();
                     while (it.hasNext()) {
                         FileItem item = it.next();
                         String name = item.getFieldName();
                         InputStream input = item.getInputStream();
+                        if ("currentChunkSize".equals(name)) {
+                            currentChunkSize = Integer.valueOf(Streams.asString(input));
+                            continue;
+                        }
                         if ("uuid".equals(name)) {
                             uuid = Streams.asString(input);
+                            continue;
+                        } else if ("identifier".equals(name)) {
+                            uuid = Streams.asString(input);
+                            fileMd5 = uuid;// 这里上传的就是md5
                             continue;
                         }
                         if ("name".equals(name)) {
@@ -112,19 +127,42 @@ public class FileServiceImpl implements FileService {
                             // &不能在get方法中，所以下载时候可能无法找到文件
                             fileName = Streams.asString(input).replace("&", "");
                             continue;
+                        } else if ("relativePath".equals(name)) {
+                            // 这个地方是依据文件流得到信息，虽然Servlet响应多次，但是死上传过来的流组成的文件是整体的。
+                            // &不能在get方法中，所以下载时候可能无法找到文件
+                            fileName = Streams.asString(input).replace("&", "");
+                            continue;
                         }
+
+
                         if ("chunk".equals(name)) {
                             chunk = Integer.valueOf(Streams.asString(input));
+                            continue;
+                        } else if ("chunkNumber".equals(name)) {
+                            chunk = Integer.valueOf(Streams.asString(input));
+                            newUpload = true;
                             continue;
                         }
                         if ("chunks".equals(name)) {
                             chunks = Integer.valueOf(Streams.asString(input));
                             continue;
+                        } else if ("totalChunks".equals(name)) {
+                            chunks = Integer.valueOf(Streams.asString(input));
+                            newUpload = true;
+
+                            continue;
                         }
                         // 处理上传文件内容
                         if (!item.isFormField()) {
 
-                            fileUuidName = uuid + fileName;
+                            // 文件路径一定不要用绝对路径
+                            String suffixName = "unknown";
+                            // 获取文件的后缀名,后缀名有可能为空
+                            if (fileName.lastIndexOf(".") != -1) {
+                                suffixName = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
+                            }
+
+                            fileUuidName = uuid + suffixName;
 
                             // TODO 重复文件存储管理，文件size获取。先要完成上传之后再次判断是否
                             // 最好的解决方案就是前端就获取文件得md5.这样后端直接以这个md5存储文件，一旦存在就不需要重复存储了。这样就需要zui去获取文件md5值
@@ -141,41 +179,59 @@ public class FileServiceImpl implements FileService {
                             File destFile = new File(dirPath, fileUuidName);
                             String filePath = DateUtil.getNowDate() + File.separator + fileUuidName;
 
-                            if (chunk == 0 && destFile.exists()) {
-                                log.warn("\n====>文件已经存在了，马上删除。{}", destFile.exists());
-                                destFile.delete();
-                                destFile = new File(DirUtil.getFileStoreDir(), fileUuidName);
+                            if (!newUpload) {
+                                // 新的上传方式不需要这个文件删除，因为 如果文件已经存在了，那么就不需要上传了，如果文件不存在，那么直接可以上传，所以也不会走到这个删除的地方。
+                                // 主要是因为新的前端并发上传时候，顺序乱了。导致序号1并不是最先上传的一块。虽然去掉了并发，保证了顺序，但是按照上述业务逻辑确实已经没必要了。
+                                if (chunk == 0 && destFile.exists()) {
+                                    log.warn("\n====>文件已经存在了，马上删除。{}", destFile.exists());
+                                    destFile.delete();
+                                    destFile = new File(DirUtil.getFileStoreDir(), fileUuidName);
+                                }
                             }
 
-                            appendFile(input, destFile);
+                            // 解决文件夹上传问题
+                            File parentFile = destFile.getParentFile();
+                            if (!parentFile.exists()) {
+                                // 新建父级文件夹
+                                boolean mkdirs = parentFile.mkdirs();
+                                if (!mkdirs) {
+                                    log.error("Could not create directory {}", parentFile);
+                                }
+                            }
 
-                            if (chunk == chunks - 1) {
+                            appendFile(input, destFile, currentChunkSize);
+
+                            if (((chunk.equals(chunks - 1)) && !newUpload) || (newUpload && chunk.equals(chunks))) {
                                 long length1 = destFile.length() / 1024 / 1024;
-                                log.info("\n====>文件上传成功：{} 文件大小：{} MB", destFile.getAbsolutePath(), length1);
+                                log.info("\n====>文件上传成功：{} 文件名: {} 文件大小：{} MB ", destFile.getAbsolutePath(), fileName, length1);
 
                                 fileUrl = "file/" + filePath;
 
-                                // 文件路径一定不要用绝对路径
-                                String suffixName = "unknown";
-                                // 获取文件的后缀名,后缀名有可能为空
-                                if (fileName.lastIndexOf(".") != -1) {
-                                    suffixName = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-                                }
+
                                 String serverName = request.getServerName();
 
 
                                 FileModel fileModel = new FileModel();
                                 fileModel.setFilePath(filePath);
                                 fileModel.setFileName(fileName);
-                                fileModel.setFileMd5(fileUuidName);
+                                fileModel.setFileMd5(fileMd5);
                                 fileModel.setFileUuid(uuid);
                                 fileModel.setFileSize(destFile.length());
                                 fileModel.setCreateTime(new Date());
                                 fileModel.setServerName(serverName);
-                                fileMapper.insert(fileModel);
+                                int insert = fileMapper.insert(fileModel);
+                                if (insert <= 0) {
+                                    log.error("插入数据库失败 {}", fileModel);
+                                } else {
+                                    log.info("成功上传文件，存入数据库{}", fileModel);
+                                }
 
                             } else {
-//                                log.debug("\n====>还剩[" + (chunks - 1 - chunk) + "]个块文件");
+                                if (newUpload) {
+                                    log.debug("====>当前chunk=[{}] ,还剩[" + (chunks - chunk) + "]个块文件", chunk);
+                                } else {
+                                    log.debug("====>当前chunk=[{}] ,还剩[" + (chunks - 1 - chunk) + "]个块文件", chunk);
+                                }
                             }
                         }
                     }
@@ -207,7 +263,19 @@ public class FileServiceImpl implements FileService {
 //        } else {
 //            return BaseResponse.error("没有该md5");
 //        }
-        return BaseResponse.success();
+
+        FileModel fileEntity = fileMapper.selectById(uuid);
+
+        if (fileEntity != null) {
+            String filePath = fileEntity.getFilePath();
+            File file = new File(DirUtil.getFileStoreDir(), filePath);
+            if (file.exists()) {
+                return BaseResponse.success("实体文件存在");
+            } else {
+                return BaseResponse.error("实体文件不存在");
+            }
+        }
+        return BaseResponse.error("文件不存在");
     }
 
     @Override
@@ -234,22 +302,58 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public BaseResponse deleteFile(String fileUuid) {
-        QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("file_uuid", fileUuid);
-        FileModel fileModel = fileMapper.selectOne(queryWrapper);
-        if (fileModel != null) {
-            String filePath = fileModel.getFilePath();
-            File file = new File(DirUtil.getFileStoreDir(), filePath);
-            if (file.exists()) {
-                boolean delete = file.delete();
-                if (delete) {
-                    fileMapper.delete(queryWrapper);
+
+        if (fileUuid.startsWith("[") && fileUuid.endsWith("]")) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                Integer[] ids = objectMapper.readValue(fileUuid, Integer[].class);
+                for (Integer id : ids) {
+                    QueryWrapper queryWrapper = new QueryWrapper<>();
+                    queryWrapper.eq("id", id);
+                    FileModel fileModel = fileMapper.selectOne(queryWrapper);
+                    if (fileModel != null) {
+                        deleteFile(fileModel);
+                    } else {
+                    }
+                }
+                return BaseResponse.success("批量删除成功");
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            QueryWrapper queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("id", fileUuid);
+            FileModel fileModel = fileMapper.selectOne(queryWrapper);
+            if (fileModel != null) {
+                boolean b = deleteFile(fileModel);
+                if (b) {
+                    return BaseResponse.success("删除成功");
                 }
             } else {
-                log.warn("文件不存在=>{}。删除失败", DirUtil.getFileStoreDir() + File.separator + filePath);
+                return BaseResponse.error("数据库没有记录");
             }
         }
-        return BaseResponse.success();
+
+        return BaseResponse.error();
+    }
+
+    private boolean deleteFile(FileModel fileModel) {
+        String filePath = fileModel.getFilePath();
+        File file = new File(DirUtil.getFileStoreDir(), filePath);
+        QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", fileModel.getId());
+        if (file.exists()) {
+            boolean delete = file.delete();
+            if (delete) {
+                fileMapper.delete(queryWrapper);
+                return true;
+            }
+        } else {
+            log.warn("文件[{}]不存在=>{}。直接从数据库删除", fileModel.getFileName(), DirUtil.getFileStoreDir() + File.separator + filePath);
+            fileMapper.delete(queryWrapper);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -339,7 +443,7 @@ public class FileServiceImpl implements FileService {
 
                 // 解决下载文件时文件名乱码问题
                 byte[] fileNameBytes = fileName.getBytes(StandardCharsets.UTF_8);
-                fileName = new String(fileNameBytes, 0, fileNameBytes.length, StandardCharsets.ISO_8859_1);
+                fileName = new String(fileNameBytes, StandardCharsets.ISO_8859_1);
 
                 //各种响应头设置
                 //支持断点续传，获取部分字节内容：
@@ -348,7 +452,7 @@ public class FileServiceImpl implements FileService {
 //                response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.setContentType(contentType);
-                response.setHeader("Content-Type", contentType);
+//                response.setHeader("Content-Type", contentType);
                 //inline表示浏览器直接使用，attachment表示下载，fileName表示下载的文件名
                 response.setHeader("Content-Disposition", "inline;filename=" + fileName);
                 response.setHeader("Content-Length", String.valueOf(contentLength));
@@ -397,7 +501,11 @@ public class FileServiceImpl implements FileService {
                         log.error("{}", e);
                     }
                 }///end try
+            } else {
+                log.error("数据库有记录，但是文件不存在。AbsoluteFilePath={}", file.getAbsoluteFile());
             }
+        } else {
+            log.error("数据库没有记录，fileUuid={}", fileUuid);
         }
 
         if (fileNotExist) {
@@ -408,11 +516,16 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public String fileList(Model model, HttpServletRequest serverRequest) {
+    public String filePageList(Model model, HttpServletRequest serverRequest) {
         String serverName = serverRequest.getServerName();
         String remoteAddr = serverRequest.getRemoteAddr();
         String code = serverRequest.getParameter("code");
-        log.warn("remoteAddr: " + remoteAddr);
+        if (code == null) {
+            code = serverRequest.getParameter("c");
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("remoteAddr: " + remoteAddr);
+        }
 
         LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
         if (serverName != null) {
@@ -423,7 +536,7 @@ public class FileServiceImpl implements FileService {
         LocalDate todaysDate = LocalDate.now();
         int dayOfMonth = todaysDate.getDayOfMonth();
 
-        if ("file.cupb.top".equals(serverName)) {
+        if ("newfile.cupb.top".equals(serverName)) {
             if (code != null && String.valueOf(dayOfMonth).equals(code)) {
                 fileModels = fileMapper.selectList(lambdaQueryWrapper);
             }
@@ -431,38 +544,65 @@ public class FileServiceImpl implements FileService {
             fileModels = fileMapper.selectList(lambdaQueryWrapper);
         }
 
-//        if (fileModels != null && fileModels.size() > 0) {
-//            SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'");
-//            f.format(f.format(fileModels))
-//        }
         model.addAttribute("fileList", fileModels);
         return "file";
     }
 
+    @Override
+    public BaseResponse filePageList(int pageSize, int pageNum, String searchValue, HttpServletRequest serverRequest) {
+        String serverName = serverRequest.getServerName();
+        String remoteAddr = serverRequest.getRemoteAddr();
+        String code = serverRequest.getParameter("code");
+        log.debug("remoteAddr: " + remoteAddr + ",serverName" + serverName + ",code=" + code);
+        LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
+        if (serverName != null) {
+            log.warn("域名{}", serverName);
+            lambdaQueryWrapper.eq(FileModel::getServerName, serverName);
+        }
+        IPage page = new Page(pageNum, pageSize);
+        lambdaQueryWrapper.orderByDesc(FileModel::getCreateTime);
+
+        if (searchValue != null && !"null".equals(searchValue) && !"nil".equals(searchValue) && searchValue.length() > 0) {
+            lambdaQueryWrapper.like(searchValue != null && searchValue.length() > 0, FileModel::getFileName, searchValue);
+        }
+
+        IPage page1 = fileMapper.selectPage(page, lambdaQueryWrapper);
+
+        return BaseResponse.success(page1);
+    }
+
     /**
-     * 合成文件
+     * 合成文件， FIXME 这个算同步合成，不能处理并发上传！！！
      *
      * @param in
      * @param destFile
+     * @param currentChunkSize 这个大小需要与前端拆分的大小一致!
      */
-    private void appendFile(InputStream in, File destFile) {
+    private void appendFile(InputStream in, File destFile, int currentChunkSize) throws IOException {
         OutputStream out = null;
+        if (currentChunkSize <= 0) {
+            currentChunkSize = BUFFER_SIZE;
+        }
+
         try {
             // plupload 配置了chunk的时候新上传的文件append到文件末尾
             if (destFile.exists()) {
-                out = new BufferedOutputStream(new FileOutputStream(destFile, true), BUFFER_SIZE);
+                out = new BufferedOutputStream(new FileOutputStream(destFile, true), currentChunkSize);
             } else {
-                out = new BufferedOutputStream(new FileOutputStream(destFile), BUFFER_SIZE);
+                out = new BufferedOutputStream(new FileOutputStream(destFile), currentChunkSize);
             }
-            in = new BufferedInputStream(in, BUFFER_SIZE);
+
+
+            in = new BufferedInputStream(in, currentChunkSize);
 
             int len = 0;
-            byte[] buffer = new byte[BUFFER_SIZE];
+            byte[] buffer = new byte[currentChunkSize];
             while ((len = in.read(buffer)) > 0) {
                 out.write(buffer, 0, len);
             }
         } catch (Exception e) {
-            log.error("", e);
+            // 接着网上抛，然后传输到前端
+            throw e;
         } finally {
             try {
                 if (null != in) {

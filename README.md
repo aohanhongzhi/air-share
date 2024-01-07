@@ -1,13 +1,36 @@
-# air-share
+air-share
+===
 
+## 企业级推荐
+
+功能比较完善
+
+https://github.com/filebrowser/filebrowser
+
+https://filebrowser.org
+
+
+线上部署
+
+http://disk.cupb.top/
+
+### 热重启
+
+https://github.com/HotswapProjects/HotswapAgent
+
+VM 参数
+
+```shell
+-XX:+AllowEnhancedClassRedefinition -XX:HotswapAgent=fatjar
+```
 
 #### 介绍
 文件分享或者传输中心。可以对标：https://airportal.cn/。
 私有化部署。
 
-![img.png](index.png)
+![img.png](asset/index.png)
 
-![img_1.png](file.png)
+![img_1.png](asset/file.png)
 
 #### 软件架构 
 软件架构说明
@@ -50,12 +73,47 @@ nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08  -jar /home
 nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -XX:+HeapDumpOnOutOfMemoryError -jar /home/insite/app/air-share-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod --hxy.print.absolute-file-path=/mnt/resource/data/air-share --spring.datasource.url=jdbc:sqlite:/home/insite/app/airshare.db -Xmx1G -Xms512M -server -XX:+UseG1GC >> /home/insite/app/air-share.log 2>&1 &
 ``` 
 
+服务器显示日志调试
+
+```shell
+/media/data/jdk/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -XX:+HeapDumpOnOutOfMemoryError -jar /home/insite/app/air-share-0.0.1-SNAPSHOT.jar --spring.profiles.active=beta --hxy.print.absolute-file-path=/media/data/data/air-share/air-share
+```
 
 # docker启动nginx
 
 ```shell
 docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v  /mnt/resource/data/docker/nginx/www:/usr/share/nginx -v /mnt/resource/data/docker/nginx/config/:/etc/nginx/ nginx
 ```
+
+docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v  /mnt/resource/data/docker/nginx/www:/usr/share/nginx -v /mnt/resource/data/docker/nginx/config/:/etc/nginx/ nginx
+
+
+服务器内存占用
+
+第一次观察
+
+![img.png](asset/server-mem.png)
+
+400720KB / 1024 = 391MB
+
+第二次观察
+
+![img.png](asset/server-memory.png)
+
+484202KB / 1024 = 472MB
+
+也就是air-share启动的时候占用了 391MB的内存，显然这么个小程序占用这么大的内存着实有点浪费了，这也是SpringBoot非常占用内存的名声来源了。
+
+
+```shell
+ps aux |grep air
+```
+
+![img.png](asset/ps-aux.png)
+
+下图是 air-share(SpringBoot)和[filebrowser](https://github.com/filebrowser/filebrowser)(Go)的对比。filebrowser的功能要比air-share更加丰富，但是内存只有26分之一。
+
+![img.png](asset/memory.png)
 
 ```nginx配置
 server {
@@ -127,3 +185,13 @@ https://github.com/beavailable/share
 
 https://gitee.com/folder-share
 
+/media/data/data/air-share/air-share/2022-12-15
+
+
+# 性能监控
+
+http://localhost:8888/koTime
+
+http://files.cupb.top/api/koTime
+
+![img_1.png](asset/kotime.png)

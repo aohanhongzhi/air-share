@@ -16,8 +16,31 @@
         </encoder>
     </appender>
 
-    <!-- 第三方日志处理 -->
-    <appender name="DINGTALK" class="hxy.dragon.extend.LogbackDingTalkAppender">
+    <!-- 输出所有日志到同一个文件，方便线上beta环境调试查看日志信息 -->
+    <appender name="ALL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ALL</level>
+            <onMatch>ACCEPT</onMatch>
+            <!--   注意这里全部接受处理    -->
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+        <file>${DEV_HOME}/all.log</file>
+        <!-- 设置滚动策略 -->
+        <!-- 按天来回滚，如果需要按小时来回滚，则设置为{yyyy-MM-dd_HH} -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--设置日志命名模式 -->
+            <fileNamePattern>${DEV_HOME}/all.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 如果按天来回滚，则最大保存时间为60天，60天之前的都将被清理掉 这里的值与滚动策略模式有关 -->
+            <maxHistory>180</maxHistory>
+            <!-- 按照日期进行归档，并且对日志文件大小进行限制 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- 设置文件大于1KB进行压缩归档 -->
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder><!-- 格式化输出 -->
+            <pattern>%date %level [%thread] %logger{36} [%file : %line] %msg%n</pattern>
+        </encoder>
     </appender>
 
     <!-- 监听器，指定日志文件存放目录 -->
@@ -146,7 +169,6 @@
     <springProfile name="prod">
         <!-- 生产环境时激活 -->
         <root level="info">
-            <appender-ref ref="DINGTALK"/>
             <appender-ref ref="INFO_FILE"/>
             <appender-ref ref="WARN_FILE"/>
             <appender-ref ref="ERROR_FILE"/>
@@ -160,6 +182,23 @@
     </springProfile>
 
     <springProfile name="beta">
+        <!-- 线上测试环境时激活 -->
+        <root level="info">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="DEBUG_FILE"/>
+            <appender-ref ref="INFO_FILE"/>
+            <appender-ref ref="WARN_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+        <logger name="hxy.dragon.*" level="INFO" additivity="false">
+            <appender-ref ref="DEBUG_FILE"/>
+            <appender-ref ref="INFO_FILE"/>
+            <appender-ref ref="WARN_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="test">
         <!-- 线上测试环境时激活 -->
         <root level="info">
             <appender-ref ref="CONSOLE"/>

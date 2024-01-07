@@ -9,7 +9,7 @@ spring:
 hxy:
   print:
     file : /upload-file
-    absolute-file-path: /mnt/resource/data/air-share # 如果绝对地址为空，那么就会采用当前用户下的一个默认地址，具体见代码
+    absolute-file-path: # 如果绝对地址为空，那么就会采用当前用户下的一个默认地址，具体见代码
 
 logging:
   level:
@@ -20,3 +20,8 @@ server:
 
 mybatis-plus:
   log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# https://gitee.com/huoyo/ko-time
+ko-time:
+  pointcut: execution(public * hxy.dragon..*.*(..))
+  #  context-path: http://localhost:8080/koTime
