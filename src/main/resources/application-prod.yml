@@ -25,4 +25,4 @@ mybatis-plus:
 # https://gitee.com/huoyo/ko-time
 ko-time:
   pointcut: execution(public * hxy.dragon..*.*(..))
-  context-path: http://files.cupb.top/api # 注意这个走了nginx，所以需要自定义下，否则会404 https://gitee.com/huoyo/ko-time/issues/I4XVRI
+  context-path: https://files.cupb.top/api # 注意这个走了nginx，所以需要自定义下，否则会404 https://gitee.com/huoyo/ko-time/issues/I4XVRI
