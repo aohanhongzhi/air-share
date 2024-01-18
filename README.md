@@ -116,51 +116,69 @@ ps aux |grep air
 ![img.png](asset/memory.png)
 
 ```nginx配置
+
 server {
     listen       80;
     listen  [::]:80;
-    server_name file.bosch-smartlife.com;
+    server_name files.cupb.top;
 
     location / {
-        #proxy_set_header HOST $host;
-        #proxy_set_header X-Forwarded-Proto $scheme;
-        #proxy_set_header X-Real-IP $remote_addr;
-        #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-
-        proxy_pass http://139.217.230.42:8888;
+         root /usr/share/nginx/html/dist;
+         index  index.html index.htm;
+    }
+    location /api/ {
+        proxy_set_header HOST $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://10.2.0.4:8888/;
         proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
-        #proxy_set_header Host $host:${server_port};
-   }
+    }
+
+
 }
 
+
 server {
-    listen       443 ssl;
-    listen  [::]:443;
-    server_name file.bosch-smartlife.com;
+    listen     443  ssl http2;
+    server_name  files.cupb.top;
+    add_header Cache-Control no-store;
+    add_header Cache-Control private;
+           
+    ssl_certificate    /etc/nginx/files.cupb.top/files.cupb.top.pem;
+    ssl_certificate_key   /etc/nginx/files.cupb.top/files.cupb.top.key;
+
+    # ssl_certificate    /etc/nginx/files.cupb.top_ecc/fullchain.cer;
+    # ssl_certificate_key   /etc/nginx/files.cupb.top_ecc/files.cupb.top.key;
+
+    ssl_session_cache    shared:SSL:1m;
+    ssl_session_timeout  5m;
+
+    ssl_protocols TLSv1.3;    
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;       
+    ssl_prefer_server_ciphers  on;
 
     location / {
-        #配置反向代理地址
-        proxy_pass http://139.217.230.42:8888;
-        index  index.html index.htm;
-        #proxy_redirect off;
-        #proxy_set_header Host $http_host;
-        #proxy_set_header X-Real-IP $remote_addr;
-        #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-   }
-    error_page 401 403 404 /40x.html;
-        location = /40x.html {
+         root /usr/share/nginx/html/dist;
+         index  index.html index.htm;
+    }
+    location /api/ {
+        proxy_set_header HOST $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://10.2.0.4:8888/;
+        proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
     }
 
-    error_page 500 502 503 504 /50x.-html;
-        location = /50x.html {
-    }
 
-   ssl_certificate /etc/nginx/conf.d/bosch-ssl/bosch-smartlife.com.pem;
-   ssl_certificate_key /etc/nginx/conf.d/bosch-ssl/bosch-smartlife.com.key;
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   html;
+    }
 }
 
 ```
-
 
 
 # TODO 
