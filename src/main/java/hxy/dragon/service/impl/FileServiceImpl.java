@@ -14,21 +14,21 @@ import hxy.dragon.entity.reponse.BaseResponse;
 import hxy.dragon.service.FileService;
 import hxy.dragon.util.DateUtil;
 import hxy.dragon.util.ResponseJsonUtil;
+import hxy.dragon.util.Streams;
 import hxy.dragon.util.file.DirUtil;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.ProgressListener;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.util.Streams;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.core.FileUploadException;
+import org.apache.commons.fileupload2.core.ProgressListener;
+import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -42,6 +42,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * 文件处理服务
@@ -71,7 +72,12 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         response.setContentType("application/json;charset=utf-8");
 
         try {
-            boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+            boolean isMultipart = false;
+            String contentType = request.getContentType();
+            if (contentType != null) {
+                isMultipart = contentType.toLowerCase(Locale.ENGLISH).startsWith("multipart/");
+            }
+
             if (isMultipart) {
                 String fileName = "";
                 String uuid = "";
@@ -79,17 +85,17 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 String fileMd5 = "";
                 Integer chunk = 0, chunks = 0, currentChunkSize = 0;
 
-                DiskFileItemFactory diskFactory = new DiskFileItemFactory();
+                DiskFileItemFactory diskFactory = DiskFileItemFactory.builder().get();
                 // threshold 极限、临界值，即硬盘缓存 1M
-                diskFactory.setSizeThreshold(4 * 1024);
+//                diskFactory.setSizeThreshold(4 * 1024);
 
-                ServletFileUpload upload = new ServletFileUpload(diskFactory);
+                JakartaServletFileUpload upload = new JakartaServletFileUpload(diskFactory);
                 //设置上传单个文件的大小的最大值，目前是设置为1024*1024字节，也就是100MB
                 upload.setFileSizeMax(1024 * 1024 * 100);
                 //设置上传文件总量的最大值，最大值=同时上传的多个文件的大小的最大值的和，目前设置为10MB
                 // 设置允许上传的最大文件大小（单位MB）
                 upload.setSizeMax(1024 * 1048576);
-                upload.setHeaderEncoding("UTF-8");
+                upload.setHeaderCharset(StandardCharsets.UTF_8);
                 //监听文件上传进度
                 upload.setProgressListener(new ProgressListener() {
                     @Override
