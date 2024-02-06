@@ -162,10 +162,12 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                         if (!item.isFormField()) {
 
                             // 文件路径一定不要用绝对路径
-                            String suffixName = "unknown";
-                            // 获取文件的后缀名,后缀名有可能为空
-                            if (fileName.lastIndexOf(".") != -1) {
-                                suffixName = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
+                            String suffixName = ".unknown";
+                            if (fileName != null && fileName.trim().length() > 0) {
+                                // 获取文件的后缀名,后缀名有可能为空
+                                if (fileName.lastIndexOf(".") != -1) {
+                                    suffixName = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
+                                }
                             }
 
                             fileUuidName = uuid + suffixName;
@@ -216,6 +218,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
                                 String serverName = request.getServerName();
 
+                                if (fileName == null || fileName.trim().length() == 0) {
+                                    fileName = fileMd5;
+                                }
 
                                 FileModel fileModel = new FileModel();
                                 fileModel.setFilePath(filePath);
