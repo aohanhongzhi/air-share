@@ -20,6 +20,15 @@ logging:
 server:
   port: 8888
 
+# 日志邮件报警
+email:
+  username: aohanhongzhi@qq.com
+  password: vtrxapjtpcivdbcb
+  default-encoding: UTF-8
+  host: smtp.qq.com
+  from: aohanhongzhi@qq.com
+  to: aohanhongzhi@qq.com
+
 info:
   build:
     artifact: hxy.dragon
