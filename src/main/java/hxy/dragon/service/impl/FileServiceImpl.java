@@ -513,10 +513,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                     }
                 }///end try
             } else {
-                log.error("数据库有记录，但是文件不存在。AbsoluteFilePath={}", file.getAbsoluteFile());
+                log.warn("数据库有记录，但是文件不存在。AbsoluteFilePath={}", file.getAbsoluteFile());
             }
         } else {
-            log.error("数据库没有记录，fileUuid={}", fileUuid);
+            log.warn("数据库没有记录，fileUuid={}", fileUuid);
         }
 
         if (fileNotExist) {
