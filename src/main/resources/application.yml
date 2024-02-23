@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: AIR-SHARE
   servlet:
     multipart:
       enabled: false
@@ -10,7 +12,7 @@ spring:
 
 hxy:
   print:
-    file : /upload-file
+    file: /upload-file
     absolute-file-path:
 
 logging:
