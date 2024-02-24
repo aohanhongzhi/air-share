@@ -22,6 +22,10 @@
     <!-- 监听器，指定日志文件存放目录 -->
     <contextListener class="hxy.dragon.config.CustomLogContextListener"/>
 
+    <!-- 第三方日志处理 -->
+    <appender name="DINGTALK" class="hxy.dragon.extend.FeishuTalkAppender">
+    </appender>
+
     <!-- 输出所有日志到同一个文件，方便线上beta环境调试查看日志信息 -->
     <appender name="ALL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
