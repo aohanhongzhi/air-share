@@ -1,10 +1,10 @@
 package hxy.dragon.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import hxy.dragon.dao.model.FileModel;
 import hxy.dragon.entity.reponse.BaseResponse;
 import hxy.dragon.service.FileService;
 import hxy.dragon.util.DiskUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -48,20 +45,7 @@ public class FileController {
 
     @GetMapping("/file/upload")
     public BaseResponse uploadGet(String identifier) {
-        LambdaQueryWrapper<FileModel> objectLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        objectLambdaQueryWrapper.eq(FileModel::getFileUuid, identifier);
-        objectLambdaQueryWrapper.last("limit 1");
-        FileModel fileModel = fileService.getOne(objectLambdaQueryWrapper);
-        Map<String, Object> hashMap = new HashMap<String, Object>();
-        if (fileModel == null) {
-            hashMap.put("skipUpload", false);
-        } else {
-            log.info("文件已经存在了，不接收再次上传md5 {} ,file {}", identifier, fileModel);
-            hashMap.put("skipUpload", true);
-        }
-        hashMap.put("uploaded", 0);
-        return BaseResponse.success(hashMap);
-
+        return fileService.uploadGet(identifier);
     }
 
     /**

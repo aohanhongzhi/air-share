@@ -39,10 +39,14 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 /**
  * 文件处理服务
@@ -57,6 +61,29 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
     @Resource
     private FileMapper fileMapper;
+
+    private HashMap<String, Integer[]> uploadRecordHashMap = new HashMap<>();
+
+    @Override
+    public BaseResponse uploadGet(String identifier) {
+        LambdaQueryWrapper<FileModel> objectLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        objectLambdaQueryWrapper.eq(FileModel::getFileUuid, identifier);
+        objectLambdaQueryWrapper.last("limit 1");
+        FileModel fileModel = this.getOne(objectLambdaQueryWrapper);
+        Map<String, Object> hashMap = new HashMap<String, Object>();
+        if (fileModel == null) {
+            hashMap.put("skipUpload", false);
+        } else {
+            log.info("文件已经存在了，不接收再次上传md5 {} ,file {}", identifier, fileModel);
+            hashMap.put("skipUpload", true);
+        }
+
+        // 下面这个是断点续传的依据
+        Integer[] integers = this.uploadRecordHashMap.get(identifier);
+        hashMap.put("uploaded", integers);
+
+        return BaseResponse.success(hashMap);
+    }
 
     /**
      * 文件分片上传，速度很快
@@ -161,6 +188,16 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                         // 处理上传文件内容
                         if (!item.isFormField()) {
 
+                            Integer[] integers = this.uploadRecordHashMap.get(fileMd5);
+                            if (integers == null) {
+                                integers = new Integer[]{chunk};
+                            } else {
+                                integers = IntStream.concat(Arrays.stream(integers).mapToInt(Integer::intValue), Arrays.stream(new int[]{chunk})).boxed().toArray(Integer[]::new);
+                            }
+
+                            // 下面这个要不要put回去？
+                            this.uploadRecordHashMap.put(fileMd5, integers);
+
                             // 文件路径一定不要用绝对路径
                             String suffixName = ".unknown";
                             if (fileName != null && fileName.trim().length() > 0) {
@@ -210,6 +247,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                             appendFile(input, destFile, currentChunkSize);
 
                             if (((chunk.equals(chunks - 1)) && !newUpload) || (newUpload && chunk.equals(chunks))) {
+                                this.uploadRecordHashMap.remove(fileMd5);
                                 long length1 = destFile.length() / 1024 / 1024;
                                 log.info("\n====>文件上传成功：{} 文件名: {} 文件大小：{} MB ", destFile.getAbsolutePath(), fileName, length1);
 
@@ -499,7 +537,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                     log.debug("下载完毕：" + startByte + "-" + endByte + "：" + transmitted);
                 } catch (ClientAbortException e) {
                     //捕获此异常表示拥护停止下载
-                    log.warn("用户停止下载：" + startByte + "-" + endByte + "：" + transmitted,e);
+                    log.warn("用户停止下载：" + startByte + "-" + endByte + "：" + transmitted, e);
                 } catch (IOException e) {
                     log.error("用户下载IO异常，Message：{}", e.getLocalizedMessage(), e);
                 } finally {

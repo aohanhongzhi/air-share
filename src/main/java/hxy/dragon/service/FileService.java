@@ -3,17 +3,19 @@ package hxy.dragon.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import hxy.dragon.dao.model.FileModel;
 import hxy.dragon.entity.reponse.BaseResponse;
-import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 /**
  * @author eric
  */
 @Service
 public interface FileService extends IService<FileModel> {
+
+    BaseResponse uploadGet(String identifier);
+
     BaseResponse uploadFile(HttpServletRequest request, HttpServletResponse response);
 
     BaseResponse fileMd5Check(String uuid, String md5);
