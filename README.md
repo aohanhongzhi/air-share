@@ -194,7 +194,7 @@ server {
 
 # TODO
 
--[ ] 断点续传
+-[x] 断点续传
 
 # 拓展
 
@@ -217,6 +217,8 @@ https://gitee.com/folder-share
 /media/data/data/air-share/air-share/2022-12-15
 
 # 性能监控
+
+不支持SpringBoot3，也不支持java9+
 
 http://localhost:8888/koTime
 
