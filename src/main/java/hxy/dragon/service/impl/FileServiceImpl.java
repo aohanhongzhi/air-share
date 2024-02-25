@@ -110,7 +110,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 String uuid = "";
                 String fileUuidName = "";
                 String fileMd5 = "";
-                Integer chunk = 0, chunks = 0, currentChunkSize = 0;
+                Integer chunk = 0, chunks = 0, chunkSize = 0, currentChunkSize = 0;
 
                 DiskFileItemFactory diskFactory = DiskFileItemFactory.builder().get();
                 // threshold 极限、临界值，即硬盘缓存 1M
@@ -143,6 +143,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                         FileItem item = it.next();
                         String name = item.getFieldName();
                         InputStream input = item.getInputStream();
+                        if ("chunkSize".equals(name)) {
+                            chunkSize = Integer.valueOf(Streams.asString(input));
+                            continue;
+                        }
                         if ("currentChunkSize".equals(name)) {
                             currentChunkSize = Integer.valueOf(Streams.asString(input));
                             continue;
@@ -244,7 +248,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                                 }
                             }
 
-                            appendFile(input, destFile, currentChunkSize);
+                            if (newUpload) {
+                                appendFile2(input, destFile, chunk, chunkSize, currentChunkSize);
+                            } else {
+                                appendFile(input, destFile, currentChunkSize);
+                            }
 
                             if (((chunk.equals(chunks - 1)) && !newUpload) || (newUpload && chunk.equals(chunks))) {
                                 this.uploadRecordHashMap.remove(fileMd5);
@@ -619,8 +627,47 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         return BaseResponse.success(page1);
     }
 
+
     /**
-     * 合成文件， FIXME 这个算同步合成，不能处理并发上传！！！
+     * 合成文件，  这个算同步合成，可以处理并发上传！！！
+     *
+     * @param in
+     * @param destFile         目标存储文件
+     * @param offset           当前块，偏移量
+     * @param chunkSize        分块的大小
+     * @param currentChunkSize 当前块的大小
+     */
+    private void appendFile2(InputStream in, File destFile, int offset, int chunkSize, int currentChunkSize) throws IOException {
+        if (currentChunkSize <= 0) {
+            currentChunkSize = BUFFER_SIZE;
+        }
+        try {
+            // plupload 配置了chunk的时候新上传的文件append到文件末尾
+            RandomAccessFile randomAccessFile = new RandomAccessFile(destFile, "rw");
+            randomAccessFile.seek((offset - 1) * chunkSize); // 移动到偏移量
+
+            in = new BufferedInputStream(in, currentChunkSize);
+
+            byte[] buffer = new byte[currentChunkSize];
+            while (in.read(buffer) > 0) {
+                randomAccessFile.write(buffer, 0, currentChunkSize);
+            }
+        } catch (Exception e) {
+            // 接着网上抛，然后传输到前端
+            throw e;
+        } finally {
+            try {
+                if (null != in) {
+                    in.close();
+                }
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 合成文件， 这个算同步合成，不能处理并发上传！！！
      *
      * @param in
      * @param destFile
@@ -633,6 +680,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         }
 
         try {
+
             // plupload 配置了chunk的时候新上传的文件append到文件末尾
             if (destFile.exists()) {
                 out = new BufferedOutputStream(new FileOutputStream(destFile, true), currentChunkSize);
