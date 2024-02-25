@@ -1,6 +1,13 @@
 air-share
 ===
 
+# 目前实现的功能
+
+1. 分块上传
+3. 并发上传
+2. 断点续传
+2. 断点下载
+
 ## 企业级推荐
 
 功能比较完善
@@ -8,7 +15,6 @@ air-share
 https://github.com/filebrowser/filebrowser
 
 https://filebrowser.org
-
 
 线上部署
 
@@ -25,6 +31,7 @@ VM 参数
 ```
 
 #### 介绍
+
 文件分享或者传输中心。可以对标：https://airportal.cn/。
 私有化部署。
 
@@ -32,7 +39,8 @@ VM 参数
 
 ![img_1.png](asset/file.png)
 
-#### 软件架构 
+#### 软件架构
+
 软件架构说明
 
 第一版本采用SpringBoot的SpringWeb构建，后期采用SpringWebFlux构建。采用Netty做领拷贝。
@@ -40,7 +48,6 @@ VM 参数
 前端采用 https://www.openzui.com/ 支持文件上传分片。
 
 后期需要加上文件断点上传。
-
 
 ### 部署
 
@@ -55,16 +62,21 @@ gradlew.bat clean bootJar -x test
 ```shell
 ssh insite@insite.cupb.top
 ```
+
 上传到服务器
+
 ```shell
 scp build/libs/air-share-0.0.1-SNAPSHOT.jar insite@file.cupb.top:/home/insite/app/
 ```
+
 上传数据库
+
 ```shell
 scp airshare.db insite@insite.cupb.top:/home/insite/app/
 ```
 
 启动
+
 ```shell
 nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08  -jar /home/insite/app/air-share-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod -Xmx1G -Xms512M -server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError >>/home/insite/app/air-share.log  2>&1 &
 ```
@@ -85,8 +97,8 @@ nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -XX:+HeapDu
 docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v  /mnt/resource/data/docker/nginx/www:/usr/share/nginx -v /mnt/resource/data/docker/nginx/config/:/etc/nginx/ nginx
 ```
 
-docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v  /mnt/resource/data/docker/nginx/www:/usr/share/nginx -v /mnt/resource/data/docker/nginx/config/:/etc/nginx/ nginx
-
+docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v /mnt/resource/data/docker/nginx/www:/usr/share/nginx -v
+/mnt/resource/data/docker/nginx/config/:/etc/nginx/ nginx
 
 服务器内存占用
 
@@ -104,14 +116,14 @@ docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v  /mnt/resource/data/dock
 
 也就是air-share启动的时候占用了 391MB的内存，显然这么个小程序占用这么大的内存着实有点浪费了，这也是SpringBoot非常占用内存的名声来源了。
 
-
 ```shell
 ps aux |grep air
 ```
 
 ![img.png](asset/ps-aux.png)
 
-下图是 air-share(SpringBoot)和[filebrowser](https://github.com/filebrowser/filebrowser)(Go)的对比。filebrowser的功能要比air-share更加丰富，但是内存只有26分之一。
+下图是 air-share(SpringBoot)和[filebrowser](https://github.com/filebrowser/filebrowser)(Go)
+的对比。filebrowser的功能要比air-share更加丰富，但是内存只有26分之一。
 
 ![img.png](asset/memory.png)
 
@@ -180,8 +192,8 @@ server {
 
 ```
 
+# TODO
 
-# TODO 
 -[ ] 断点续传
 
 # 拓展
@@ -191,7 +203,6 @@ server {
 ```
 python3 -m http.server -b 192.168.0.118 8080
 ```
-
 
 # 学习
 
@@ -204,7 +215,6 @@ https://github.com/beavailable/share
 https://gitee.com/folder-share
 
 /media/data/data/air-share/air-share/2022-12-15
-
 
 # 性能监控
 
