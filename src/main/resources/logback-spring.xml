@@ -23,7 +23,7 @@
     <contextListener class="hxy.dragon.config.CustomLogContextListener"/>
 
     <!-- 第三方日志处理 -->
-    <appender name="DINGTALK" class="hxy.dragon.extend.FeishuTalkAppender">
+    <appender name="FEISHU" class="hxy.dragon.extend.FeishuTalkAppender">
     </appender>
 
     <!-- 输出所有日志到同一个文件，方便线上beta环境调试查看日志信息 -->
@@ -213,6 +213,7 @@
             <appender-ref ref="ERROR_FILE"/>
             <appender-ref ref="ALL_FILE"/>
             <appender-ref ref="EMAIL"/>
+            <appender-ref ref="FEISHU"/>
         </root>
         <logger name="hxy.dragon.*" level="INFO" additivity="false">
             <appender-ref ref="DEBUG_FILE"/>
@@ -231,6 +232,7 @@
             <appender-ref ref="INFO_FILE"/>
             <appender-ref ref="WARN_FILE"/>
             <appender-ref ref="ERROR_FILE"/>
+            <appender-ref ref="FEISHU"/>
             <appender-ref ref="ALL_FILE"/>
         </root>
         <logger name="hxy.dragon.*" level="INFO" additivity="false">
@@ -250,6 +252,7 @@
             <appender-ref ref="WARN_FILE"/>
             <appender-ref ref="ERROR_FILE"/>
             <appender-ref ref="ALL_FILE"/>
+            <appender-ref ref="FEISHU"/>
         </root>
         <logger name="hxy.dragon.*" level="INFO" additivity="false">
             <appender-ref ref="DEBUG_FILE"/>
