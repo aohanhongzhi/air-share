@@ -127,6 +127,11 @@ ps aux |grep air
 
 ![img.png](asset/memory.png)
 
+```shell
+docker exec -it  nginx-rblc nginx -t
+docker exec -it  nginx-rblc nginx -s reload
+
+```
 ```nginx配置
 
 server {

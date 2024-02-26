@@ -208,7 +208,6 @@
     <springProfile name="prod">
         <!-- 生产环境时激活 -->
         <root level="info">
-            <appender-ref ref="INFO_FILE"/>
             <appender-ref ref="WARN_FILE"/>
             <appender-ref ref="ERROR_FILE"/>
             <appender-ref ref="ALL_FILE"/>

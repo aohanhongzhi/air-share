@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-
 @CrossOrigin
 @RestController
 @Slf4j
@@ -32,7 +30,7 @@ public class FileController {
      */
     @PostMapping("/file/upload")
     public BaseResponse upload(HttpServletRequest request, HttpServletResponse response) {
-        long diskinfo = DiskUtil.getDiskInfo();
+        long diskinfo = DiskUtil.getFileStorage();
         if (diskinfo < 5) {
             log.error("服务器空间不足了,upload disk free size  {} GB", diskinfo);
             // 经过实际测试这个获取的是系统盘符的大小，不是数据盘的大小。但是能有效检测系统存储满了导致崩溃。
