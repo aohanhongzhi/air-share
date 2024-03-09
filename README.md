@@ -49,6 +49,10 @@ VM 参数
 
 后期需要加上文件断点上传。
 
+### Fleet开发
+
+![](./asset/Snipaste_2024-03-02_10-25-38.png)
+
 ### 部署
 
 ```shell
@@ -127,6 +131,11 @@ ps aux |grep air
 
 ![img.png](asset/memory.png)
 
+```shell
+docker exec -it  nginx-rblc nginx -t
+docker exec -it  nginx-rblc nginx -s reload
+
+```
 ```nginx配置
 
 server {

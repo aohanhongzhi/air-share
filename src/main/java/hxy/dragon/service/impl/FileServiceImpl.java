@@ -110,7 +110,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 String uuid = "";
                 String fileUuidName = "";
                 String fileMd5 = "";
-                Integer chunk = 0, chunks = 0, chunkSize = 0, currentChunkSize = 0;
+                Integer chunk = 0, chunks = 0, currentChunkSize = 0;
+                long chunkSize = 0;
 
                 DiskFileItemFactory diskFactory = DiskFileItemFactory.builder().get();
                 // threshold 极限、临界值，即硬盘缓存 1M
@@ -144,7 +145,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                         String name = item.getFieldName();
                         InputStream input = item.getInputStream();
                         if ("chunkSize".equals(name)) {
-                            chunkSize = Integer.valueOf(Streams.asString(input));
+                            chunkSize = Long.valueOf(Streams.asString(input));
                             continue;
                         }
                         if ("currentChunkSize".equals(name)) {
@@ -302,7 +303,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 return BaseResponse.error("请求体异常，仅支持POST方法");
             }
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error("{}", e.getMessage(), e);
             response.setStatus(500);
             return BaseResponse.error("文件上传失败", e.getMessage());
         }
@@ -637,14 +638,15 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
      * @param chunkSize        分块的大小
      * @param currentChunkSize 当前块的大小
      */
-    private void appendFile2(InputStream in, File destFile, int offset, int chunkSize, int currentChunkSize) throws IOException {
+    private void appendFile2(InputStream in, File destFile, int offset, long chunkSize, int currentChunkSize) throws IOException {
         if (currentChunkSize <= 0) {
             currentChunkSize = BUFFER_SIZE;
         }
         try {
             // plupload 配置了chunk的时候新上传的文件append到文件末尾
             RandomAccessFile randomAccessFile = new RandomAccessFile(destFile, "rw");
-            randomAccessFile.seek((offset - 1) * chunkSize); // 移动到偏移量
+            long seek = (offset - 1) * chunkSize;
+            randomAccessFile.seek(seek); // 移动到偏移量
 
             in = new BufferedInputStream(in, currentChunkSize);
 
@@ -654,6 +656,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             }
         } catch (Exception e) {
             // 接着网上抛，然后传输到前端
+            log.error("当前块 {}=>{}", offset, chunkSize);
             throw e;
         } finally {
             try {
