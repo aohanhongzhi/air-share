@@ -12,14 +12,24 @@
             }
         },
         {
-            "name": "AirShareApplication",
+            "name": "Mac AirShareApplication",
+            "type": "spring-boot",
+            "workingDir": "$PROJECT_DIR$",
+            "dependsOn": ["Build air-share"],
+            "mainClass": "dragon.AirShareApplication",
+            "module": "hxy.air-share.main",
+            "options": ["-XX:TieredStopAtLevel=1", "-Dspring.output.ansi.enabled=always", "-Dcom.sun.management.jmxremote", "-Dspring.jmx.enabled=true", "-Dspring.liveBeansView.mbeanDomain", "-Dspring.application.admin.enabled=true", "-Dmanagement.endpoints.jmx.exposure.include=*", "-Dfile.encoding=UTF-8", "-Dsun.stdout.encoding=UTF-8", "-Dsun.stderr.encoding=UTF-8", "-classpath", "$USER_HOME$/.m2/repository/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar"],
+            "activeProfiles": ["beta"]
+        },
+        {
+            "name": "Linux AirShareApplication",
             "type": "spring-boot",
             "workingDir": "$PROJECT_DIR$",
             "dependsOn": ["Build air-share"],
             "mainClass": "hxy.dragon.AirShareApplication",
-            "module": "air-share.main",
+            "module": "hxy.air-share.main",
             "options": ["-XX:TieredStopAtLevel=1", "-Dspring.output.ansi.enabled=always", "-Dcom.sun.management.jmxremote", "-Dspring.jmx.enabled=true", "-Dspring.liveBeansView.mbeanDomain", "-Dspring.application.admin.enabled=true", "-Dmanagement.endpoints.jmx.exposure.include=*", "-Dfile.encoding=UTF-8", "-Dsun.stdout.encoding=UTF-8", "-Dsun.stderr.encoding=UTF-8", "-classpath", "$USER_HOME$/.m2/repository/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar"],
-            "activeProfiles": ["beta"]
+            "activeProfiles": ["test"]
         }
     ]
 }

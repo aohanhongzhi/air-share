@@ -5,10 +5,10 @@ create table if not exists file_model
             primary key autoincrement,
     file_name   TEXT,
     file_path   TEXT,
-    file_md5    TEXT,
+    file_md5    varchar(255),
     create_time timestamp,
     file_size   INTEGER,
-    file_uuid   TEXT,
+    file_uuid   varchar(255),
     server_name varchar(255)
 );
 

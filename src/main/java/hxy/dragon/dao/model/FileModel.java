@@ -19,7 +19,7 @@ public class FileModel {
      * 文件的uuid是主键。 air-share是随意新建的，airshare-plus是文件md5值
      * 主键，存在就更新，不存在就插入
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.NONE)
     private String fileUuid;
 
     /**

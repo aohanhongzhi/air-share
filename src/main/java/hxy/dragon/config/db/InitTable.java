@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,19 +30,19 @@ public class InitTable {
             Connection connection = dataSource.getConnection();
             SqlRunner sqlRunner = new SqlRunner(connection);
             String sql = """
-                    create table if not exists file_model
-                    (
-                        id          INTEGER not null
-                            constraint file_model_pk
-                                primary key autoincrement,
-                        file_name   TEXT,
-                        file_path   TEXT,
-                        file_md5    TEXT,
-                        create_time timestamp,
-                        file_size   INTEGER,
-                        file_uuid   TEXT,
-                        server_name varchar(255)
-                    );
+                           create table if not exists file_model
+                            (
+                                id          INTEGER not null
+                                    constraint file_model_pk
+                                        primary key autoincrement,
+                                file_name   TEXT,
+                                file_path   TEXT,
+                                file_md5    varchar(255),
+                                create_time timestamp,
+                                file_size   INTEGER,
+                                file_uuid   varchar(255),
+                                server_name varchar(255)
+                            );
                     """;
             log.info("开始建表 {}", sql);
             sqlRunner.run(sql);
