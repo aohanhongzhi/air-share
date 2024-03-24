@@ -8,7 +8,27 @@ air-share
 2. 断点续传
 2. 断点下载
 
+# 类似开源实现
+
+## 简单版本
+
+### sharing
+
+只有下载，不能上传，类似nginx的静态文件服务器
+
+https://github.com/parvardegr/sharing
+
+### python的http.server
+
+只能查看文件列表
+
+```
+python3 -m http.server -b 192.168.0.118 8080
+```
+
 ## 企业级推荐
+
+### filebrowser
 
 功能比较完善
 
@@ -20,7 +40,7 @@ https://filebrowser.org
 
 http://disk.cupb.top/
 
-### 热重启
+# 热重启
 
 https://github.com/HotswapProjects/HotswapAgent
 
@@ -201,17 +221,6 @@ server {
 
 ```
 
-# TODO
-
--[x] 断点续传
-
-# 拓展
-
-只能查看文件列表
-
-```
-python3 -m http.server -b 192.168.0.118 8080
-```
 
 # 学习
 
