@@ -25,6 +25,12 @@ https://github.com/parvardegr/sharing
 ```
 python3 -m http.server -b 192.168.0.118 8080
 ```
+### pairdrop
+
+https://github.com/schlagmichdoch/pairdrop
+
+https://pairdrop.net/
+
 
 ## 企业级推荐
 
