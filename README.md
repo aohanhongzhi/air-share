@@ -39,6 +39,12 @@ https://github.com/beavailable/share
 
 https://gitee.com/folder-share
 
+### croc
+
+命令行传输文件，端到端加密
+
+https://github.com/schollz/croc
+
 ## 企业级推荐
 
 ### filebrowser
@@ -57,7 +63,7 @@ http://disk.cupb.top/
 
 https://github.com/tagspaces/tagspaces
 
-### LocalSend
+### end
 
 https://localsend.org
 
