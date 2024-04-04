@@ -31,6 +31,13 @@ https://github.com/schlagmichdoch/pairdrop
 
 https://pairdrop.net/
 
+### share
+
+https://github.com/beavailable/share
+
+### folder-share
+
+https://gitee.com/folder-share
 
 ## 企业级推荐
 
@@ -45,6 +52,25 @@ https://filebrowser.org
 线上部署
 
 http://disk.cupb.top/
+
+### tagspaces
+
+https://github.com/tagspaces/tagspaces
+
+### LocalSend
+
+https://localsend.org
+
+## 商业化应用
+
+### EasyShare
+
+ivo开发的
+
+http://esin.vivo.com/
+
+http://as.vivo.com/
+
 
 # 热重启
 
@@ -232,13 +258,7 @@ server {
 
 [SpringBoot SpringMVC文件下载，大文件断点续传，可以实时播放视频,拖动进度条](https://blog.csdn.net/qq_41389354/article/details/105043312)
 
-# 其他类似轮子
 
-https://github.com/beavailable/share
-
-https://gitee.com/folder-share
-
-/media/data/data/air-share/air-share/2022-12-15
 
 # 性能监控
 
