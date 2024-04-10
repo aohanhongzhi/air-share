@@ -88,6 +88,10 @@ VM 参数
 -XX:+AllowEnhancedClassRedefinition -XX:HotswapAgent=fatjar
 ```
 
+支持jdk21
+
+![img.png](asset/HotswapAgent.png)
+
 #### 介绍
 
 文件分享或者传输中心。可以对标：https://airportal.cn/。
