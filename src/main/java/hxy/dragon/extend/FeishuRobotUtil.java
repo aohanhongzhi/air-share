@@ -74,10 +74,10 @@ public class FeishuRobotUtil {
                 }
 
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("{}", e.getMessage(), e);
             }
         } else {
-            System.err.println("飞书机器人发送消息错误 " + textContent);
+            log.error("飞书机器人发送消息错误 {}", textContent);
         }
     }
 
@@ -129,7 +129,7 @@ public class FeishuRobotUtil {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("{}", e.getMessage(), e);
         }
 
         return null;
@@ -159,6 +159,7 @@ public class FeishuRobotUtil {
         try {
             return InetAddress.getLocalHost().getHostName(); // For example, return InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
+            log.error("{}", e.getMessage(), e);
             return null;
         }
     }
