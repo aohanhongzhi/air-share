@@ -484,7 +484,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                     } catch (NumberFormatException e) {
                         startByte = 0;
                         endByte = file.length() - 1;
-                        log.error("Range Occur Error,Message:{}", e.getLocalizedMessage());
+                        log.error("Range[{}] Occur Error,Message:{}", ranges, e.getLocalizedMessage(), e);
                     }
                 }
 
@@ -548,7 +548,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                     //捕获此异常表示拥护停止下载
                     log.warn("用户停止下载：" + startByte + "-" + endByte + "：" + transmitted, e);
                 } catch (IOException e) {
-                    log.error("用户下载IO异常，Message：{}", e.getLocalizedMessage(), e);
+                    log.warn("用户下载IO异常，Message：{}", e.getLocalizedMessage(), e);
                 } finally {
                     try {
                         if (randomAccessFile != null) {
