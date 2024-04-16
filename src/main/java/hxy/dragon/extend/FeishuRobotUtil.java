@@ -27,11 +27,6 @@ public class FeishuRobotUtil {
 
     private static TenantAccessTokenBody tenantAccessToken;
 
-    public static void main(String[] args) {
-        feishuRobot("java send messages");
-        feishuRobotDetail("java send messages2");
-    }
-
     public static void feishuRobotDetail(String msg) {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         String callerInfo = stackTrace[2].getFileName() + ":" + stackTrace[2].getLineNumber();
@@ -40,7 +35,7 @@ public class FeishuRobotUtil {
         feishuRobot(content);
     }
 
-    public static void feishuRobot(String textContent) {
+    private static void feishuRobot(String textContent) {
         if (!isTokenValid(tenantAccessToken)) {
             tenantAccessToken = getTenantAccessToken();
         }

@@ -46,7 +46,7 @@ public class FeishuTalkAppender extends UnsynchronizedAppenderBase<ILoggingEvent
                     String msg = String.format("时间：%s,级别:%s,原因%s", timeStamp, eventObject.getLevel(), eventObject.getFormattedMessage());
                     postBody.put("title", loggerName);
                     postBody.put("msg", msg);
-                    FeishuRobotUtil.feishuRobot(msg);
+                    FeishuRobotUtil.feishuRobotDetail(msg);
                 }
                 break;
             case Level.WARN_INT:
