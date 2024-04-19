@@ -47,9 +47,15 @@ https://github.com/schollz/croc
 
 ## 企业级推荐
 
+### pingvin-share 1.9k
+
+文件共享平台
+
+https://github.com/stonith404/pingvin-share
+
 ### filebrowser
 
-功能比较完善
+功能比较完善的网盘
 
 https://github.com/filebrowser/filebrowser
 
