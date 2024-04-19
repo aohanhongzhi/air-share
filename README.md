@@ -25,6 +25,7 @@ https://github.com/parvardegr/sharing
 ```
 python3 -m http.server -b 192.168.0.118 8080
 ```
+
 ### pairdrop
 
 https://github.com/schlagmichdoch/pairdrop
@@ -69,7 +70,13 @@ http://disk.cupb.top/
 
 https://github.com/tagspaces/tagspaces
 
-### end
+### Cloudreve 20.7k
+
+功能也非常完善
+
+https://github.com/cloudreve/Cloudreve
+
+### localsend
 
 https://localsend.org
 
@@ -82,7 +89,6 @@ ivo开发的
 http://esin.vivo.com/
 
 http://as.vivo.com/
-
 
 # 热重启
 
@@ -204,6 +210,7 @@ docker exec -it  nginx-rblc nginx -t
 docker exec -it  nginx-rblc nginx -s reload
 
 ```
+
 ```nginx配置
 
 server {
@@ -269,12 +276,9 @@ server {
 
 ```
 
-
 # 学习
 
 [SpringBoot SpringMVC文件下载，大文件断点续传，可以实时播放视频,拖动进度条](https://blog.csdn.net/qq_41389354/article/details/105043312)
-
-
 
 # 性能监控
 
