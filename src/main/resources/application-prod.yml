@@ -2,6 +2,7 @@ spring:
   servlet:
     multipart:
       enabled: false
+      location: /media/data/data/tmp/upload # 解决 linux系统上占用 /tmp文件夹问题。https://blog.csdn.net/jianxia801/article/details/99671263
   datasource:
     url: jdbc:sqlite:airshare.db
     driver-class-name: org.sqlite.JDBC
