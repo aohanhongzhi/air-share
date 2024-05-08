@@ -49,6 +49,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter
 //    implementation 'mysql:mysql-connector-java'
+
+//  https://github.com/xerial/sqlite-jdbc
     implementation 'org.xerial:sqlite-jdbc:3.45.3.0'
     implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.6'
 //    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.6'
