@@ -82,6 +82,16 @@ https://github.com/cloudreve/Cloudreve
 
 https://localsend.org
 
+### Airclap
+
+linux正在规划中
+
+https://airclap.app/
+
+https://github.com/Gentleflow/Airclap
+
+
+
 ## 商业化应用
 
 ### EasyShare
