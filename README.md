@@ -14,6 +14,15 @@ air-share
 
 ## 简单版本
 
+
+### miniserve
+
+Rustlang开发的
+
+就是静态文件服务器，不能长传文件。
+
+https://github.com/svenstaro/miniserve
+
 ### sharing
 
 只有下载，不能上传，类似nginx的静态文件服务器
@@ -50,15 +59,10 @@ https://github.com/schollz/croc
 
 ## 企业级推荐
 
-### pingvin-share 1.9k
 
-文件共享平台
+### filebrowser 24.1k
 
-https://github.com/stonith404/pingvin-share
-
-### filebrowser
-
-功能比较完善的网盘
+功能比较完善的网盘，可以作为家庭NSA使用。
 
 https://github.com/filebrowser/filebrowser
 
@@ -68,19 +72,40 @@ https://filebrowser.org
 
 http://disk.cupb.top/
 
-### tagspaces
-
-https://github.com/tagspaces/tagspaces
 
 ### Cloudreve 20.7k
 
-功能也非常完善
+功能也非常完善。还支持市面常见的远程云存储。
+
+Golang + React开发的前后端分离。
 
 https://github.com/cloudreve/Cloudreve
+
+Demo
+
+https://demo.cloudreve.org/login
 
 ### localsend
 
 https://localsend.org
+
+### tagspaces 3.5k
+
+TagSpaces is an offline, open source, document manager with tagging support
+
+www.tagspaces.org
+
+https://github.com/tagspaces/tagspaces
+
+### pingvin-share 2.1k
+
+文件共享平台，看起来还不错。有账户体系。
+
+https://github.com/stonith404/pingvin-share
+
+Demo
+
+https://pingvin-share.dev.eliasschneider.com/
 
 ### Airclap
 
