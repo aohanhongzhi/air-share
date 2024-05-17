@@ -31,7 +31,7 @@ public class FeishuRobotUtil {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         String callerInfo = stackTrace[2].getFileName() + ":" + stackTrace[2].getLineNumber();
         String content = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
-                ",air-share," + getHostName() + "," + callerInfo + ":" + msg;
+                "【air-share】" + getHostName() + "," + callerInfo + ":" + msg;
         feishuRobot(content);
     }
 
@@ -154,7 +154,7 @@ public class FeishuRobotUtil {
         try {
             return InetAddress.getLocalHost().getHostName(); // For example, return InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            log.error("{}", e.getMessage(), e);
+            log.error("获取主机名字失败 {}", e.getMessage(), e);
             return null;
         }
     }

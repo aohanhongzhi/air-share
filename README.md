@@ -12,7 +12,7 @@ air-share
 
 # 类似开源实现
 
-## 简单版本
+## 简单版本-纯静态服务
 
 
 ### miniserve
@@ -56,6 +56,16 @@ https://gitee.com/folder-share
 命令行传输文件，端到端加密
 
 https://github.com/schollz/croc
+
+## 简单版本-可以上传下载删除
+
+### dufs
+
+Rust开发的，小型的够用。
+
+A file server that supports static serving, uploading, searching, accessing control, webdav..
+
+https://github.com/sigoden/dufs.git
 
 ## 企业级推荐
 

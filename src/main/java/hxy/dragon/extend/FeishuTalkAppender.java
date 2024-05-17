@@ -22,7 +22,7 @@ public class FeishuTalkAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 
     private static final Logger log = LoggerFactory.getLogger(FeishuTalkAppender.class);
 
-    @Retryable(value = Exception.class, maxAttempts = 4, backoff = @Backoff(delay = 100, maxDelay = 500))
+    @Retryable(retryFor = Exception.class, maxAttempts = 4, backoff = @Backoff(delay = 100, maxDelay = 500))
     @Override
     protected void append(ILoggingEvent eventObject) {
         String activeProfile = EnvironmentUtil.getActiveProfile();
