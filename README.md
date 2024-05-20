@@ -67,6 +67,14 @@ A file server that supports static serving, uploading, searching, accessing cont
 
 https://github.com/sigoden/dufs.git
 
+### filegator
+
+PHP 开发的。
+
+FileGator is a free, open-source, self-hosted web application for managing files and folders.
+
+https://github.com/filegator/filegator
+
 ## 企业级推荐
 
 
