@@ -55,6 +55,15 @@ public class FileController {
         return fileService.deleteFile(fileUuid);
     }
 
+    /**
+     * 获取文件列表
+     *
+     * @param pageSize 每页显示的记录数
+     * @param pageNum 当前页码
+     * @param searchValue 搜索条件，非必传
+     * @param serverRequest Http请求对象
+     * @return 包含分页列表信息的BaseResponse对象
+     */
     @GetMapping("/file/list")
     public BaseResponse listFile(Integer pageSize, Integer pageNum, @RequestParam(required = false) String searchValue, HttpServletRequest serverRequest) {
         if (pageNum == null || pageNum == 0) {

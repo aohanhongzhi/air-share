@@ -29,6 +29,13 @@ public class IndexController {
     @Resource
     private FileService fileService;
 
+    /**
+     * 获取文件列表并添加到Model中
+     *
+     * @param model 存放文件列表的Model对象
+     * @return 跳转到文件列表页面的字符串
+     * @deprecated 该方法已过时，不建议使用
+     */
     //    @RequestMapping("/file")
     @Deprecated
     public String file(Model model) {
@@ -66,11 +73,24 @@ public class IndexController {
         return "file";
     }
 
+    /**
+     * 获取文件列表
+     *
+     * @param model Model对象，用于向页面传递数据
+     * @param serverRequest HttpServletRequest对象，包含当前HTTP请求信息
+     * @return 返回包含文件列表的字符串页面名称
+     */
     @RequestMapping("/files")
     public String files(Model model, HttpServletRequest serverRequest) {
         return fileService.filePageList(model, serverRequest);
     }
 
+    /**
+     * 删除文件
+     *
+     * @param fileUuid 文件UUID
+     * @return 跳转到文件列表页面的字符串
+     */
     @RequestMapping("/file/del")
     public String fileDel(String fileUuid) {
         log.debug("{}", fileUuid);
