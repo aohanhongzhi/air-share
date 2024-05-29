@@ -75,6 +75,8 @@ FileGator is a free, open-source, self-hosted web application for managing files
 
 https://github.com/filegator/filegator
 
+https://filegator.io/
+
 ## 企业级推荐
 
 
