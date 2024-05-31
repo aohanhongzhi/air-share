@@ -94,6 +94,8 @@ https://alist.nn.ci/
 
 ![Snipaste_2024-06-01_00-17-19.png](asset/Snipaste_2024-06-01_00-17-19.png)
 
+[检测文件是否上传过，对于已经上传的文件给出文件位置提示。或者移动文件到指定文件夹。](https://github.com/alist-org/alist/discussions/6561)
+
 ### filebrowser 24.1k
 
 功能比较完善的网盘，可以作为家庭NSA使用。
