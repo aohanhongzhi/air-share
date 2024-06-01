@@ -86,6 +86,7 @@ https://github.com/alist-org/alist 38k
 https://alist.nn.ci/
 
 1. 可以选择各种云盘【阿里云盘官网推荐】，[webdav](https://alist.nn.ci/zh/guide/webdav.html#webdav-%E5%AD%98%E5%82%A8%E6%94%AF%E6%8C%81)或者本地磁盘作为存储。
+2. 支持加密存储。https://alist.nn.ci/zh/guide/drivers/Crypt.html https://www.bilibili.com/video/BV1h94y1W794/
 2. [既支持作为webdav客户端使用，同时也可以作为**webdav服务器使用**](https://alist.nn.ci/zh/guide/webdav.html#webdav-%E5%AD%98%E5%82%A8%E6%94%AF%E6%8C%81)，使用看视频 https://www.bilibili.com/video/BV1r14y1n7A7
 3. 支持游客访问，只能下载。
 3. 提供api，方便再次开发服务，源码开源。
