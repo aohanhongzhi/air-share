@@ -77,6 +77,16 @@ https://github.com/filegator/filegator
 
 https://filegator.io/
 
+### Syncthing 60.4k
+
+支持P2P的形式
+
+Open Source Continuous File Synchronization
+
+https://github.com/syncthing/syncthing
+
+https://mp.weixin.qq.com/s/gHQzT9pJySQlY0UBpb57rQ
+
 ## 企业级推荐
 
 ### alist
