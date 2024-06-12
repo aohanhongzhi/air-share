@@ -12,7 +12,7 @@
             }
         },
         {
-            "name": "Mac AirShareApplication",
+            "name": "Mac&Windows AirShareApplication",
             "type": "spring-boot",
             "workingDir": "$PROJECT_DIR$",
             "dependsOn": ["Build air-share"],
