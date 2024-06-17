@@ -3,6 +3,7 @@ package hxy.dragon.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -76,6 +77,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         } else {
             log.info("文件已经存在了，不接收再次上传md5 {} ,file {}", identifier, fileModel);
             hashMap.put("skipUpload", true);
+            //  这里需要修改文件时间，使其排在第一位
+            LambdaUpdateWrapper<FileModel> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+            lambdaUpdateWrapper.eq(FileModel::getFileUuid, identifier);
+            lambdaUpdateWrapper.set(FileModel::getCreateTime, new Date());
+            fileMapper.update(lambdaUpdateWrapper);
         }
 
         // 下面这个是断点续传的依据
@@ -585,7 +591,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         }
 
         LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
-        if (serverName != null) {
+        if (serverName != null && !(serverName.startsWith("192.168") || serverName.startsWith("172.31") || serverName.startsWith("10"))) {
             log.warn("域名{}", serverName);
             lambdaQueryWrapper.eq(FileModel::getServerName, serverName);
         }
