@@ -87,6 +87,14 @@ https://github.com/syncthing/syncthing
 
 https://mp.weixin.qq.com/s/gHQzT9pJySQlY0UBpb57rQ
 
+### send
+
+基于 Bitiful S4 对象存储的 “Simul-Transfer（即传即收）” 技术实现的大文件实时多人分享，Wetransfer 或 奶牛快传 的相似开源替代品。
+
+https://send.bitiful.com/
+
+https://github.com/bitiful/send
+
 ## 企业级推荐
 
 ### alist
