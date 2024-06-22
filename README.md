@@ -87,6 +87,16 @@ https://github.com/syncthing/syncthing
 
 https://mp.weixin.qq.com/s/gHQzT9pJySQlY0UBpb57rQ
 
+
+### picoshare 2.2k
+
+Golang开发的
+
+https://github.com/mtlynch/picoshare
+
+![img.png](asset/picoshare.png)
+![img_1.png](asset/picoshare1.png)
+
 ## 企业级推荐
 
 ### alist
