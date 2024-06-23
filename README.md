@@ -10,6 +10,8 @@ air-share
 2. 断点续传
 2. 断点下载
 
+[基于 Vue + Element plus + Node 实现大文件分片上传，断点续传和秒传的功能！牛哇~](https://mp.weixin.qq.com/s/JRS0iw8KmetEznVo6ok_pg)
+
 # 类似开源实现
 
 ## 简单版本-纯静态服务
