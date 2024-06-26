@@ -150,6 +150,19 @@ https://demo.cloudreve.org/login
 
 https://localsend.org
 
+
+#### flix
+
+基于 localsend二次开发的，界面更加美化。
+
+https://flix.center/
+
+#### 闪电藤
+
+基于 localsend二次开发的，功能更丰富。
+
+https://sdt.zishu.life
+
 ### tagspaces 3.5k
 
 TagSpaces is an offline, open source, document manager with tagging support
