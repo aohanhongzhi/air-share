@@ -14,8 +14,11 @@ air-share
 
 # 类似开源实现
 
-## 简单版本-纯静态服务
+## 练手项目
 
+https://gitee.com/Gary2016/minio-upload
+
+## 简单版本-纯静态服务
 
 ### miniserve
 
