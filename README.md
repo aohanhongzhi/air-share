@@ -195,6 +195,10 @@ https://github.com/Gentleflow/Airclap
  
 https://gitee.com/qiwen-cloud/qiwen-file
 
+### zfile
+
+https://github.com/zfile-dev/zfile
+
 ## 商业化应用
 
 ### EasyShare
