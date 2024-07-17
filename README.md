@@ -10,10 +10,15 @@ air-share
 2. 断点续传
 2. 断点下载
 
+[基于 Vue + Element plus + Node 实现大文件分片上传，断点续传和秒传的功能！牛哇~](https://mp.weixin.qq.com/s/JRS0iw8KmetEznVo6ok_pg)
+
 # 类似开源实现
 
-## 简单版本-纯静态服务
+## 练手项目
 
+https://gitee.com/Gary2016/minio-upload
+
+## 简单版本-纯静态服务
 
 ### miniserve
 
@@ -101,6 +106,16 @@ Easy P2P file transfer powered by WebRTC - inspired by Apple AirDrop
 
 https://github.com/szimek/sharedrop
 
+### picoshare 2.2k
+
+Golang开发的
+
+https://github.com/mtlynch/picoshare
+
+![img.png](asset/picoshare.png)
+![img_1.png](asset/picoshare1.png)
+
+
 ## 企业级推荐
 
 ### alist
@@ -152,6 +167,19 @@ https://demo.cloudreve.org/login
 
 https://localsend.org
 
+
+#### flix
+
+基于 localsend二次开发的，界面更加美化。
+
+https://flix.center/
+
+#### 闪电藤
+
+基于 localsend二次开发的，功能更丰富。
+
+https://sdt.zishu.life
+
 ### tagspaces 3.5k
 
 TagSpaces is an offline, open source, document manager with tagging support
@@ -183,6 +211,10 @@ https://github.com/Gentleflow/Airclap
 基于SpringBoot开发
  
 https://gitee.com/qiwen-cloud/qiwen-file
+
+### zfile
+
+https://github.com/zfile-dev/zfile
 
 ## 商业化应用
 

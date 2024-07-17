@@ -594,12 +594,21 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             code = serverRequest.getParameter("c");
         }
         if (log.isDebugEnabled()) {
+<<<<<<< HEAD
             log.debug("remoteAddr: {}", remoteAddr);
         }
 
         LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
         if (serverName != null && !(serverName.startsWith("192.168") || serverName.startsWith("172.31") || serverName.startsWith("10"))) {
             log.warn("域名{}", serverName);
+=======
+            log.debug("remoteAddress: {}", remoteAddr);
+        }
+
+        LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
+        if (serverName != null) {
+            log.info("域名: {}", serverName);
+>>>>>>> 9ea24275a0c4db6224a6c845e4c1e664a904d30c
             lambdaQueryWrapper.eq(FileModel::getServerName, serverName);
         }
         List<FileModel> fileModels = null;
