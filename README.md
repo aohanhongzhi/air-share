@@ -95,6 +95,12 @@ https://send.bitiful.com/
 
 https://github.com/bitiful/send
 
+### sharedrop
+
+Easy P2P file transfer powered by WebRTC - inspired by Apple AirDrop
+
+https://github.com/szimek/sharedrop
+
 ## 企业级推荐
 
 ### alist
