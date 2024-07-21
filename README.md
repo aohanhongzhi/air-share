@@ -1,14 +1,18 @@
 air-share
 ===
 
+```shell
+git remote set-url --add origin git@github.com:aohanhongzhi/air-share.git
+```
+
 支持jdk21
 
 # 目前实现的功能
 
 1. 分块上传
-3. 并发上传
-2. 断点续传
-2. 断点下载
+2. 并发上传
+3. 断点续传
+4. 断点下载
 
 [基于 Vue + Element plus + Node 实现大文件分片上传，断点续传和秒传的功能！牛哇~](https://mp.weixin.qq.com/s/JRS0iw8KmetEznVo6ok_pg)
 
@@ -22,7 +26,7 @@ https://gitee.com/Gary2016/minio-upload
 
 ### miniserve
 
-Rustlang开发的
+Rustlang 开发的
 
 就是静态文件服务器，不能长传文件。
 
@@ -115,7 +119,6 @@ https://github.com/mtlynch/picoshare
 ![img.png](asset/picoshare.png)
 ![img_1.png](asset/picoshare1.png)
 
-
 ## 企业级推荐
 
 ### alist
@@ -124,13 +127,17 @@ https://github.com/alist-org/alist 38k
 
 https://alist.nn.ci/
 
-1. 可以选择各种云盘【阿里云盘官网推荐】，[webdav](https://alist.nn.ci/zh/guide/webdav.html#webdav-%E5%AD%98%E5%82%A8%E6%94%AF%E6%8C%81)或者本地磁盘作为存储。
+1. 可以选择各种云盘【阿里云盘官网推荐】，[webdav](https://alist.nn.ci/zh/guide/webdav.html#webdav-%E5%AD%98%E5%82%A8%E6%94%AF%E6%8C%81)
+或者本地磁盘作为存储。
+
 2. 支持加密存储。https://alist.nn.ci/zh/guide/drivers/Crypt.html https://www.bilibili.com/video/BV1h94y1W794/
-2. [既支持作为webdav客户端使用，同时也可以作为**webdav服务器使用**](https://alist.nn.ci/zh/guide/webdav.html#webdav-%E5%AD%98%E5%82%A8%E6%94%AF%E6%8C%81)，使用看视频 https://www.bilibili.com/video/BV1r14y1n7A7
-3. 支持游客访问，只能下载。
-3. 提供api，方便再次开发服务，源码开源。
-4. 支持离线下载，非常适合下载任务多的。
-5. 各种文件预览，视频等。
+3. [既支持作为webdav客户端使用，同时也可以作为**webdav服务器使用
+   **](https://alist.nn.ci/zh/guide/webdav.html#webdav-%E5%AD%98%E5%82%A8%E6%94%AF%E6%8C%81)
+   ，使用看视频 https://www.bilibili.com/video/BV1r14y1n7A7
+4. 支持游客访问，只能下载。
+5. 提供api，方便再次开发服务，源码开源。
+6. 支持离线下载，非常适合下载任务多的。
+7. 各种文件预览，视频等。
 
 ![Snipaste_2024-06-01_00-17-19.png](asset/Snipaste_2024-06-01_00-17-19.png)
 
@@ -150,7 +157,6 @@ https://filebrowser.org
 
 http://disk.cupb.top/
 
-
 ### Cloudreve 20.7k
 
 功能也非常完善。还支持市面常见的远程云存储。
@@ -166,7 +172,6 @@ https://demo.cloudreve.org/login
 ### localsend
 
 https://localsend.org
-
 
 #### flix
 
@@ -209,7 +214,7 @@ https://github.com/Gentleflow/Airclap
 ### 奇文网盘 2.3k
 
 基于SpringBoot开发
- 
+
 https://gitee.com/qiwen-cloud/qiwen-file
 
 ### zfile
@@ -217,6 +222,12 @@ https://gitee.com/qiwen-cloud/qiwen-file
 https://github.com/zfile-dev/zfile
 
 ## 商业化应用
+
+### fastsend
+
+P2P transfer
+
+https://fastsend.ing/
 
 ### EasyShare
 
