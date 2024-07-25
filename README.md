@@ -281,6 +281,8 @@ VM 参数
 ./gradlew clean bootRun -x test   --args='--spring.profiles.active=beta'
 ```
 
+> https://docs.spring.io/spring-boot/gradle-plugin/running.html
+
 ```shell
 ./gradlew clean bootJar -x test
 ```
