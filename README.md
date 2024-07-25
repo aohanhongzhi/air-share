@@ -276,6 +276,11 @@ VM 参数
 
 ### 部署
 
+启动
+```shell
+./gradlew clean bootRun -x test   --args='--spring.profiles.active=beta'
+```
+
 ```shell
 ./gradlew clean bootJar -x test
 ```
@@ -308,7 +313,7 @@ nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08  -jar /home
 
 ```shell
 nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -XX:+HeapDumpOnOutOfMemoryError -jar /home/insite/app/air-share-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod --hxy.print.absolute-file-path=/mnt/resource/data/air-share --spring.datasource.url=jdbc:sqlite:/home/insite/app/airshare.db -Xmx1G -Xms512M -server -XX:+UseG1GC >> /home/insite/app/air-share.log 2>&1 &
-``` 
+```
 
 服务器显示日志调试
 
@@ -387,7 +392,7 @@ server {
     server_name  files.cupb.top;
     add_header Cache-Control no-store;
     add_header Cache-Control private;
-           
+
     ssl_certificate    /etc/nginx/files.cupb.top/files.cupb.top.pem;
     ssl_certificate_key   /etc/nginx/files.cupb.top/files.cupb.top.key;
 
@@ -397,8 +402,8 @@ server {
     ssl_session_cache    shared:SSL:1m;
     ssl_session_timeout  5m;
 
-    ssl_protocols TLSv1.3;    
-    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;       
+    ssl_protocols TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
     ssl_prefer_server_ciphers  on;
 
     location / {
