@@ -55,6 +55,7 @@ public class CustomLogContextListener extends ContextAwareBase implements Logger
         String classpath = null;
         try {
             classpath = ResourceUtils.getURL(ResourceUtils.CLASSPATH_URL_PREFIX).getPath();
+            System.out.println("classpath:" + classpath);
         } catch (FileNotFoundException e) {
             System.err.println("File not found" + e.getMessage());
         }
@@ -62,8 +63,7 @@ public class CustomLogContextListener extends ContextAwareBase implements Logger
         String logPath = "./logs";
 
         // 判断是否jar 包启动
-        if (classpath != null && classpath.contains("jar!")) {
-            System.out.println("classpath:" + classpath);
+        if (classpath != null && classpath.contains("nested:") && classpath.contains("jar") && classpath.contains("BOOT-INF")) {
             String currentPath = new File(classpath).getParentFile().getParentFile().getParent();
             // 如果是jar包启动的，那么获取当前jar包程序的路径，作为日志存放的位置
             currentPath = currentPath.replace("file:", "");

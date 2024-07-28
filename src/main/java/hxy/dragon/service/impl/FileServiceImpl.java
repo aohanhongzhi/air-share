@@ -571,7 +571,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                     outputStream.flush();
                     response.flushBuffer();
                     randomAccessFile.close();
-                    log.debug("下载完毕：{}-{}：{}", startByte, endByte, transmitted);
+                    log.debug("下载完毕：{}。 {}-{}：{}",file.getAbsolutePath(), startByte, endByte, transmitted);
                 } catch (ClientAbortException e) {
                     //捕获此异常表示拥护停止下载
                     log.warn("用户停止下载：{}-{}：{}", startByte, endByte, transmitted, e);
