@@ -13,7 +13,6 @@ import java.security.ProtectionDomain;
 public class AppPath {
 
     public static String getAppPath() {
-        String classpath = null;
 
         // 非Spring推荐
         ProtectionDomain protectionDomain = AppPath.class.getProtectionDomain();
@@ -21,6 +20,7 @@ public class AppPath {
         URL location = codeSource.getLocation();
         System.out.println("java :" + location);
         System.out.println("java classpath:" + location.getPath());
+        String classpath = location.getPath();
 
         String logPath = "";
 
@@ -40,7 +40,7 @@ public class AppPath {
                 int i = currentPath.indexOf(File.separator);
                 currentPath = currentPath.substring(i);
             }
-            logPath = currentPath;
+            logPath = currentPath + File.separator;
         }
         return logPath;
     }

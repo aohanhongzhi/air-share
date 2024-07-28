@@ -23,16 +23,13 @@ import java.util.Properties;
 //@Profile(value = {"prod", "beta"}) // 貌似这个没啥用，其他环境变量的时候也跑了程序
 public class RemoteEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
-    private static final Logger log = LoggerFactory.getLogger(RemoteEnvironmentPostProcessor.class);
-
-
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         String currentProfile = environment.getProperty("spring.profiles.active");
 
         final Properties properties = new Properties();
         String url = "jdbc:sqlite:" + AppPath.getAppPath() + "airshare.db";
-        log.info("数据库目录 {}", url);
+        System.out.println("数据库目录 " + url);
 
         properties.put("spring.datasource.url", url);
         PropertiesPropertySource propertySource = new PropertiesPropertySource(currentProfile, properties);
