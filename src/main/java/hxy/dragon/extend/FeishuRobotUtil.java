@@ -31,7 +31,7 @@ public class FeishuRobotUtil {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         String callerInfo = stackTrace[2].getFileName() + ":" + stackTrace[2].getLineNumber();
         String content = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +
-                "【air-share】" + getHostName() + "," + callerInfo + ":" + msg;
+            "【air-share】" + getHostName() + "," + callerInfo + ":" + msg;
         feishuRobot(content);
     }
 
@@ -51,8 +51,8 @@ public class FeishuRobotUtil {
                 conn.setDoOutput(true);
 
                 String jsonInputString = "{\"receive_id\": \"oc_0dcaa407df30d1a3415c382e397dcd0f\"," +
-                        "\"msg_type\": \"text\"," +
-                        "\"content\": \"{\\\"text\\\":\\\"" + content + "\\\"}\"}";
+                    "\"msg_type\": \"text\"," +
+                    "\"content\": \"{\\\"text\\\":\\\"" + content + "\\\"}\"}";
 
                 try (OutputStream os = conn.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
@@ -61,7 +61,7 @@ public class FeishuRobotUtil {
                 String responseBody;
                 try (InputStream inputStream = conn.getInputStream()) {
                     responseBody = new Scanner(inputStream, StandardCharsets.UTF_8).useDelimiter("\\A").next();
-                    System.out.println("飞书请求结果" + responseBody + ", 参数 " + content);
+                    log.info("飞书请求结果" + responseBody + ", 参数 " + content);
                 } catch (IOException exception) {
                     // If an error occurs, read the error stream instead
                     responseBody = readInputStream(conn.getErrorStream());

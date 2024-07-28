@@ -75,13 +75,24 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         if (fileModel == null) {
             hashMap.put("skipUpload", false);
         } else {
-            log.info("文件已经存在了，不接收再次上传md5 {} ,file {}", identifier, fileModel);
-            hashMap.put("skipUpload", true);
-            //  这里需要修改文件时间，使其排在第一位
-            LambdaUpdateWrapper<FileModel> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-            lambdaUpdateWrapper.eq(FileModel::getFileUuid, identifier);
-            lambdaUpdateWrapper.set(FileModel::getCreateTime, new Date());
-            fileMapper.update(lambdaUpdateWrapper);
+            // 数据库有记录，但是需要进一步检查文件是否存在
+            String filePath = fileModel.getFilePath();
+            File file = new File(DirUtil.getFileStoreDir(), filePath);
+            if (file.exists()) {
+                log.info("文件已经存在了，不接收再次上传md5 {} ,file {}", identifier, fileModel);
+                hashMap.put("skipUpload", true);
+                //  这里需要修改文件时间，使其排在第一位
+                LambdaUpdateWrapper<FileModel> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+                lambdaUpdateWrapper.eq(FileModel::getFileUuid, identifier);
+                lambdaUpdateWrapper.set(FileModel::getCreateTime, new Date());
+                fileMapper.update(lambdaUpdateWrapper);
+            } else {
+                log.error("实体文件不存在{} {}", file.getAbsolutePath(), fileModel);
+                hashMap.put("skipUpload", false);
+                QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("id", fileModel.getId());
+                fileMapper.delete(queryWrapper);
+            }
         }
 
         // 下面这个是断点续传的依据
@@ -336,9 +347,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             if (file.exists()) {
                 return BaseResponse.success("实体文件存在");
             } else {
+                log.error("实体文件不存在{} {}", file.getAbsolutePath(), fileEntity);
                 return BaseResponse.error("实体文件不存在");
             }
         }
+        log.error("数据库没有记录，文件不存在 {}", fileEntity);
         return BaseResponse.error("文件不存在");
     }
 
@@ -387,6 +400,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         } else {
             QueryWrapper queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", fileUuid);
+            queryWrapper.or();
+            queryWrapper.eq("file_uuid",fileUuid);
             FileModel fileModel = fileMapper.selectOne(queryWrapper);
             if (fileModel != null) {
                 boolean b = deleteFile(fileModel);
