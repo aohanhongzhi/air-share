@@ -351,7 +351,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 return BaseResponse.error("实体文件不存在");
             }
         }
-        log.error("数据库没有记录，文件不存在 {}", fileEntity);
+        log.error("数据库没有记录，文件不存在 uuid {} md5 {} {}", uuid, md5, fileEntity);
         return BaseResponse.error("文件不存在");
     }
 
@@ -401,7 +401,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             QueryWrapper queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", fileUuid);
             queryWrapper.or();
-            queryWrapper.eq("file_uuid",fileUuid);
+            queryWrapper.eq("file_uuid", fileUuid);
             FileModel fileModel = fileMapper.selectOne(queryWrapper);
             if (fileModel != null) {
                 boolean b = deleteFile(fileModel);
@@ -571,7 +571,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                     outputStream.flush();
                     response.flushBuffer();
                     randomAccessFile.close();
-                    log.debug("下载完毕：{}。 {}-{}：{}",file.getAbsolutePath(), startByte, endByte, transmitted);
+                    log.debug("下载完毕：{}。 {}-{}：{}", file.getAbsolutePath(), startByte, endByte, transmitted);
                 } catch (ClientAbortException e) {
                     //捕获此异常表示拥护停止下载
                     log.warn("用户停止下载：{}-{}：{}", startByte, endByte, transmitted, e);
