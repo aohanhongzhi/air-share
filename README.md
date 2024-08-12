@@ -16,6 +16,15 @@ git remote set-url --add origin git@github.com:aohanhongzhi/air-share.git
 
 [基于 Vue + Element plus + Node 实现大文件分片上传，断点续传和秒传的功能！牛哇~](https://mp.weixin.qq.com/s/JRS0iw8KmetEznVo6ok_pg)
 
+# 证书配置
+
+```shell
+/home/insite/.acme.sh/acme.sh --install-cert -d files.cupb.top \
+	--key-file       /mnt/resource/data/docker/nginx/config/n-backend.cupb.top/files.cupb.top.key  \
+	--fullchain-file /mnt/resource/data/docker/nginx/config/n-backend.cupb.top/files.cupb.top.pem \
+	--reloadcmd     "docker exec -it  nginx-rblc nginx -s reload"
+```
+
 # 类似开源实现
 
 ## 练手项目
