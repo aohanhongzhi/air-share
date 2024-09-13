@@ -338,8 +338,19 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 //        } else {
 //            return BaseResponse.error("没有该md5");
 //        }
+        FileModel fileEntity = null;
+        try {
+            fileEntity = fileMapper.selectById(uuid);
+        } catch (Exception e) {
+            log.error("参数 {} , {}", uuid, e.getMessage(), e);
 
-        FileModel fileEntity = fileMapper.selectById(uuid);
+            QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("file_uuid", uuid);
+            List<FileModel> fileModels = fileMapper.selectList(queryWrapper);
+            if (fileModels.size() > 0) {
+                fileEntity = fileModels.get(0);
+            }
+        }
 
         if (fileEntity != null) {
             String filePath = fileEntity.getFilePath();
