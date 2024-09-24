@@ -20,4 +20,9 @@ public class FileServiceTest extends AirShareApplicationTests {
         log.info("File {}", baseResponse);
     }
 
+    @Test
+    public void deleteFile(){
+        fileService.deleteFile("11");
+    }
+
 }

@@ -1,23 +1,41 @@
 air-share
 ===
 
+```shell
+git remote set-url --add origin git@github.com:aohanhongzhi/air-share.git
+```
+
 支持jdk21
 
 # 目前实现的功能
 
 1. 分块上传
-3. 并发上传
-2. 断点续传
-2. 断点下载
+2. 并发上传
+3. 断点续传
+4. 断点下载
+
+[基于 Vue + Element plus + Node 实现大文件分片上传，断点续传和秒传的功能！牛哇~](https://mp.weixin.qq.com/s/JRS0iw8KmetEznVo6ok_pg)
+
+# 证书配置
+
+```shell
+/home/insite/.acme.sh/acme.sh --install-cert -d files.cupb.top \
+	--key-file       /mnt/resource/data/docker/nginx/config/n-backend.cupb.top/files.cupb.top.key  \
+	--fullchain-file /mnt/resource/data/docker/nginx/config/n-backend.cupb.top/files.cupb.top.pem \
+	--reloadcmd     "docker exec -it  nginx-rblc nginx -s reload"
+```
 
 # 类似开源实现
 
-## 简单版本-纯静态服务
+## 练手项目
 
+https://gitee.com/Gary2016/minio-upload
+
+## 简单版本-纯静态服务
 
 ### miniserve
 
-Rustlang开发的
+Rustlang 开发的
 
 就是静态文件服务器，不能长传文件。
 
@@ -87,6 +105,29 @@ https://github.com/syncthing/syncthing
 
 https://mp.weixin.qq.com/s/gHQzT9pJySQlY0UBpb57rQ
 
+### send
+
+基于 Bitiful S4 对象存储的 “Simul-Transfer（即传即收）” 技术实现的大文件实时多人分享，Wetransfer 或 奶牛快传 的相似开源替代品。
+
+https://send.bitiful.com/
+
+https://github.com/bitiful/send
+
+### sharedrop
+
+Easy P2P file transfer powered by WebRTC - inspired by Apple AirDrop
+
+https://github.com/szimek/sharedrop
+
+### picoshare 2.2k
+
+Golang开发的
+
+https://github.com/mtlynch/picoshare
+
+![img.png](asset/picoshare.png)
+![img_1.png](asset/picoshare1.png)
+
 ## 企业级推荐
 
 ### alist
@@ -95,13 +136,17 @@ https://github.com/alist-org/alist 38k
 
 https://alist.nn.ci/
 
-1. 可以选择各种云盘【阿里云盘官网推荐】，[webdav](https://alist.nn.ci/zh/guide/webdav.html#webdav-%E5%AD%98%E5%82%A8%E6%94%AF%E6%8C%81)或者本地磁盘作为存储。
+1. 可以选择各种云盘【阿里云盘官网推荐】，[webdav](https://alist.nn.ci/zh/guide/webdav.html#webdav-%E5%AD%98%E5%82%A8%E6%94%AF%E6%8C%81)
+或者本地磁盘作为存储。
+
 2. 支持加密存储。https://alist.nn.ci/zh/guide/drivers/Crypt.html https://www.bilibili.com/video/BV1h94y1W794/
-2. [既支持作为webdav客户端使用，同时也可以作为**webdav服务器使用**](https://alist.nn.ci/zh/guide/webdav.html#webdav-%E5%AD%98%E5%82%A8%E6%94%AF%E6%8C%81)，使用看视频 https://www.bilibili.com/video/BV1r14y1n7A7
-3. 支持游客访问，只能下载。
-3. 提供api，方便再次开发服务，源码开源。
-4. 支持离线下载，非常适合下载任务多的。
-5. 各种文件预览，视频等。
+3. [既支持作为webdav客户端使用，同时也可以作为**webdav服务器使用
+   **](https://alist.nn.ci/zh/guide/webdav.html#webdav-%E5%AD%98%E5%82%A8%E6%94%AF%E6%8C%81)
+   ，使用看视频 https://www.bilibili.com/video/BV1r14y1n7A7
+4. 支持游客访问，只能下载。
+5. 提供api，方便再次开发服务，源码开源。
+6. 支持离线下载，非常适合下载任务多的。
+7. 各种文件预览，视频等。
 
 ![Snipaste_2024-06-01_00-17-19.png](asset/Snipaste_2024-06-01_00-17-19.png)
 
@@ -121,7 +166,6 @@ https://filebrowser.org
 
 http://disk.cupb.top/
 
-
 ### Cloudreve 20.7k
 
 功能也非常完善。还支持市面常见的远程云存储。
@@ -137,6 +181,18 @@ https://demo.cloudreve.org/login
 ### localsend
 
 https://localsend.org
+
+#### flix
+
+基于 localsend二次开发的，界面更加美化。
+
+https://flix.center/
+
+#### 闪电藤
+
+基于 localsend二次开发的，功能更丰富。
+
+https://sdt.zishu.life
 
 ### tagspaces 3.5k
 
@@ -164,9 +220,23 @@ https://airclap.app/
 
 https://github.com/Gentleflow/Airclap
 
+### 奇文网盘 2.3k
 
+基于SpringBoot开发
+
+https://gitee.com/qiwen-cloud/qiwen-file
+
+### zfile
+
+https://github.com/zfile-dev/zfile
 
 ## 商业化应用
+
+### fastsend
+
+P2P transfer
+
+https://fastsend.ing/
 
 ### EasyShare
 
@@ -215,6 +285,13 @@ VM 参数
 
 ### 部署
 
+启动
+```shell
+./gradlew clean bootRun -x test   --args='--spring.profiles.active=beta'
+```
+
+> https://docs.spring.io/spring-boot/gradle-plugin/running.html
+
 ```shell
 ./gradlew clean bootJar -x test
 ```
@@ -247,7 +324,7 @@ nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08  -jar /home
 
 ```shell
 nohup /opt/jbr/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -XX:+HeapDumpOnOutOfMemoryError -jar /home/insite/app/air-share-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod --hxy.print.absolute-file-path=/mnt/resource/data/air-share --spring.datasource.url=jdbc:sqlite:/home/insite/app/airshare.db -Xmx1G -Xms512M -server -XX:+UseG1GC >> /home/insite/app/air-share.log 2>&1 &
-``` 
+```
 
 服务器显示日志调试
 
@@ -326,7 +403,7 @@ server {
     server_name  files.cupb.top;
     add_header Cache-Control no-store;
     add_header Cache-Control private;
-           
+
     ssl_certificate    /etc/nginx/files.cupb.top/files.cupb.top.pem;
     ssl_certificate_key   /etc/nginx/files.cupb.top/files.cupb.top.key;
 
@@ -336,8 +413,8 @@ server {
     ssl_session_cache    shared:SSL:1m;
     ssl_session_timeout  5m;
 
-    ssl_protocols TLSv1.3;    
-    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;       
+    ssl_protocols TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
     ssl_prefer_server_ciphers  on;
 
     location / {

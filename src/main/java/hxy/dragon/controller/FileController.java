@@ -58,9 +58,9 @@ public class FileController {
     /**
      * 获取文件列表
      *
-     * @param pageSize 每页显示的记录数
-     * @param pageNum 当前页码
-     * @param searchValue 搜索条件，非必传
+     * @param pageSize      每页显示的记录数
+     * @param pageNum       当前页码
+     * @param searchValue   搜索条件，非必传
      * @param serverRequest Http请求对象
      * @return 包含分页列表信息的BaseResponse对象
      */
@@ -91,7 +91,11 @@ public class FileController {
      */
     @GetMapping("/file/exsit")
     public BaseResponse exsit(String uuid, String md5) {
-        return fileService.fileMd5Check(uuid, md5);
+        if ((uuid == null || uuid.trim().length() == 0) && (md5 == null || md5.trim().length() == 0)) {
+            return BaseResponse.error();
+        } else {
+            return fileService.fileMd5Check(uuid, md5);
+        }
     }
 
 

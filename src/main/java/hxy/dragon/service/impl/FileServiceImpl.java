@@ -3,6 +3,7 @@ package hxy.dragon.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -74,8 +75,24 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         if (fileModel == null) {
             hashMap.put("skipUpload", false);
         } else {
-            log.info("文件已经存在了，不接收再次上传md5 {} ,file {}", identifier, fileModel);
-            hashMap.put("skipUpload", true);
+            // 数据库有记录，但是需要进一步检查文件是否存在
+            String filePath = fileModel.getFilePath();
+            File file = new File(DirUtil.getFileStoreDir(), filePath);
+            if (file.exists()) {
+                log.info("文件已经存在了，不接收再次上传md5 {} ,file {}", identifier, fileModel);
+                hashMap.put("skipUpload", true);
+                //  这里需要修改文件时间，使其排在第一位
+                LambdaUpdateWrapper<FileModel> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+                lambdaUpdateWrapper.eq(FileModel::getFileUuid, identifier);
+                lambdaUpdateWrapper.set(FileModel::getCreateTime, new Date());
+                fileMapper.update(lambdaUpdateWrapper);
+            } else {
+                log.error("实体文件不存在{} {}", file.getAbsolutePath(), fileModel);
+                hashMap.put("skipUpload", false);
+                QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("id", fileModel.getId());
+                fileMapper.delete(queryWrapper);
+            }
         }
 
         // 下面这个是断点续传的依据
@@ -321,8 +338,19 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 //        } else {
 //            return BaseResponse.error("没有该md5");
 //        }
+        FileModel fileEntity = null;
+        try {
+            fileEntity = fileMapper.selectById(uuid);
+        } catch (Exception e) {
+            log.error("参数 {} , {}", uuid, e.getMessage(), e);
 
-        FileModel fileEntity = fileMapper.selectById(uuid);
+            QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("file_uuid", uuid);
+            List<FileModel> fileModels = fileMapper.selectList(queryWrapper);
+            if (fileModels.size() > 0) {
+                fileEntity = fileModels.get(0);
+            }
+        }
 
         if (fileEntity != null) {
             String filePath = fileEntity.getFilePath();
@@ -330,9 +358,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             if (file.exists()) {
                 return BaseResponse.success("实体文件存在");
             } else {
+                log.error("实体文件不存在{} {}", file.getAbsolutePath(), fileEntity);
                 return BaseResponse.error("实体文件不存在");
             }
         }
+        log.error("数据库没有记录，文件不存在 uuid {} md5 {} {}", uuid, md5, fileEntity);
         return BaseResponse.error("文件不存在");
     }
 
@@ -381,6 +411,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         } else {
             QueryWrapper queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", fileUuid);
+            queryWrapper.or();
+            queryWrapper.eq("file_uuid", fileUuid);
             FileModel fileModel = fileMapper.selectOne(queryWrapper);
             if (fileModel != null) {
                 boolean b = deleteFile(fileModel);
@@ -444,13 +476,14 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
     public void downloadByFileId(String fileUuid, HttpServletRequest request, HttpServletResponse response, String range) {
         FileModel fileEntity = fileMapper.selectById(fileUuid);
         boolean fileNotExist = true;
+        String originalRange = range;
 
         if (fileEntity != null) {
             String filePath = fileEntity.getFilePath();
             File file = new File(DirUtil.getFileStoreDir(), filePath);
             if (file.exists()) {
                 fileNotExist = false;
-                log.debug("current request rang:" + range);
+                log.debug("current request rang:{}", range);
                 //开始下载位置
                 long startByte = 0;
                 //结束下载位置
@@ -475,21 +508,27 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                         }
                         //类型三：bytes=22-2343
                         else if (ranges.length == 2) {
-                            startByte = Long.parseLong(ranges[0]);
+                            String rangeStart = ranges[0];
+                            if (rangeStart != null && rangeStart.trim().length() > 0) {
+                                startByte = Long.parseLong(rangeStart);
+                            }
                             endByte = Long.parseLong(ranges[1]);
                         } else {
-                            log.error("ranges错误！{}", range);
+                            log.error("ranges错误！originalRange {} , range {}", originalRange, range);
                         }
 
                     } catch (NumberFormatException e) {
                         startByte = 0;
                         endByte = file.length() - 1;
-                        log.error("Range[{}] Occur Error,Message:{}", ranges, e.getLocalizedMessage(), e);
+                        log.error("originalRange: {} Range: {} Occur Error,Message: {}", originalRange, ranges, e.getLocalizedMessage(), e);
                     }
                 }
 
                 //要下载的长度
                 long contentLength = endByte - startByte + 1;
+                if (contentLength <= 0) {
+                    log.error("下载文件长度异常 {},start {}，end {}", contentLength, startByte, endByte);
+                }
                 //文件名
                 String fileName = fileEntity.getFileName();
                 //文件类型。不全是application/octet-stream
@@ -543,10 +582,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                     outputStream.flush();
                     response.flushBuffer();
                     randomAccessFile.close();
-                    log.debug("下载完毕：" + startByte + "-" + endByte + "：" + transmitted);
+                    log.debug("下载完毕：{}。 {}-{}：{}", file.getAbsolutePath(), startByte, endByte, transmitted);
                 } catch (ClientAbortException e) {
                     //捕获此异常表示拥护停止下载
-                    log.warn("用户停止下载：" + startByte + "-" + endByte + "：" + transmitted, e);
+                    log.warn("用户停止下载：{}-{}：{}", startByte, endByte, transmitted, e);
                 } catch (IOException e) {
                     log.warn("用户下载IO异常，Message：{}", e.getLocalizedMessage(), e);
                 } finally {
@@ -555,7 +594,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                             randomAccessFile.close();
                         }
                     } catch (IOException e) {
-                        log.error("{}", e);
+                        log.error("{}", e.getMessage(), e);
                     }
                 }///end try
             } else {
@@ -581,11 +620,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             code = serverRequest.getParameter("c");
         }
         if (log.isDebugEnabled()) {
-            log.debug("remoteAddr: " + remoteAddr);
+            log.debug("remoteAddr: {}", remoteAddr);
         }
 
         LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
-        if (serverName != null) {
+        if (serverName != null && !(serverName.startsWith("192.168") || serverName.startsWith("172.31") || serverName.startsWith("10"))) {
             log.warn("域名{}", serverName);
             lambdaQueryWrapper.eq(FileModel::getServerName, serverName);
         }
@@ -610,7 +649,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         String serverName = serverRequest.getServerName();
         String remoteAddr = serverRequest.getRemoteAddr();
         String code = serverRequest.getParameter("code");
-        log.debug("remoteAddr: " + remoteAddr + ",serverName" + serverName + ",code=" + code);
+        log.debug("remoteAddr: {},serverName{},code={}", remoteAddr, serverName, code);
         LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
         if (serverName != null) {
             log.warn("域名{}", serverName);
