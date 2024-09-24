@@ -26,33 +26,27 @@
     <appender name="FEISHU" class="hxy.dragon.extend.FeishuTalkAppender">
     </appender>
 
-    <!-- 输出所有日志到同一个文件，方便线上beta环境调试查看日志信息 -->
     <appender name="ALL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>ALL</level>
-            <onMatch>ACCEPT</onMatch>
-            <!--   注意这里全部接受处理    -->
-            <onMismatch>ACCEPT</onMismatch>
-        </filter>
         <file>${LOG_PATH}/all.log</file>
-        <!-- 设置滚动策略 -->
-        <!-- 按天来回滚，如果需要按小时来回滚，则设置为{yyyy-MM-dd_HH} -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!--设置日志命名模式 -->
-            <fileNamePattern>${LOG_PATH}/all.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <!-- 如果按天来回滚，则最大保存时间为60天，60天之前的都将被清理掉 这里的值与滚动策略模式有关 -->
-            <maxHistory>180</maxHistory>
-            <!-- 按照日期进行归档，并且对日志文件大小进行限制
-             -->
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- 设置文件大于1KB进行压缩归档 -->
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
-        <encoder><!-- 格式化输出 -->
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%date %highlight(%-5level) [%thread]  %yellow(at %class.%method) \(%file:%line\) - %msg%n</pattern>
         </encoder>
+        <!-- 设置滚动策略 -->
+        <!-- 按天来回滚，如果需要按小时来回滚，则设置为{yyyy-MM-dd_HH} -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <!--设置日志命名模式 -->
+            <fileNamePattern>${LOG_PATH}/all.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- keep 180 days' worth of history -->
+            <!-- 如果按天来回滚，则最大保存时间为180天，180天之前的都将被清理掉 这里的值与滚动策略模式有关 -->
+            <maxHistory>180</maxHistory>
+            <maxFileSize>15MB</maxFileSize>
+            <!-- 设置文件大于20MB进行压缩归档 -->
+            <totalSizeCap>20MB</totalSizeCap>
+        </rollingPolicy>
     </appender>
+
 
     <!-- debug输出到文件 -->
     <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -64,16 +58,15 @@
         <file>${LOG_PATH}/debug.log</file>
         <!-- 设置滚动策略 -->
         <!-- 按天来回滚，如果需要按小时来回滚，则设置为{yyyy-MM-dd_HH} -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--设置日志命名模式 -->
             <fileNamePattern>${LOG_PATH}/debug.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 如果按天来回滚，则最大保存时间为60天，60天之前的都将被清理掉 这里的值与滚动策略模式有关 -->
             <maxHistory>180</maxHistory>
             <!-- 按照日期进行归档，并且对日志文件大小进行限制 -->
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- 设置文件大于1KB进行压缩归档 -->
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>15MB</maxFileSize>
+            <!-- 设置文件大于20MB进行压缩归档 -->
+            <totalSizeCap>20MB</totalSizeCap>
         </rollingPolicy>
         <encoder><!-- 格式化输出 -->
             <pattern>%date %level [%thread] %logger{36} [%file:%line] %msg%n</pattern>
@@ -88,12 +81,12 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <file>${LOG_PATH}/info.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/info.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxHistory>60</maxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>15MB</maxFileSize>
+            <!-- 设置文件大于20MB进行压缩归档 -->
+            <totalSizeCap>20MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>%date %level [%thread] %class.%method \(%file:%line\) %msg%n</pattern>
@@ -106,12 +99,12 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <file>${LOG_PATH}/warn.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/warn.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxHistory>60</maxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>15MB</maxFileSize>
+            <!-- 设置文件大于20MB进行压缩归档 -->
+            <totalSizeCap>20MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>%date %level [%thread] %class.%method \(%file:%line\) %msg%n</pattern>
@@ -124,12 +117,12 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <file>${LOG_PATH}/error.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxHistory>60</maxHistory>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>15MB</maxFileSize>
+            <!-- 设置文件大于20MB进行压缩归档 -->
+            <totalSizeCap>20MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
             <pattern>%date %level [%thread] %class.%method \(%file:%line\) %msg%n</pattern>
@@ -196,6 +189,7 @@
         <!-- 开发环境时激活 -->
         <root level="info">
             <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ALL_FILE"/>
         </root>
         <logger name="hxy.dragon.*" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
