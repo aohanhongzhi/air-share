@@ -20,8 +20,8 @@ git remote set-url --add origin git@github.com:aohanhongzhi/air-share.git
 
 ```shell
 /home/insite/.acme.sh/acme.sh --install-cert -d files.cupb.top \
-	--key-file       /mnt/resource/data/docker/nginx/config/n-backend.cupb.top/files.cupb.top.key  \
-	--fullchain-file /mnt/resource/data/docker/nginx/config/n-backend.cupb.top/files.cupb.top.pem \
+	--key-file       /mnt/resource/data/docker/nginx/config/files.cupb.top/private.key  \
+	--fullchain-file /mnt/resource/data/docker/nginx/config/files.cupb.top/full_chain.pem \
 	--reloadcmd     "docker exec -it  nginx-rblc nginx -s reload"
 ```
 
@@ -341,32 +341,12 @@ docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v  /mnt/resource/data/dock
 docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v /mnt/resource/data/docker/nginx/www:/usr/share/nginx -v
 /mnt/resource/data/docker/nginx/config/:/etc/nginx/ nginx
 
-服务器内存占用
-
-第一次观察
-
-![img.png](asset/server-mem.png)
-
-400720KB / 1024 = 391MB
-
-第二次观察
-
-![img.png](asset/server-memory.png)
-
-484202KB / 1024 = 472MB
-
-也就是air-share启动的时候占用了 391MB的内存，显然这么个小程序占用这么大的内存着实有点浪费了，这也是SpringBoot非常占用内存的名声来源了。
-
-```shell
-ps aux |grep air
-```
-
-![img.png](asset/ps-aux.png)
-
-下图是 air-share(SpringBoot)和[filebrowser](https://github.com/filebrowser/filebrowser)(Go)
-的对比。filebrowser的功能要比air-share更加丰富，但是内存只有26分之一。
 
 ![img.png](asset/memory.png)
+
+```shell
+vim /mnt/resource/data/docker/nginx/config/conf.d/default.conf
+```
 
 ```shell
 docker exec -it  nginx-rblc nginx -t
@@ -438,6 +418,31 @@ server {
 }
 
 ```
+
+服务器内存占用
+
+第一次观察
+
+![img.png](asset/server-mem.png)
+
+400720KB / 1024 = 391MB
+
+第二次观察
+
+![img.png](asset/server-memory.png)
+
+484202KB / 1024 = 472MB
+
+也就是air-share启动的时候占用了 391MB的内存，显然这么个小程序占用这么大的内存着实有点浪费了，这也是SpringBoot非常占用内存的名声来源了。
+
+```shell
+ps aux |grep air
+```
+
+![img.png](asset/ps-aux.png)
+
+下图是 air-share(SpringBoot)和[filebrowser](https://github.com/filebrowser/filebrowser)(Go)
+的对比。filebrowser的功能要比air-share更加丰富，但是内存只有26分之一。
 
 # 学习
 
