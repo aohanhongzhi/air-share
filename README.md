@@ -5,6 +5,12 @@ air-share
 git remote set-url --add origin git@github.com:aohanhongzhi/air-share.git
 ```
 
+## IDEA启动执行
+
+```shell
+git pull origin $(git rev-parse --abbrev-ref HEAD)
+```
+
 支持jdk21
 
 # 目前实现的功能
