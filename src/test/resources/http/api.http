@@ -31,3 +31,4 @@ Content-Type: application/json
 
 ###
 
+GET {{host}}/build

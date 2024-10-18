@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.List;
 @Controller
 public class IndexController {
 
-    @RequestMapping(path = {"/index", "/","/index.html"})
+    @RequestMapping(path = {"/index", "/", "/index.html"})
     public String index() {
         return "index";
     }
@@ -76,7 +77,7 @@ public class IndexController {
     /**
      * 获取文件列表
      *
-     * @param model Model对象，用于向页面传递数据
+     * @param model         Model对象，用于向页面传递数据
      * @param serverRequest HttpServletRequest对象，包含当前HTTP请求信息
      * @return 返回包含文件列表的字符串页面名称
      */
@@ -101,6 +102,7 @@ public class IndexController {
     @GetMapping("/build")
     @ResponseBody
     public BaseResponse rebuild() {
+        log.error("错误信息发送到邮件");
         return BaseResponse.error("5");
     }
 }
