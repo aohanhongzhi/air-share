@@ -53,6 +53,12 @@ https://github.com/svenstaro/miniserve
 
 https://github.com/parvardegr/sharing
 
+### FList
+
+将 GitHub Releases,Hugging Face,文件url等，渲染成类似网盘的文件列表显示在网页上，方便用户下载开源软件。 支持视频、音频、图片、PDF 等文件的在线预览。
+
+https://github.com/jianjianai/FList
+
 ### python的http.server
 
 只能查看文件列表
