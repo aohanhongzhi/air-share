@@ -134,7 +134,10 @@
         <!--smtp 服务器-->
         <smtpHost>${smtpHost}</smtpHost>
         <!--port-->
-        <smtpPort>25</smtpPort>
+        <smtpPort>465</smtpPort>
+        <SSL>true</SSL>
+        <!-- 是否使用 SSL/TLS -->
+        <STARTTLS>false</STARTTLS>
         <!-- 发给谁的邮件列表，多个人用逗号分隔 -->
         <to>${to}</to>
         <!--发件人，添加邮箱和上面的username保持一致-->
@@ -144,7 +147,6 @@
         <username>${username}</username>
         <!--发件人的邮箱密码-->
         <password>${password}</password>
-        <SSL>false</SSL>
         <!--是否异步-->
         <asynchronousSending>true</asynchronousSending>
         <layout class="ch.qos.logback.classic.PatternLayout">
