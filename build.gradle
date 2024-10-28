@@ -53,6 +53,7 @@ dependencies {
 //  https://github.com/xerial/sqlite-jdbc
     implementation 'org.xerial:sqlite-jdbc:3.47.0.0'
     implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.9'
+    implementation("com.baomidou:mybatis-plus-jsqlparser:3.5.9")
 //    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.6'
 //    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 
