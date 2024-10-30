@@ -21,7 +21,7 @@ logging:
     hxy.dragon: debug
 server:
   port: 8888
-
+#  address: 0.0.0.0 # 这里不会影响局域网访问
 # 日志邮件报警
 email:
   username: aohanhongzhi@qq.com

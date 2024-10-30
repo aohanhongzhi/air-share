@@ -1,6 +1,9 @@
 air-share
 ===
 
+[【腾讯文档】局域网无法访问本机端口](https://docs.qq.com/doc/DSGplRmttZEt6d3lx)
+
+
 ```shell
 git remote set-url --add origin git@github.com:aohanhongzhi/air-share.git
 ```
