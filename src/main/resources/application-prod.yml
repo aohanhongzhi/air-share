@@ -2,7 +2,7 @@ spring:
   servlet:
     multipart:
       enabled: false
-      location: /media/data/data/tmp/upload # 解决 linux系统上占用 /tmp文件夹问题。https://blog.csdn.net/jianxia801/article/details/99671263
+      location: /media/data/app/air-share/tmp # 解决 linux系统上占用 /tmp文件夹问题。https://blog.csdn.net/jianxia801/article/details/99671263
   datasource:
     url: jdbc:sqlite:airshare.db
     driver-class-name: org.sqlite.JDBC
@@ -10,7 +10,7 @@ spring:
 hxy:
   print:
     file: /upload-file
-    absolute-file-path: /media/data/data/air-share/air-share # 如果绝对地址为空，那么就会采用当前用户下的一个默认地址，具体见代码
+    absolute-file-path: /media/data/app/air-share/file # 如果绝对地址为空，那么就会采用当前用户下的一个默认地址，具体见代码
 #    absolute-file-path: /mnt/resource/data/air-share # 如果绝对地址为空，那么就会采用当前用户下的一个默认地址，具体见代码
 
 logging:
