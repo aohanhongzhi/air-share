@@ -91,7 +91,7 @@ public class FileController {
      */
     @GetMapping("/file/exsit")
     public BaseResponse exsit(String uuid, String md5) {
-        if ((uuid == null || uuid.trim().length() == 0) && (md5 == null || md5.trim().length() == 0)) {
+        if ((uuid == null || uuid.trim().isEmpty()) && (md5 == null || md5.trim().isEmpty())) {
             return BaseResponse.error();
         } else {
             return fileService.fileMd5Check(uuid, md5);

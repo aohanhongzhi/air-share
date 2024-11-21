@@ -13,7 +13,7 @@ public class StringToStringConverter implements Converter<String, String> {
     @Override
     public String convert(String source) {
         log.debug("convert source: {}", source);
-        if (source != null && "null".equals(source.toLowerCase())) {
+        if (source != null && "null".equalsIgnoreCase(source)) {
             return "";
         }
         return source;

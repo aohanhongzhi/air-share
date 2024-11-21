@@ -116,7 +116,7 @@ public class CustomLogContextListener extends ContextAwareBase implements Logger
 
     @Override
     public void stop() {
-
+        System.out.println("日志停止了");
     }
 
     @Override

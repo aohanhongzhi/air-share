@@ -22,7 +22,7 @@ public class InitTable {
     private static final Logger log = LoggerFactory.getLogger(InitTable.class);
 
     @Autowired
-    DataSource dataSource;
+    private DataSource dataSource;
 
     @PostConstruct
     public void createTable() {

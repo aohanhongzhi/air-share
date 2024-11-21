@@ -222,7 +222,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
                             // 文件路径一定不要用绝对路径
                             String suffixName = ".unknown";
-                            if (fileName != null && fileName.trim().length() > 0) {
+                            if (fileName != null && !fileName.trim().isEmpty()) {
                                 // 获取文件的后缀名,后缀名有可能为空
                                 if (fileName.lastIndexOf(".") != -1) {
                                     suffixName = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
@@ -241,7 +241,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                             File directory = new File(dirPath);
                             if (!directory.exists()) {
                                 log.info("文件夹不存在{}", dirPath);
-                                directory.mkdirs();
+                                boolean mkdirs = directory.mkdirs();
+                                if (!mkdirs) {
+                                    log.error("文件夹新建失败 {}", dirPath);
+                                }
                             }
                             File destFile = new File(dirPath, fileUuidName);
                             String filePath = DateUtil.getNowDate() + File.separator + fileUuidName;
@@ -251,7 +254,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                                 // 主要是因为新的前端并发上传时候，顺序乱了。导致序号1并不是最先上传的一块。虽然去掉了并发，保证了顺序，但是按照上述业务逻辑确实已经没必要了。
                                 if (chunk == 0 && destFile.exists()) {
                                     log.warn("\n====>文件已经存在了，马上删除。{}", destFile.exists());
-                                    destFile.delete();
+                                    boolean delete = destFile.delete();
+                                    if (!delete) {
+                                        log.error("文件删除失败 {}", destFile.getAbsolutePath());
+                                    }
                                     destFile = new File(DirUtil.getFileStoreDir(), fileUuidName);
                                 }
                             }
@@ -282,7 +288,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
                                 String serverName = request.getServerName();
 
-                                if (fileName == null || fileName.trim().length() == 0) {
+                                if (fileName == null || fileName.trim().isEmpty()) {
                                     fileName = fileMd5;
                                 }
 
@@ -347,8 +353,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("file_uuid", uuid);
             List<FileModel> fileModels = fileMapper.selectList(queryWrapper);
-            if (fileModels.size() > 0) {
-                fileEntity = fileModels.get(0);
+            if (!fileModels.isEmpty()) {
+                fileEntity = fileModels.getFirst();
             }
         }
 
@@ -396,12 +402,13 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             try {
                 Integer[] ids = objectMapper.readValue(fileUuid, Integer[].class);
                 for (Integer id : ids) {
-                    QueryWrapper queryWrapper = new QueryWrapper<>();
+                    QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
                     queryWrapper.eq("id", id);
                     FileModel fileModel = fileMapper.selectOne(queryWrapper);
                     if (fileModel != null) {
                         deleteFile(fileModel);
                     } else {
+                        log.warn("数据库没有找到这个文件 id={}", id);
                     }
                 }
                 return BaseResponse.success("批量删除成功");
@@ -409,7 +416,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 throw new RuntimeException(e);
             }
         } else {
-            QueryWrapper queryWrapper = new QueryWrapper<>();
+            QueryWrapper<FileModel> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("id", fileUuid);
             queryWrapper.or();
             queryWrapper.eq("file_uuid", fileUuid);
@@ -509,7 +516,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                         //类型三：bytes=22-2343
                         else if (ranges.length == 2) {
                             String rangeStart = ranges[0];
-                            if (rangeStart != null && rangeStart.trim().length() > 0) {
+                            if (rangeStart != null && !rangeStart.trim().isEmpty()) {
                                 startByte = Long.parseLong(rangeStart);
                             }
                             endByte = Long.parseLong(ranges[1]);
@@ -623,7 +630,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             log.debug("remoteAddr: {}", remoteAddr);
         }
 
-        LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
+        LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         if (serverName != null && !(serverName.startsWith("192.168") || serverName.startsWith("172.31") || serverName.startsWith("10"))) {
             log.warn("域名{}", serverName);
             lambdaQueryWrapper.eq(FileModel::getServerName, serverName);
@@ -650,7 +657,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         String remoteAddr = serverRequest.getRemoteAddr();
         String code = serverRequest.getParameter("code");
         log.debug("remoteAddr: {},serverName{},code={}", remoteAddr, serverName, code);
-        LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper();
+        LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         if (serverName != null) {
             log.warn("域名{}", serverName);
             lambdaQueryWrapper.eq(FileModel::getServerName, serverName);
@@ -681,9 +688,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         if (currentChunkSize <= 0) {
             currentChunkSize = BUFFER_SIZE;
         }
-        try {
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(destFile, "rw")) {
             // plupload 配置了chunk的时候新上传的文件append到文件末尾
-            RandomAccessFile randomAccessFile = new RandomAccessFile(destFile, "rw");
             long seek = (offset - 1) * chunkSize;
             randomAccessFile.seek(seek); // 移动到偏移量
 
