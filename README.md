@@ -34,6 +34,23 @@ git pull origin $(git rev-parse --abbrev-ref HEAD)
 	--reloadcmd     "docker exec -it  nginx-rblc nginx -s reload"
 ```
 
+
+105服务器
+
+```shell
+~/.acme.sh/acme.sh --issue -d file.cupb.top --dns dns_ali --debug
+```
+
+![img_1.png](img_1.png)
+
+
+```shell
+/home/rblc/.acme.sh/acme.sh --install-cert -d file.cupb.top \
+	--key-file       /media/data/docker/nginx/config/nginx/cert/file.cupb.top/private.key  \
+	--fullchain-file /media/data/docker/nginx/config/nginx/cert/file.cupb.top/full_chain.pem \
+	--reloadcmd     "docker exec -it  nginx-rblc nginx -s reload"
+```
+
 # 类似开源实现
 
 ## 练手项目
@@ -432,6 +449,71 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_pass http://10.2.0.4:8888/;
+        proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
+    }
+
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   html;
+    }
+}
+
+```
+
+迁移到105服务器
+
+```nginx配置
+
+server {
+    listen       80;
+    listen  [::]:80;
+    server_name file.cupb.top;
+
+    location / {
+         root /usr/share/nginx/airshare;
+         index  index.html index.htm;
+    }
+    location /api/ {
+        proxy_set_header HOST $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://10.2.0.5:8888/;
+        proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
+    }
+
+}
+
+
+server {
+    listen     443  ssl;
+    http2 on;
+    
+    server_name  file.cupb.top;
+    add_header Cache-Control no-store;
+    add_header Cache-Control private;
+
+    ssl_certificate    /etc/nginx/cert/file.cupb.top/full_chain.pem;
+    ssl_certificate_key   /etc/nginx/cert/file.cupb.top/private.key;
+    
+    ssl_session_cache    shared:SSL:1m;
+    ssl_session_timeout  5m;
+
+    ssl_protocols TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+    ssl_prefer_server_ciphers  on;
+
+    location / {
+         root /usr/share/nginx/airshare;
+         index  index.html index.htm;
+    }
+    location /api/ {
+        proxy_set_header HOST $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://10.2.0.5:8888/;
         proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
     }
 
