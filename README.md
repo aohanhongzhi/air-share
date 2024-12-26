@@ -136,6 +136,11 @@ https://github.com/WindRunnerMax/FileTransfer
 
 https://webrtc.touchczy.top/
 
+### FastSend
+
+FastSend 是一个基于 WebRTC 技术的点对点（P2P）文件传输工具，支持快速的目录同步和文件传输。通过浏览器即可实现安全、高效的文件共享。
+
+https://github.com/ShouChenICU/FastSend
 
 ### Syncthing 60.4k
 
