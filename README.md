@@ -109,6 +109,10 @@ https://github.com/schollz/croc
 
 ## 简单版本-可以上传下载删除
 
+### go-file
+
+https://github.com/songquanpeng/go-file
+
 ### dufs
 
 Rust开发的，小型的够用。
