@@ -239,6 +239,20 @@ https://flix.center/
 
 https://sdt.zishu.life
 
+
+#### nitroshare
+
+代码好多年没有更新了。
+
+类似LocalSend的跨平台传文件
+
+Cross-platform application for transferring files across a local network.
+
+https://nitroshare.net/
+
+https://github.com/nitroshare
+
+
 ### tagspaces 3.5k
 
 TagSpaces is an offline, open source, document manager with tagging support
