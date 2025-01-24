@@ -173,6 +173,19 @@ https://github.com/mtlynch/picoshare
 ![img.png](asset/picoshare.png)
 ![img_1.png](asset/picoshare1.png)
 
+
+
+### free-fs
+
+这个如果是小团队，应该也可以的。重点是可以对接aliyun OSS
+
+Free-Fs 开源文件管理系统：基于 SpringBoot3.x + MyBatis Flex + MySQL + Sa-Token + Layui 等搭配阿里云Oss、Minio、七牛云等各种云存储实现的云存储管理系统。 ✨Free-Fs 开源文件管理系统：基于 SpringBoot3.x + MyBatis Flex + MySQL + Sa-Token + Layui 等搭配阿里云OSS、Minio、七牛云等各种云存储实现的云存储管理系统。 包含文件上传、删除、在线预览、云资源列表查询、下载、文件移动、重命名、目录管理、登录、注册、以及权限控制等功能。
+
+https://gitee.com/xddcode/free-fs
+
+https://github.com/xddcode/free-fs
+
+
 ## 企业级推荐
 
 ### alist
