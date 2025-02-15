@@ -3,7 +3,6 @@ air-share
 
 [【腾讯文档】局域网无法访问本机端口](https://docs.qq.com/doc/DSGplRmttZEt6d3lx)
 
-
 ```shell
 git remote set-url --add origin git@github.com:aohanhongzhi/air-share.git
 ```
@@ -34,7 +33,6 @@ git pull origin $(git rev-parse --abbrev-ref HEAD)
 	--reloadcmd     "docker exec -it  nginx-rblc nginx -s reload"
 ```
 
-
 105服务器
 
 ```shell
@@ -42,7 +40,6 @@ git pull origin $(git rev-parse --abbrev-ref HEAD)
 ```
 
 ![img_1.png](img_1.png)
-
 
 ```shell
 /home/rblc/.acme.sh/acme.sh --install-cert -d file.cupb.top \
@@ -75,7 +72,8 @@ https://github.com/parvardegr/sharing
 
 ### FList
 
-将 GitHub Releases,Hugging Face,文件url等，渲染成类似网盘的文件列表显示在网页上，方便用户下载开源软件。 支持视频、音频、图片、PDF 等文件的在线预览。
+将 GitHub Releases,Hugging Face,文件url等，渲染成类似网盘的文件列表显示在网页上，方便用户下载开源软件。 支持视频、音频、图片、PDF
+等文件的在线预览。
 
 https://github.com/jianjianai/FList
 
@@ -131,7 +129,6 @@ https://github.com/filegator/filegator
 
 https://filegator.io/
 
-
 ### FileTransfer
 
 P2P 局域网文件传输
@@ -173,18 +170,18 @@ https://github.com/mtlynch/picoshare
 ![img.png](asset/picoshare.png)
 ![img_1.png](asset/picoshare1.png)
 
-
-
 ### free-fs
 
 这个如果是小团队，应该也可以的。重点是可以对接aliyun OSS
 
-Free-Fs 开源文件管理系统：基于 SpringBoot3.x + MyBatis Flex + MySQL + Sa-Token + Layui 等搭配阿里云Oss、Minio、七牛云等各种云存储实现的云存储管理系统。 ✨Free-Fs 开源文件管理系统：基于 SpringBoot3.x + MyBatis Flex + MySQL + Sa-Token + Layui 等搭配阿里云OSS、Minio、七牛云等各种云存储实现的云存储管理系统。 包含文件上传、删除、在线预览、云资源列表查询、下载、文件移动、重命名、目录管理、登录、注册、以及权限控制等功能。
+Free-Fs 开源文件管理系统：基于 SpringBoot3.x + MyBatis Flex + MySQL + Sa-Token + Layui
+等搭配阿里云Oss、Minio、七牛云等各种云存储实现的云存储管理系统。 ✨Free-Fs 开源文件管理系统：基于 SpringBoot3.x + MyBatis
+Flex + MySQL + Sa-Token + Layui 等搭配阿里云OSS、Minio、七牛云等各种云存储实现的云存储管理系统。
+包含文件上传、删除、在线预览、云资源列表查询、下载、文件移动、重命名、目录管理、登录、注册、以及权限控制等功能。
 
 https://gitee.com/xddcode/free-fs
 
 https://github.com/xddcode/free-fs
-
 
 ## 企业级推荐
 
@@ -236,6 +233,14 @@ Demo
 
 https://demo.cloudreve.org/login
 
+### jmal-cloud-server
+
+JmalCloud除了常规网盘的文件管理、文档在线预览编辑之外，还支持外部OSS存储，还自带一个博客系统。支持 WebDAV 协议，可将 JmalCloud 挂载为本地磁盘。
+
+• 项目源码：https://github.com/jamebal/jmal-cloud-server
+• 项目官网：https://jmalcloud.github.io/
+• 官方演示地址：https://jmal.cc/demo/
+
 ### localsend
 
 https://localsend.org
@@ -252,7 +257,6 @@ https://flix.center/
 
 https://sdt.zishu.life
 
-
 #### nitroshare
 
 代码好多年没有更新了。
@@ -264,7 +268,6 @@ Cross-platform application for transferring files across a local network.
 https://nitroshare.net/
 
 https://github.com/nitroshare
-
 
 ### tagspaces 3.5k
 
@@ -362,6 +365,7 @@ VM 参数
 ### 部署
 
 启动
+
 ```shell
 ./gradlew clean bootRun -x test   --args='--spring.profiles.active=beta'
 ```
@@ -416,7 +420,6 @@ docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v  /mnt/resource/data/dock
 
 docker run -d -p 80:80 -p 443:443 --name rblc-nginx1 -v /mnt/resource/data/docker/nginx/www:/usr/share/nginx -v
 /mnt/resource/data/docker/nginx/config/:/etc/nginx/ nginx
-
 
 ![img.png](asset/memory.png)
 
