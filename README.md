@@ -185,6 +185,11 @@ https://gitee.com/xddcode/free-fs
 
 https://github.com/xddcode/free-fs
 
+### PasswordPusher
+
+密码传输工具，也可以传输文件
+
+https://github.com/pglombardo/PasswordPusher
 
 ## 企业级推荐
 
