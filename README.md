@@ -246,6 +246,25 @@ JmalCloud除了常规网盘的文件管理、文档在线预览编辑之外，�
 • 项目官网：https://jmalcloud.github.io/
 • 官方演示地址：https://jmal.cc/demo/
 
+
+### OxiCloud
+
+OxiCloud server, efficient and secure way to save all your data
+
+OxiCloud是一款类似 NextCloud 的文件存储系统，采用 Rust 语言构建，从一开始就以性能、安全性和可扩展性作为其核心设计原则。非常适合自行搭建个人云存储，或在企业环境中部署使用。
+
+✨ 主要特点
+
+🔥 极速性能：使用 Rust 语言构建，并针对速度进行了优化
+📁 高级文件管理：直观的文件夹结构，搭配强大的批量操作功能
+🔄 并发处理：支持对大文件和批量处理进行并行文件操作
+🔍 智能缓存：针对元数据和文件访问的多层缓存系统
+🌐 国际化：全面支持国际化（目前支持英语和西班牙语）
+📱 响应式设计：在桌面设备和移动设备上都能无缝使用
+🔌 可扩展架构：遵循领域驱动原则的简洁分层设计
+
+https://github.com/DioCrafts/OxiCloud
+
 ### localsend
 
 https://localsend.org
