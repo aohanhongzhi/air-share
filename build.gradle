@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '3.4.0'// https://spring.io/projects/spring-boot#learn
-    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.springframework.boot' version '3.5.0'// https://spring.io/projects/spring-boot#learn
+    id 'io.spring.dependency-management' version '1.1.7' // https://docs.spring.io/dependency-management-plugin/docs/current/reference/html/
     id 'java'
 }
 
@@ -35,7 +35,8 @@ repositories {
 
 dependencies {
 //    implementation 'cn.langpy:ko-time:2.4.2' // 没有很好适配jdk9以上
-    implementation 'org.aspectj:aspectjrt:1.9.20.1'
+//  https://mvnrepository.com/artifact/org.aspectj/aspectjrt
+    implementation 'org.aspectj:aspectjrt:1.9.24'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 
     implementation 'org.springframework.boot:spring-boot-starter'
@@ -44,25 +45,27 @@ dependencies {
 
     implementation 'com.ejlchina:okhttps-jackson:3.4.0'
 //    https://github.com/spring-projects/spring-retry
-    implementation 'org.springframework.retry:spring-retry:2.0.10'
+    implementation 'org.springframework.retry:spring-retry:2.0.12'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
     // https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter
 //    implementation 'mysql:mysql-connector-java'
 
 //  https://github.com/xerial/sqlite-jdbc
-    implementation 'org.xerial:sqlite-jdbc:3.47.0.0'
-    implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.9'
-    implementation("com.baomidou:mybatis-plus-jsqlparser:3.5.9")
+    implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
+    implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.12'
+    implementation("com.baomidou:mybatis-plus-jsqlparser:3.5.12")
 //    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.6'
 //    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 
 //  https://github.com/brettwooldridge/HikariCP
-    implementation 'com.zaxxer:HikariCP:6.0.0'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+    implementation 'com.zaxxer:HikariCP:6.3.0'
+//    https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-fileupload2-jakarta
     implementation group: 'org.apache.commons', name: 'commons-fileupload2-jakarta', version: '2.0.0-M1'
 
+//    https://mvnrepository.com/artifact/jakarta.annotation/jakarta.annotation-api
     implementation 'jakarta.annotation:jakarta.annotation-api:3.0.0'
 
     compileOnly 'org.projectlombok:lombok'
