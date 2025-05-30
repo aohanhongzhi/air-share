@@ -270,6 +270,12 @@ OxiCloud是一款类似 NextCloud 的文件存储系统，采用 Rust 语言构�
 
 https://github.com/DioCrafts/OxiCloud
 
+### Nimbus
+
+An open source alternative to Google Drive, One Drive, iCloud, etc.
+
+https://github.com/logscore/Nimbus
+
 ### localsend
 
 https://localsend.org
