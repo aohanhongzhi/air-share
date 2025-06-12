@@ -66,7 +66,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
     private HashMap<String, Integer[]> uploadRecordHashMap = new HashMap<>();
 
     @Override
-    public BaseResponse uploadGet(String identifier) {
+    public BaseResponse uploadGet(String identifier, String fileName) {
         LambdaQueryWrapper<FileModel> objectLambdaQueryWrapper = new LambdaQueryWrapper<>();
         objectLambdaQueryWrapper.eq(FileModel::getFileUuid, identifier);
         objectLambdaQueryWrapper.last("limit 1");
@@ -85,6 +85,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 LambdaUpdateWrapper<FileModel> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
                 lambdaUpdateWrapper.eq(FileModel::getFileUuid, identifier);
                 lambdaUpdateWrapper.set(FileModel::getCreateTime, new Date());
+                if (fileModel.getFileName() == null || !fileModel.getFileName().equals(fileName)) {
+                    lambdaUpdateWrapper.set(FileModel::getFileName, fileName);
+                }
                 fileMapper.update(lambdaUpdateWrapper);
             } else {
                 log.error("实体文件不存在{} {}", file.getAbsolutePath(), fileModel);

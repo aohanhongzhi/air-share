@@ -14,7 +14,7 @@ import org.springframework.ui.Model;
 @Service
 public interface FileService extends IService<FileModel> {
 
-    BaseResponse uploadGet(String identifier);
+    BaseResponse uploadGet(String identifier, String fileName);
 
     /**
      * 上传文件

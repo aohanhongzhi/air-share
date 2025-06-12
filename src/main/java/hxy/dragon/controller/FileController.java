@@ -42,8 +42,8 @@ public class FileController {
     }
 
     @GetMapping("/file/upload")
-    public BaseResponse uploadGet(String identifier) {
-        return fileService.uploadGet(identifier);
+    public BaseResponse uploadGet(String identifier, String fileName) {
+        return fileService.uploadGet(identifier,fileName);
     }
 
     /**
@@ -104,7 +104,7 @@ public class FileController {
      */
     @GetMapping("/file/download")
     public void download(@RequestParam("fileUuid") String fileUuid, HttpServletRequest request, HttpServletResponse
-            response,// 获取Header里面的Range内容, 可选项, 可为空
+                                 response,// 获取Header里面的Range内容, 可选项, 可为空
                          @RequestHeader(name = "Range", required = false) String range) {
         fileService.downloadByFileId(fileUuid, request, response, range);
     }
