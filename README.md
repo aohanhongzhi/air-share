@@ -600,6 +600,74 @@ server {
 
 ```
 
+
+迁移到89服务器
+
+```nginx配置
+
+server {
+    listen       80;
+    listen  [::]:80;
+    server_name file.bosch-smartlife.com;
+
+    location / {
+         root /usr/share/nginx/airshare;
+         index  index.html index.htm;
+    }
+    location /api/ {
+        proxy_set_header HOST $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://10.5.0.8:8888/;
+        proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
+    }
+
+}
+
+
+server {
+    listen     443  ssl;
+    http2 on;
+    
+    server_name  file.bosch-smartlife.com;
+    add_header Cache-Control no-store;
+    add_header Cache-Control private;
+
+    ssl_certificate    /etc/nginx/8492630__bosch-smartlife.com_nginx/bosch-smartlife.com.pem;
+    ssl_certificate_key   /etc/nginx/8492630__bosch-smartlife.com_nginx/bosch-smartlife.com.key;
+    
+    ssl_session_cache    shared:SSL:1m;
+    ssl_session_timeout  5m;
+
+    ssl_protocols TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+    ssl_prefer_server_ciphers  on;
+
+    location / {
+         root /usr/share/nginx/airshare;
+         index  index.html index.htm;
+    }
+    location /api/ {
+        proxy_set_header HOST $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://10.5.0.8:8888/;
+        proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
+    }
+
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   html;
+    }
+}
+
+```
+
+
+
 查看是否是 http2协议
 
 ![img.png](img.png)
