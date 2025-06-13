@@ -42,7 +42,7 @@ public class FileController {
     }
 
     @GetMapping("/file/upload")
-    public BaseResponse uploadGet(String identifier, String fileName) {
+    public BaseResponse uploadGet(String identifier, @RequestParam("filename") String fileName) {
         return fileService.uploadGet(identifier,fileName);
     }
 
