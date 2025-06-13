@@ -87,6 +87,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 lambdaUpdateWrapper.set(FileModel::getCreateTime, new Date());
                 if (fileModel.getFileName() == null || !fileModel.getFileName().equals(fileName)) {
                     lambdaUpdateWrapper.set(FileModel::getFileName, fileName);
+                    hashMap.put("newName", fileName);
                 }
                 fileMapper.update(lambdaUpdateWrapper);
             } else {
