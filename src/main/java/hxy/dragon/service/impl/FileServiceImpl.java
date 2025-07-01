@@ -247,7 +247,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                                 log.info("文件夹不存在{}", dirPath);
                                 boolean mkdirs = directory.mkdirs();
                                 if (!mkdirs) {
-                                    log.error("文件夹新建失败 {}", dirPath);
+                                    log.warn("文件夹新建失败 {}", dirPath);
                                 }
                             }
                             File destFile = new File(dirPath, fileUuidName);
