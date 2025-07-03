@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '3.5.0'// https://spring.io/projects/spring-boot#learn
+    id 'org.springframework.boot' version '3.5.3'// https://spring.io/projects/spring-boot#learn
     id 'io.spring.dependency-management' version '1.1.7'
     // https://docs.spring.io/dependency-management-plugin/docs/current/reference/html/
     id 'java'
@@ -49,18 +49,19 @@ dependencies {
     implementation 'org.springframework.retry:spring-retry:2.0.12'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-    // https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter
 //    implementation 'mysql:mysql-connector-java'
 
 //  https://github.com/xerial/sqlite-jdbc
-    implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
+    implementation 'org.xerial:sqlite-jdbc:3.50.2.0'
+
+    // https://mvnrepository.com/artifact/com.baomidou/mybatis-plus-boot-starter
     implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.12'
     implementation("com.baomidou:mybatis-plus-jsqlparser:3.5.12")
 //    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.6'
 //    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 
 //  https://github.com/brettwooldridge/HikariCP
-    implementation 'com.zaxxer:HikariCP:6.3.0'
+    implementation 'com.zaxxer:HikariCP:6.3.1'
 //    https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-fileupload2-jakarta
