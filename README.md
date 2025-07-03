@@ -231,7 +231,7 @@ https://filebrowser.org
 
 http://disk.cupb.top/
 
-### Cloudreve 20.7k
+### Cloudreve 23.9k
 
 功能也非常完善。还支持市面常见的远程云存储。
 
