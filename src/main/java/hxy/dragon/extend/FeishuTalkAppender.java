@@ -36,7 +36,7 @@ public class FeishuTalkAppender extends UnsynchronizedAppenderBase<ILoggingEvent
         }
         switch (level.toInt()) {
             case Level.ERROR_INT:
-                if (true) {
+                if (false) {
                     // 发送到feishu
                     ConcurrentHashMap<String, Object> postBody = new ConcurrentHashMap<>();
                     long timeStamp = eventObject.getTimeStamp();
