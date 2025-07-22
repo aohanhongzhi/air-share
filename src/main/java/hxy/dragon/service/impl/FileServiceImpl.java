@@ -372,7 +372,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 return BaseResponse.error("实体文件不存在");
             }
         }
-        log.error("数据库没有记录，文件不存在 uuid {} md5 {} {}", uuid, md5, fileEntity);
+        log.warn("数据库没有记录，文件不存在 uuid {} md5 {} {}", uuid, md5, fileEntity);
         return BaseResponse.error("文件不存在");
     }
 
