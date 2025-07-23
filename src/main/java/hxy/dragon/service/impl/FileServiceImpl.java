@@ -33,6 +33,7 @@ import org.springframework.ui.Model;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -329,7 +330,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             } else {
                 return BaseResponse.error("请求体异常，仅支持POST方法");
             }
-        } catch (IOException e) {
+        } catch (FileNotFoundException e) {
+            log.warn("{}", e.getMessage(), e);
+            response.setStatus(500);
+            return BaseResponse.error("文件上传失败", e.getMessage());
+        }catch (IOException e) {
             log.error("{}", e.getMessage(), e);
             response.setStatus(500);
             return BaseResponse.error("文件上传失败", e.getMessage());
