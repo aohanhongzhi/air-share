@@ -30,6 +30,9 @@ import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -63,6 +66,62 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
     @Resource
     private FileMapper fileMapper;
+    
+    /**
+     * Sanitizes a file path to prevent directory traversal attacks
+     * 
+     * @param path The path to sanitize
+     * @return A sanitized path without any traversal sequences
+     */
+    private String sanitizePath(String path) {
+        if (path == null) {
+            return "";
+        }
+        
+        // Replace any backslashes with forward slashes for consistency
+        String sanitized = path.replaceAll("\\\\", "/");
+        
+        // Remove any directory traversal sequences
+        sanitized = sanitized.replaceAll("\\.\\./", "");
+        sanitized = sanitized.replaceAll("\\.\\.\\\\", "");
+        sanitized = sanitized.replaceAll("/\\./", "/");
+        
+        // Remove any remaining problematic sequences
+        sanitized = sanitized.replaceAll("\\.\\.", "");
+        
+        // Ensure path doesn't start with / or \ to prevent absolute path usage
+        sanitized = sanitized.replaceAll("^[/\\\\]+", "");
+        
+        return sanitized;
+    }
+    
+    /**
+     * Ensures a path is within the intended root directory
+     * 
+     * @param basePath The root base path
+     * @param relativePath The relative path to validate
+     * @return A safe canonical path that is guaranteed to be within the base path
+     */
+    private String ensurePathWithinRoot(String basePath, String relativePath) {
+        try {
+            // Normalize both paths
+            Path normalizedBase = Paths.get(basePath).normalize().toAbsolutePath();
+            Path normalizedPath = Paths.get(basePath, sanitizePath(relativePath)).normalize().toAbsolutePath();
+            
+            // Check if the normalized path starts with the base path
+            if (!normalizedPath.startsWith(normalizedBase)) {
+                log.error("Attempted directory traversal attack: {} is outside of {}", normalizedPath, normalizedBase);
+                // If the path is outside the base, return just the base path
+                return basePath;
+            }
+            
+            return normalizedPath.toString();
+        } catch (Exception e) {
+            log.error("Path validation error", e);
+            // In case of error, return just the base path to be safe
+            return basePath;
+        }
+    }
 
     private HashMap<String, Integer[]> uploadRecordHashMap = new HashMap<>();
 
@@ -242,7 +301,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
                             // 目标文件
 
-                            String dirPath = DirUtil.getFileStoreDir() + File.separator + DateUtil.getNowDate();
+                            // 安全处理日期路径，防止目录遍历攻击
+                            String dateDir = sanitizePath(DateUtil.getNowDate());
+                            String baseDir = DirUtil.getFileStoreDir();
+                            String dirPath = ensurePathWithinRoot(baseDir, dateDir);
+                            
                             File directory = new File(dirPath);
                             if (!directory.exists()) {
                                 log.info("文件夹不存在{}", dirPath);
@@ -251,8 +314,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                                     log.warn("文件夹新建失败 {}", dirPath);
                                 }
                             }
-                            File destFile = new File(dirPath, fileUuidName);
-                            String filePath = DateUtil.getNowDate() + File.separator + fileUuidName;
+                            // 安全处理文件路径
+                            String safeFileUuidName = sanitizePath(fileUuidName);
+                            File destFile = new File(dirPath, safeFileUuidName);
+                            String filePath = dateDir + File.separator + safeFileUuidName;
 
                             if (!newUpload) {
                                 // 新的上传方式不需要这个文件删除，因为 如果文件已经存在了，那么就不需要上传了，如果文件不存在，那么直接可以上传，所以也不会走到这个删除的地方。
@@ -263,17 +328,23 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                                     if (!delete) {
                                         log.error("文件删除失败 {}", destFile.getAbsolutePath());
                                     }
-                                    destFile = new File(DirUtil.getFileStoreDir(), fileUuidName);
+                                    String safeUuidName = sanitizePath(fileUuidName);
+                                    destFile = new File(DirUtil.getFileStoreDir(), safeUuidName);
                                 }
                             }
 
-                            // 解决文件夹上传问题
+                            // 解决文件夹上传问题 - 使用安全路径验证
                             File parentFile = destFile.getParentFile();
                             if (!parentFile.exists()) {
-                                // 新建父级文件夹
-                                boolean mkdirs = parentFile.mkdirs();
-                                if (!mkdirs) {
-                                    log.error("Could not create directory {}", parentFile);
+                                // 验证父目录路径是否安全
+                                if (parentFile.getAbsolutePath().startsWith(DirUtil.getFileStoreDir())) {
+                                    // 新建父级文件夹
+                                    boolean mkdirs = parentFile.mkdirs();
+                                    if (!mkdirs) {
+                                        log.error("Could not create directory {}", parentFile);
+                                    }
+                                } else {
+                                    log.error("Security violation: Attempted to create directory outside of allowed path: {}", parentFile);
                                 }
                             }
 
