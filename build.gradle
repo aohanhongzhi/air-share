@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '3.5.3'// https://spring.io/projects/spring-boot#learn
+    id 'org.springframework.boot' version '3.5.4'// https://spring.io/projects/spring-boot#learn
     id 'io.spring.dependency-management' version '1.1.7'
     // https://docs.spring.io/dependency-management-plugin/docs/current/reference/html/
     id 'java'
@@ -61,9 +61,9 @@ dependencies {
 //    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 
 //  https://github.com/brettwooldridge/HikariCP
-    implementation 'com.zaxxer:HikariCP:6.3.1'
+    implementation 'com.zaxxer:HikariCP:6.3.2'
 //    https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-fileupload2-jakarta
     implementation group: 'org.apache.commons', name: 'commons-fileupload2-jakarta', version: '2.0.0-M1'
 
