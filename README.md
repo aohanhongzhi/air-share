@@ -142,6 +142,12 @@ https://webrtc.touchczy.top/
 
 https://github.com/tl-open-source/tl-rtc-file
 
+
+p2p的不经过服务器中转
+
+https://github.com/MatrixSeven/file-transfer-go
+
+
 ### Syncthing 60.4k
 
 支持P2P的形式
