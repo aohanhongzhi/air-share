@@ -30,9 +30,6 @@ import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -43,6 +40,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
@@ -198,6 +197,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 // threshold 极限、临界值，即硬盘缓存 1M
 //                diskFactory.setSizeThreshold(4 * 1024);
 
+                @SuppressWarnings("unchecked")
                 JakartaServletFileUpload upload = new JakartaServletFileUpload(diskFactory);
                 //设置上传单个文件的大小的最大值，目前是设置为1024*1024字节，也就是100MB
                 upload.setFileSizeMax(1024 * 1024 * 100);
@@ -749,7 +749,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             lambdaQueryWrapper.like(searchValue != null && searchValue.length() > 0, FileModel::getFileName, searchValue);
         }
 
-        IPage page1 = fileMapper.selectPage(page, lambdaQueryWrapper);
+        @SuppressWarnings("unchecked")
+        IPage<FileModel> page1 = (IPage<FileModel>) fileMapper.selectPage(page, lambdaQueryWrapper);
 
         return BaseResponse.success(page1);
     }

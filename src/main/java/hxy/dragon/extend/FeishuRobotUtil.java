@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -43,7 +44,7 @@ public class FeishuRobotUtil {
         if (tenantAccessToken != null) {
             String content = textContent;
             try {
-                URL url = new URL("https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id");
+                URL url = URI.create("https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id").toURL();
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Authorization", "Bearer " + tenantAccessToken.getTenantAccessToken());
@@ -104,7 +105,7 @@ public class FeishuRobotUtil {
         String appSecret = "PAtVnWyuRQTyRRQ1EpHQ9fnAevpYGkkV";
 
         try {
-            URL url = new URL("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal");
+            URL url = URI.create("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal").toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import jakarta.annotation.PostConstruct;
@@ -135,13 +136,24 @@ public class GlobalExceptionHandler implements InitializingBean {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(value = Exception.class)
     public BaseResponse exceptionHandler(HttpServletRequest request, Exception exception) {
-        String message = "系统发生错误";
-        log.error("当前URL={} ", request.getRequestURI(), exception);
+        boolean errorLevel = true;
+        String ip = request.getRemoteHost();
 
+        String message = "系统发生错误";
         if (exception instanceof NullPointerException) {
             message = "biu，踩雷啦！";
         } else if (exception instanceof ValidationException) {
             message = "参数检验出错啦！";
+            errorLevel = false;
+        } else if (exception instanceof NoResourceFoundException) {
+            message = "参数检验出错啦！";
+            errorLevel = false;
+        }
+
+        if (errorLevel) {
+            log.error("{} URI={}, {}=>{}", request.getMethod(), request.getRequestURI(), ip, exception.getMessage(), exception);
+        } else {
+            log.warn("{} URI={}, {}=>{}", request.getMethod(), request.getRequestURI(), ip, exception.getMessage(), exception);
         }
 
         return BaseResponse.error(message, exception.getMessage());

@@ -29,7 +29,7 @@ public class LogbackDingTalkAppender extends UnsynchronizedAppenderBase<ILogging
             .addMsgConvertor(new JacksonMsgConvertor())
             .build();
 
-    @Retryable(value = Exception.class, maxAttempts = 4, backoff = @Backoff(delay = 100, maxDelay = 500))
+    @Retryable(retryFor = Exception.class, maxAttempts = 4, backoff = @Backoff(delay = 100, maxDelay = 500))
     @Override
     protected void append(ILoggingEvent eventObject) {
         String activeProfile = EnvironmentUtil.getActiveProfile();
