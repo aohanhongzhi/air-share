@@ -105,6 +105,14 @@ https://gitee.com/folder-share
 
 https://github.com/schollz/croc
 
+
+### FileSync
+
+Send files from one device to many in real-time.
+
+https://github.com/polius/FileSync
+
+
 ## 简单版本-可以上传下载删除
 
 ### go-file
