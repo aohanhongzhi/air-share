@@ -69,6 +69,43 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    public String sendLoginVerificationCode(String email) {
+        try {
+            // Generate 6-digit verification code
+            String verificationCode = generateVerificationCode();
+            
+            // Clean up expired verification codes
+            emailVerificationMapper.deleteExpiredCodes();
+            
+            // Save verification code to database
+            EmailVerificationModel emailVerification = new EmailVerificationModel();
+            emailVerification.setEmail(email);
+            emailVerification.setVerificationCode(verificationCode);
+            emailVerification.setUsed(false);
+            emailVerification.setCreateTime(LocalDateTime.now());
+            emailVerification.setExpireTime(LocalDateTime.now().plusMinutes(10)); // Expire in 10 minutes
+            
+            emailVerificationMapper.insert(emailVerification);
+            
+            // Send email
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(email);
+            message.setSubject("AirShare Login Verification");
+            message.setText("Your login verification code is: " + verificationCode + "\n\nThis code will expire in 10 minutes.\n\nIf you did not request this code, please ignore this email.");
+            
+            mailSender.send(message);
+            
+            log.info("Login verification code sent to email: {}", email);
+            return verificationCode;
+            
+        } catch (Exception e) {
+            log.error("Failed to send login verification code to email: {}", email, e);
+            throw new RuntimeException("Failed to send login verification email");
+        }
+    }
+
+    @Override
     public boolean verifyCode(String email, String code) {
         try {
             EmailVerificationModel verification = emailVerificationMapper.findValidVerification(email, code);

@@ -4,6 +4,7 @@ import hxy.dragon.dao.mapper.UserMapper;
 import hxy.dragon.dao.model.UserModel;
 import hxy.dragon.entity.request.UserLoginRequest;
 import hxy.dragon.entity.request.UserRegisterRequest;
+import hxy.dragon.entity.request.VerificationCodeLoginRequest;
 import hxy.dragon.entity.response.UserLoginResponse;
 import hxy.dragon.service.EmailService;
 import hxy.dragon.service.UserService;
@@ -102,6 +103,40 @@ public class UserServiceImpl implements UserService {
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getEmail());
 
         log.info("User logged in successfully: {}", user.getUsername());
+        
+        return new UserLoginResponse(token, user.getUsername(), user.getEmail(), user.getId());
+    }
+
+    @Override
+    public UserLoginResponse loginWithVerificationCode(VerificationCodeLoginRequest request) {
+        // Find user by email
+        UserModel user = userMapper.findByEmail(request.getEmail());
+        
+        if (user == null) {
+            throw new RuntimeException("User not found with this email");
+        }
+
+        if (!user.getEnabled()) {
+            throw new RuntimeException("User account is disabled");
+        }
+
+        if (!user.getEmailVerified()) {
+            throw new RuntimeException("Email not verified");
+        }
+
+        // Verify verification code
+        if (!emailService.verifyCode(request.getEmail(), request.getVerificationCode())) {
+            throw new RuntimeException("Invalid or expired verification code");
+        }
+
+        // Update last login time
+        user.setLastLoginTime(LocalDateTime.now());
+        userMapper.updateById(user);
+
+        // Generate JWT token
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getEmail());
+
+        log.info("User logged in with verification code successfully: {}", user.getUsername());
         
         return new UserLoginResponse(token, user.getUsername(), user.getEmail(), user.getId());
     }

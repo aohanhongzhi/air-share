@@ -3,6 +3,7 @@ package hxy.dragon.service;
 import hxy.dragon.dao.model.UserModel;
 import hxy.dragon.entity.request.UserLoginRequest;
 import hxy.dragon.entity.request.UserRegisterRequest;
+import hxy.dragon.entity.request.VerificationCodeLoginRequest;
 import hxy.dragon.entity.response.UserLoginResponse;
 
 /**
@@ -27,6 +28,14 @@ public interface UserService {
      * @return login response with token
      */
     UserLoginResponse login(UserLoginRequest request);
+
+    /**
+     * User login with verification code
+     *
+     * @param request verification code login request
+     * @return login response with token
+     */
+    UserLoginResponse loginWithVerificationCode(VerificationCodeLoginRequest request);
 
     /**
      * Find user by username or email

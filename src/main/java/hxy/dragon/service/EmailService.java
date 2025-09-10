@@ -16,6 +16,14 @@ public interface EmailService {
     String sendVerificationCode(String email);
 
     /**
+     * Send login verification code to existing user
+     *
+     * @param email target email address
+     * @return verification code sent
+     */
+    String sendLoginVerificationCode(String email);
+
+    /**
      * Verify email verification code
      *
      * @param email target email address

@@ -5,6 +5,7 @@ import hxy.dragon.entity.reponse.BaseResponse;
 import hxy.dragon.entity.request.EmailVerificationRequest;
 import hxy.dragon.entity.request.UserLoginRequest;
 import hxy.dragon.entity.request.UserRegisterRequest;
+import hxy.dragon.entity.request.VerificationCodeLoginRequest;
 import hxy.dragon.entity.response.UserLoginResponse;
 import hxy.dragon.service.EmailService;
 import hxy.dragon.service.UserService;
@@ -112,6 +113,63 @@ public class AuthController {
         } catch (Exception e) {
             log.error("User login failed", e);
             return BaseResponse.error("Login failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Send login verification code for existing users
+     */
+    @PostMapping("/send-login-verification-code")
+    public BaseResponse<String> sendLoginVerificationCode(@Validated @RequestBody EmailVerificationRequest request) {
+        try {
+            // Check if email is registered
+            if (!userService.existsByEmail(request.getEmail())) {
+                return BaseResponse.error("Email is not registered");
+            }
+
+            String code = emailService.sendLoginVerificationCode(request.getEmail());
+            log.info("Login verification code sent to: {}", request.getEmail());
+            
+            return BaseResponse.success("Login verification code sent successfully");
+        } catch (Exception e) {
+            log.error("Failed to send login verification code", e);
+            return BaseResponse.error("Failed to send login verification code: " + e.getMessage());
+        }
+    }
+
+    /**
+     * User login with verification code
+     */
+    @PostMapping("/login-with-code")
+    public BaseResponse<UserLoginResponse> loginWithCode(@Validated @RequestBody VerificationCodeLoginRequest request, HttpServletRequest httpRequest) {
+        try {
+            UserLoginResponse response = userService.loginWithVerificationCode(request);
+            log.info("User logged in with verification code successfully: {}", response.getUsername());
+            
+            // Create session for template-based navigation
+            HttpSession session = httpRequest.getSession(true);
+            
+            // Create authentication for session
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                response.getUsername(),
+                null, // Don't store password
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+            );
+            
+            // Set authentication in security context
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+            securityContext.setAuthentication(auth);
+            
+            // Store security context in session
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+            SecurityContextHolder.setContext(securityContext);
+            
+            log.info("Session created for user: {}", response.getUsername());
+            
+            return BaseResponse.success("Login with verification code successful", response);
+        } catch (Exception e) {
+            log.error("User login with verification code failed", e);
+            return BaseResponse.error("Login with verification code failed: " + e.getMessage());
         }
     }
 
