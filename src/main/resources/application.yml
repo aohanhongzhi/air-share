@@ -9,6 +9,20 @@ spring:
     driver-class-name: org.sqlite.JDBC
   profiles:
     active: prod
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: ${email.username}
+    password: ${email.password}
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  main:
+    allow-circular-references: true
 
 hxy:
   print:
@@ -19,9 +33,15 @@ logging:
   level:
     root: info
     hxy.dragon: debug
+    
 server:
   port: 8888
 #  address: 0.0.0.0 # 这里不会影响局域网访问
+
+# JWT configuration
+jwt:
+  expiration: 86400000 # 24 hours in milliseconds
+
 # 日志邮件报警
 email:
   username: aohanhongzhi@qq.com

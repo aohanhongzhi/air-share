@@ -13,6 +13,13 @@ git remote set-url --add origin git@github.com:aohanhongzhi/air-share.git
 git pull origin $(git rev-parse --abbrev-ref HEAD)
 ```
 
+windows下取进程
+
+```shell
+netstat -aon | findstr :8888
+taskkill /PID 26024 /F
+```
+
 支持jdk21
 
 # 目前实现的功能

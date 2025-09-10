@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - Air Share!</title>
+
+    <!-- zui -->
+    <link rel="stylesheet" href="../css/zui.css">
+
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .btn-full-width {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .alert {
+            margin-bottom: 15px;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        footer {
+            position: absolute;
+            bottom: 0;
+            clear: both;
+            display: block;
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="login-container">
+        <h2 class="text-center">Login to Air Share</h2>
+        
+        <div id="alert-container"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="usernameOrEmail">Username or Email:</label>
+                <input type="text" class="form-control" id="usernameOrEmail" name="usernameOrEmail" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full-width">Login</button>
+        </form>
+        
+        <div class="text-center">
+            <p>Don't have an account? <a href="register">Register here</a></p>
+            <p><a href="/">Back to Home</a></p>
+        </div>
+    </div>
+</div>
+
+<footer id="footer"><a href="https://beian.miit.gov.cn/">京ICP备18028985号-2</a></footer>
+
+<!-- jQuery -->
+<script src="../js/jquery-1.11.0.min.js"></script>
+<!-- ZUI Javascript组件 -->
+<script src="../js/zui.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#loginForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = {
+                usernameOrEmail: $('#usernameOrEmail').val(),
+                password: $('#password').val()
+            };
+            
+            $.ajax({
+                url: '/auth/login',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    if (response.code === 200) {
+                        // Store the token
+                        localStorage.setItem('authToken', response.data.token);
+                        localStorage.setItem('username', response.data.username);
+                        localStorage.setItem('email', response.data.email);
+                        localStorage.setItem('userId', response.data.userId);
+                        
+                        showAlert('Login successful! Redirecting...', 'alert-success');
+                        
+                        // Redirect to home page after a short delay
+                        setTimeout(function() {
+                            window.location.href = '/';
+                        }, 1000);
+                    } else {
+                        showAlert('Login failed: ' + response.msg, 'alert-danger');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var errorMessage = 'Login failed';
+                    if (xhr.responseJSON && xhr.responseJSON.msg) {
+                        errorMessage += ': ' + xhr.responseJSON.msg;
+                    }
+                    showAlert(errorMessage, 'alert-danger');
+                }
+            });
+        });
+    });
+    
+    function showAlert(message, alertClass) {
+        var alertHtml = '<div class="alert ' + alertClass + '">' + message + '</div>';
+        $('#alert-container').html(alertHtml);
+        
+        // Auto-hide success alerts after 3 seconds
+        if (alertClass === 'alert-success') {
+            setTimeout(function() {
+                $('#alert-container').html('');
+            }, 3000);
+        }
+    }
+</script>
+</body>
+
+</html>

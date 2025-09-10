@@ -30,16 +30,29 @@
 <div class="container">
     <ul class="nav nav-primary" style="margin-top: 20px">
         <li class="active"><a href="index">首页</a></li>
-        <li><a href="files">文件</a></li>
+        <li><a href="#" id="filesLink">文件</a></li>
+        <li class="pull-right" id="authSection">
+            <!-- Auth section will be populated by JavaScript -->
+        </li>
     </ul>
-    <h3>上传完文件后直接点击“文件”查看。下面上传你的文件，任何人可以访问到</h3>
-    <h3 style="color: red">文件是公开的，请及时删除！！！</h3>
+    
+    <div id="loginRequired" style="display: none;">
+        <div class="alert alert-info">
+            <h4>Login Required</h4>
+            <p>Please <a href="/login">login</a> or <a href="/register">register</a> to upload and view files.</p>
+        </div>
+    </div>
+    
+    <div id="uploadSection">
+        <h3>上传完文件后直接点击"文件"查看。下面上传你的文件，只有登录用户可以访问</h3>
+        <h3 style="color: red">文件需要登录才能查看，请及时删除！！！</h3>
 
-    <div id="uploaderExample" class="uploader">
-        <div class="file-list" data-drag-placeholder="请拖拽文件到此处"></div>
-        <button type="button" class="btn btn-primary uploader-btn-browse"><i class="icon icon-cloud-upload"></i>
-            选择文件
-        </button>
+        <div id="uploaderExample" class="uploader">
+            <div class="file-list" data-drag-placeholder="请拖拽文件到此处"></div>
+            <button type="button" class="btn btn-primary uploader-btn-browse"><i class="icon icon-cloud-upload"></i>
+                选择文件
+            </button>
+        </div>
     </div>
 
     <h3>同类的产品推荐</h3>
@@ -83,6 +96,97 @@
 <script src="../lib/uploader/zui.uploader.js"></script>
 
 <script>
+    // Authentication management
+    $(document).ready(function() {
+        checkAuthStatus();
+        
+        // Handle files link click
+        $('#filesLink').on('click', function(e) {
+            e.preventDefault();
+            var token = localStorage.getItem('authToken');
+            if (token) {
+                window.location.href = '/files';
+            } else {
+                alert('Please login first to view files.');
+                window.location.href = '/login';
+            }
+        });
+    });
+    
+    function checkAuthStatus() {
+        var token = localStorage.getItem('authToken');
+        var username = localStorage.getItem('username');
+        
+        if (token && username) {
+            // User is logged in
+            $('#authSection').html(
+                '<li class="dropdown">' +
+                '<a href="#" class="dropdown-toggle" data-toggle="dropdown">' +
+                'Welcome, ' + username + ' <b class="caret"></b>' +
+                '</a>' +
+                '<ul class="dropdown-menu">' +
+                '<li><a href="#" onclick="logout()">Logout</a></li>' +
+                '</ul>' +
+                '</li>'
+            );
+            $('#loginRequired').hide();
+            $('#uploadSection').show();
+            $('#filesLink').attr('href', '/files').text('文件 (已登录)');
+            
+            // Configure uploader with authentication
+            setupAuthenticatedUploader();
+        } else {
+            // User is not logged in
+            $('#authSection').html(
+                '<li><a href="/login">Login</a></li>' +
+                '<li><a href="/register">Register</a></li>'
+            );
+            $('#loginRequired').show();
+            $('#uploadSection').hide();
+            $('#filesLink').attr('href', '#').text('文件 (需登录)');
+        }
+    }
+    
+    function logout() {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('username');
+        localStorage.removeItem('email');
+        localStorage.removeItem('userId');
+        checkAuthStatus();
+    }
+    
+    function setupAuthenticatedUploader() {
+        var token = localStorage.getItem('authToken');
+        
+        $('#uploaderExample').uploader({
+            autoUpload: true,
+            prevent_duplicates: true,
+            chunk_size: '4mb',
+            url: '/file/upload',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            responseHandler: function (responseObject, file) {
+                console.log("服务器返回信息:", responseObject);
+                
+                if (responseObject.response.indexOf('error') === 0) {
+                    return '上传失败。服务器返回了一个错误：' + responseObject.response;
+                } else if (responseObject.response.indexOf('error2') === 0) {
+                    return true;
+                }
+            },
+            onError: function (error) {
+                console.log(error.code + error.message + file.name);
+                
+                // Check if error is due to authentication
+                if (error.code === 401 || error.message.includes('unauthorized')) {
+                    alert('Authentication failed. Please login again.');
+                    logout();
+                }
+            }
+        });
+    }
+    
     function getHostPath() {
         //获取当前网址，如： http://localhost:8088/test/test.jsp
         var curPath = window.document.location.href;
@@ -103,34 +207,6 @@
         console.log("当前服务器地址" + localhostPath)
         return localhostPath;//发布前用此
     }
-
-    $('#uploaderExample').uploader({
-        autoUpload: true, // 当选择文件后立即自动进行上传操作
-        prevent_duplicates: true, // 阻止重复文件上传
-        chunk_size: '4mb',
-        url: '/file/upload', // 文件上传提交地址
-        responseHandler: function (responseObject, file) {
-            // alert(file.files[0].name)
-            // 当服务器返回的文本内容包含 `'error'` 文本时视为上传失败
-            // alert(responseObject.response)
-            console.log("服务器返回信息:", responseObject);
-            /* 使用触发器对象直接显示 */
-            // var host = getHostPath();
-            // let parse = JSON.parse(responseObject.response);
-            // (new $.zui.ModalTrigger({custom: host + parse.data})).show();
-
-            if (responseObject.response.indexOf('error') === 0) {
-                return '上传失败。服务器返回了一个错误：' + responseObject.response;
-            } else if (responseObject.response.indexOf('error2') === 0) {
-                //无论返回啥都是错误，没有错误就不返回即可
-                return true;
-            }
-        },
-        onError: function (error) {
-            console.log(error.code + error.message + file.name)
-
-        }
-    });
 </script>
 </body>
 

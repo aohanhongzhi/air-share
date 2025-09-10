@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register - Air Share!</title>
+
+    <!-- zui -->
+    <link rel="stylesheet" href="../css/zui.css">
+
+    <style>
+        .register-container {
+            max-width: 450px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .btn-full-width {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .alert {
+            margin-bottom: 15px;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .verification-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .verification-group input {
+            flex: 1;
+        }
+        
+        .verification-group button {
+            flex: 0 0 auto;
+        }
+        
+        footer {
+            position: absolute;
+            bottom: 0;
+            clear: both;
+            display: block;
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="register-container">
+        <h2 class="text-center">Register for Air Share</h2>
+        
+        <div id="alert-container"></div>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+                <small class="text-muted">3-50 characters, letters and numbers only</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="verificationCode">Email Verification Code:</label>
+                <div class="verification-group">
+                    <input type="text" class="form-control" id="verificationCode" name="verificationCode" placeholder="Enter verification code" required>
+                    <button type="button" class="btn btn-secondary" id="sendCodeBtn">Send Code</button>
+                </div>
+                <small class="text-muted">We'll send a verification code to your email</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+                <small class="text-muted">At least 6 characters</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password:</label>
+                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full-width">Register</button>
+        </form>
+        
+        <div class="text-center">
+            <p>Already have an account? <a href="login">Login here</a></p>
+            <p><a href="/">Back to Home</a></p>
+        </div>
+    </div>
+</div>
+
+<footer id="footer"><a href="https://beian.miit.gov.cn/">京ICP备18028985号-2</a></footer>
+
+<!-- jQuery -->
+<script src="../js/jquery-1.11.0.min.js"></script>
+<!-- ZUI Javascript组件 -->
+<script src="../js/zui.js"></script>
+
+<script>
+    $(document).ready(function() {
+        var codeSentTime = 0;
+        var codeTimer = null;
+        
+        // Send verification code
+        $('#sendCodeBtn').on('click', function() {
+            var email = $('#email').val();
+            if (!email) {
+                showAlert('Please enter your email address first', 'alert-warning');
+                return;
+            }
+            
+            // Check if code was sent recently (60 seconds cooldown)
+            var now = Date.now();
+            if (now - codeSentTime < 60000) {
+                showAlert('Please wait 60 seconds before requesting another code', 'alert-warning');
+                return;
+            }
+            
+            var button = $(this);
+            button.prop('disabled', true).text('Sending...');
+            
+            $.ajax({
+                url: '/auth/send-verification-code',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({email: email}),
+                success: function(response) {
+                    if (response.code === 200) {
+                        showAlert('Verification code sent to your email!', 'alert-success');
+                        codeSentTime = Date.now();
+                        startCooldown(button);
+                    } else {
+                        showAlert('Failed to send verification code: ' + response.msg, 'alert-danger');
+                        button.prop('disabled', false).text('Send Code');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var errorMessage = 'Failed to send verification code';
+                    if (xhr.responseJSON && xhr.responseJSON.msg) {
+                        errorMessage += ': ' + xhr.responseJSON.msg;
+                    }
+                    showAlert(errorMessage, 'alert-danger');
+                    button.prop('disabled', false).text('Send Code');
+                }
+            });
+        });
+        
+        // Register form submission
+        $('#registerForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            var password = $('#password').val();
+            var confirmPassword = $('#confirmPassword').val();
+            
+            if (password !== confirmPassword) {
+                showAlert('Passwords do not match', 'alert-danger');
+                return;
+            }
+            
+            var formData = {
+                username: $('#username').val(),
+                email: $('#email').val(),
+                password: password,
+                verificationCode: $('#verificationCode').val()
+            };
+            
+            $.ajax({
+                url: '/auth/register',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    if (response.code === 200) {
+                        showAlert('Registration successful! Redirecting to login...', 'alert-success');
+                        
+                        // Redirect to login page after a short delay
+                        setTimeout(function() {
+                            window.location.href = '/login';
+                        }, 2000);
+                    } else {
+                        showAlert('Registration failed: ' + response.msg, 'alert-danger');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var errorMessage = 'Registration failed';
+                    if (xhr.responseJSON && xhr.responseJSON.msg) {
+                        errorMessage += ': ' + xhr.responseJSON.msg;
+                    }
+                    showAlert(errorMessage, 'alert-danger');
+                }
+            });
+        });
+        
+        // Real-time validation
+        $('#username').on('blur', function() {
+            var username = $(this).val();
+            if (username && username.length >= 3) {
+                checkUsernameAvailability(username);
+            }
+        });
+        
+        $('#email').on('blur', function() {
+            var email = $(this).val();
+            if (email && email.includes('@')) {
+                checkEmailAvailability(email);
+            }
+        });
+    });
+    
+    function startCooldown(button) {
+        var countdown = 60;
+        codeTimer = setInterval(function() {
+            countdown--;
+            button.text('Resend (' + countdown + 's)');
+            
+            if (countdown <= 0) {
+                clearInterval(codeTimer);
+                button.prop('disabled', false).text('Send Code');
+            }
+        }, 1000);
+    }
+    
+    function checkUsernameAvailability(username) {
+        $.ajax({
+            url: '/auth/check-username?username=' + encodeURIComponent(username),
+            type: 'GET',
+            success: function(response) {
+                if (!response.data) {
+                    $('#username').removeClass('is-valid').addClass('is-invalid');
+                    showAlert('Username is already taken', 'alert-warning');
+                } else {
+                    $('#username').removeClass('is-invalid').addClass('is-valid');
+                }
+            }
+        });
+    }
+    
+    function checkEmailAvailability(email) {
+        $.ajax({
+            url: '/auth/check-email?email=' + encodeURIComponent(email),
+            type: 'GET',
+            success: function(response) {
+                if (!response.data) {
+                    $('#email').removeClass('is-valid').addClass('is-invalid');
+                    showAlert('Email is already registered', 'alert-warning');
+                } else {
+                    $('#email').removeClass('is-invalid').addClass('is-valid');
+                }
+            }
+        });
+    }
+    
+    function showAlert(message, alertClass) {
+        var alertHtml = '<div class="alert ' + alertClass + '">' + message + '</div>';
+        $('#alert-container').html(alertHtml);
+        
+        // Auto-hide success alerts after 5 seconds
+        if (alertClass === 'alert-success') {
+            setTimeout(function() {
+                $('#alert-container').html('');
+            }, 5000);
+        }
+    }
+</script>
+</body>
+
+</html>
