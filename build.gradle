@@ -55,7 +55,7 @@ dependencies {
     // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    implementation 'com.ejlchina:okhttps-jackson:3.4.0'
+    implementation 'cn.zhxu:okhttps-jackson:4.1.0'
 //    https://github.com/spring-projects/spring-retry
     implementation 'org.springframework.retry:spring-retry:2.0.12'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'

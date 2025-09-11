@@ -117,16 +117,13 @@ public class AuthController {
     }
 
     /**
-     * Send login verification code for existing users
+     * Send login verification code (allows for both existing and new users)
      */
     @PostMapping("/send-login-verification-code")
     public BaseResponse<String> sendLoginVerificationCode(@Validated @RequestBody EmailVerificationRequest request) {
         try {
-            // Check if email is registered
-            if (!userService.existsByEmail(request.getEmail())) {
-                return BaseResponse.error("Email is not registered");
-            }
-
+            // Send verification code regardless of whether email is registered
+            // This allows for automatic user creation during login
             String code = emailService.sendLoginVerificationCode(request.getEmail());
             log.info("Login verification code sent to: {}", request.getEmail());
             

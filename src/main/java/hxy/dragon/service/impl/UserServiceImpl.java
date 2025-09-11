@@ -108,25 +108,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserLoginResponse loginWithVerificationCode(VerificationCodeLoginRequest request) {
+        // Verify verification code first
+        if (!emailService.verifyCode(request.getEmail(), request.getVerificationCode())) {
+            throw new RuntimeException("Invalid or expired verification code");
+        }
+
         // Find user by email
         UserModel user = userMapper.findByEmail(request.getEmail());
         
+        // If user doesn't exist, create a new user automatically
         if (user == null) {
-            throw new RuntimeException("User not found with this email");
+            log.info("User not found for email: {}, creating new user", request.getEmail());
+            user = createUserFromEmail(request.getEmail());
         }
 
         if (!user.getEnabled()) {
             throw new RuntimeException("User account is disabled");
-        }
-
-        if (!user.getEmailVerified()) {
-            throw new RuntimeException("Email not verified");
-        }
-
-        // Verify verification code
-        if (!emailService.verifyCode(request.getEmail(), request.getVerificationCode())) {
-            throw new RuntimeException("Invalid or expired verification code");
         }
 
         // Update last login time
@@ -139,6 +138,47 @@ public class UserServiceImpl implements UserService {
         log.info("User logged in with verification code successfully: {}", user.getUsername());
         
         return new UserLoginResponse(token, user.getUsername(), user.getEmail(), user.getId());
+    }
+
+    /**
+     * Create a new user from email during verification code login
+     */
+    private UserModel createUserFromEmail(String email) {
+        // Generate a unique username from email
+        String baseUsername = email.substring(0, email.indexOf('@'));
+        String username = generateUniqueUsername(baseUsername);
+        
+        // Create new user without password
+        UserModel user = new UserModel();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(null); // No password for verification code created users
+        user.setEnabled(true);
+        user.setEmailVerified(true); // Email is verified through verification code
+        user.setCreateTime(LocalDateTime.now());
+        user.setUpdateTime(LocalDateTime.now());
+
+        // Save user to database
+        userMapper.insert(user);
+
+        log.info("New user created automatically during verification code login: {}", username);
+        return user;
+    }
+
+    /**
+     * Generate a unique username by appending numbers if needed
+     */
+    private String generateUniqueUsername(String baseUsername) {
+        String username = baseUsername;
+        int counter = 1;
+        
+        // Keep trying until we find a unique username
+        while (existsByUsername(username)) {
+            username = baseUsername + counter;
+            counter++;
+        }
+        
+        return username;
     }
 
     @Override

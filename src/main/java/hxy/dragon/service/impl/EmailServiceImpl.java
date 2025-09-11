@@ -92,7 +92,7 @@ public class EmailServiceImpl implements EmailService {
             message.setFrom(fromEmail);
             message.setTo(email);
             message.setSubject("AirShare Login Verification");
-            message.setText("Your login verification code is: " + verificationCode + "\n\nThis code will expire in 10 minutes.\n\nIf you did not request this code, please ignore this email.");
+            message.setText("Your login verification code is: " + verificationCode + "\n\nThis code will expire in 10 minutes.\n\nIf you don't have an account yet, this code can also be used to create a new account automatically.\n\nIf you did not request this code, please ignore this email.");
             
             mailSender.send(message);
             
