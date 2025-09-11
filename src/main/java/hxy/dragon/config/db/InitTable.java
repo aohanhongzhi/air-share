@@ -29,25 +29,71 @@ public class InitTable {
         try {
             Connection connection = dataSource.getConnection();
             SqlRunner sqlRunner = new SqlRunner(connection);
-            String sql = """
-                           create table if not exists file_model
-                            (
-                                id          INTEGER not null
-                                    constraint file_model_pk
-                                        primary key autoincrement,
-                                file_name   TEXT,
-                                file_path   TEXT,
-                                file_md5    varchar(255),
-                                create_time timestamp,
-                                file_size   INTEGER,
-                                file_uuid   varchar(255),
-                                server_name varchar(255)
-                            );
-                    """;
-            log.info("开始建表 {}", sql);
-            sqlRunner.run(sql);
+
+            // 分割并执行每个SQL语句
+            String[] sqlStatements = {
+                """
+                create table if not exists file_model
+                (
+                    id          INTEGER not null
+                        constraint file_model_pk
+                            primary key autoincrement,
+                    file_name   TEXT,
+                    file_path   TEXT,
+                    file_md5    varchar(255),
+                    create_time timestamp,
+                    file_size   INTEGER,
+                    file_uuid   varchar(255),
+                    server_name varchar(255)
+                )
+                """,
+                """
+                create table if not exists user_model
+                (
+                    id              INTEGER not null
+                        constraint user_model_pk
+                            primary key autoincrement,
+                    username        varchar(50) not null unique,
+                    email           varchar(100) not null unique,
+                    password        varchar(255) not null,
+                    enabled         boolean default true,
+                    email_verified  boolean default false,
+                    create_time     timestamp default current_timestamp,
+                    update_time     timestamp default current_timestamp,
+                    last_login_time timestamp
+                )
+                """,
+                """
+                create table if not exists email_verification
+                (
+                    id                INTEGER not null
+                        constraint email_verification_pk
+                            primary key autoincrement,
+                    email             varchar(100) not null,
+                    verification_code varchar(10) not null,
+                    used              boolean default false,
+                    create_time       timestamp default current_timestamp,
+                    expire_time       timestamp not null
+                )
+                """,
+                "create index if not exists idx_user_username on user_model(username)",
+                "create index if not exists idx_user_email on user_model(email)",
+                "create index if not exists idx_email_verification_email on email_verification(email)",
+                "create index if not exists idx_email_verification_code on email_verification(verification_code)"
+            };
+
+            for (String sql : sqlStatements) {
+                try {
+                    log.info("执行SQL: {}", sql.trim());
+                    sqlRunner.run(sql);
+                    log.info("SQL执行成功");
+                } catch (SQLException e) {
+                    log.warn("SQL执行失败 (可能表或索引已存在): {}", e.getMessage());
+                }
+            }
+
         } catch (SQLException e) {
-            log.error("{}", e.getMessage(), e);
+            log.error("数据库连接错误: {}", e.getMessage(), e);
         }
     }
 }
