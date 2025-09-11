@@ -1,6 +1,8 @@
 package hxy.dragon.service;
 
 import hxy.dragon.dao.model.UserModel;
+import hxy.dragon.entity.request.UpdatePasswordRequest;
+import hxy.dragon.entity.request.UpdateUsernameRequest;
 import hxy.dragon.entity.request.UserLoginRequest;
 import hxy.dragon.entity.request.UserRegisterRequest;
 import hxy.dragon.entity.request.VerificationCodeLoginRequest;
@@ -68,4 +70,22 @@ public interface UserService {
      * @return true if exists
      */
     boolean existsByEmail(String email);
+
+    /**
+     * Update username
+     *
+     * @param userId user ID
+     * @param request update username request
+     * @return updated user
+     */
+    UserModel updateUsername(Long userId, UpdateUsernameRequest request);
+
+    /**
+     * Update password
+     *
+     * @param userId user ID
+     * @param request update password request
+     * @return updated user
+     */
+    UserModel updatePassword(Long userId, UpdatePasswordRequest request);
 }

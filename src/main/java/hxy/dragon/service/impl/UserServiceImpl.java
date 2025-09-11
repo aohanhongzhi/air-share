@@ -2,6 +2,8 @@ package hxy.dragon.service.impl;
 
 import hxy.dragon.dao.mapper.UserMapper;
 import hxy.dragon.dao.model.UserModel;
+import hxy.dragon.entity.request.UpdatePasswordRequest;
+import hxy.dragon.entity.request.UpdateUsernameRequest;
 import hxy.dragon.entity.request.UserLoginRequest;
 import hxy.dragon.entity.request.UserRegisterRequest;
 import hxy.dragon.entity.request.VerificationCodeLoginRequest;
@@ -199,5 +201,78 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByEmail(String email) {
         return userMapper.findByEmail(email) != null;
+    }
+
+    @Override
+    @Transactional
+    public UserModel updateUsername(Long userId, UpdateUsernameRequest request) {
+        // Check if user exists
+        UserModel user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        // Check if the new username is different from current
+        if (user.getUsername().equals(request.getUsername())) {
+            throw new RuntimeException("New username must be different from current username");
+        }
+
+        // Check if username already exists (by other users)
+        UserModel existingUser = userMapper.findByUsername(request.getUsername());
+        if (existingUser != null && !existingUser.getId().equals(userId)) {
+            throw new RuntimeException("Username already exists");
+        }
+
+        // Update username
+        user.setUsername(request.getUsername());
+        user.setUpdateTime(LocalDateTime.now());
+        userMapper.updateById(user);
+
+        log.info("Username updated successfully for user ID: {} to: {}", userId, request.getUsername());
+        return user;
+    }
+
+    @Override
+    @Transactional
+    public UserModel updatePassword(Long userId, UpdatePasswordRequest request) {
+        // Validate password confirmation
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new RuntimeException("New password and confirm password do not match");
+        }
+
+        // Check if user exists
+        UserModel user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        // For users created through verification code login (no password), allow setting password
+        if (user.getPassword() != null) {
+            // User has existing password, validate current password
+            if (request.getCurrentPassword() == null || request.getCurrentPassword().trim().isEmpty()) {
+                throw new RuntimeException("Current password is required when updating existing password");
+            }
+            
+            // Verify current password
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                throw new RuntimeException("Current password is incorrect");
+            }
+        } else {
+            // User has no existing password (created via verification code), no current password needed
+            log.info("Setting password for user who was created via verification code login: {}", userId);
+        }
+
+        // Check if new password is different from current (if current exists)
+        if (user.getPassword() != null && passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new RuntimeException("New password must be different from current password");
+        }
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setUpdateTime(LocalDateTime.now());
+        userMapper.updateById(user);
+
+        log.info("Password updated successfully for user ID: {}", userId);
+        return user;
     }
 }

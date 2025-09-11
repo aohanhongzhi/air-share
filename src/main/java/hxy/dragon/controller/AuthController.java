@@ -3,12 +3,15 @@ package hxy.dragon.controller;
 import hxy.dragon.dao.model.UserModel;
 import hxy.dragon.entity.reponse.BaseResponse;
 import hxy.dragon.entity.request.EmailVerificationRequest;
+import hxy.dragon.entity.request.UpdatePasswordRequest;
+import hxy.dragon.entity.request.UpdateUsernameRequest;
 import hxy.dragon.entity.request.UserLoginRequest;
 import hxy.dragon.entity.request.UserRegisterRequest;
 import hxy.dragon.entity.request.VerificationCodeLoginRequest;
 import hxy.dragon.entity.response.UserLoginResponse;
 import hxy.dragon.service.EmailService;
 import hxy.dragon.service.UserService;
+import hxy.dragon.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Authentication controller
@@ -40,6 +45,9 @@ public class AuthController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     /**
      * Send email verification code
      */
@@ -53,7 +61,7 @@ public class AuthController {
 
             String code = emailService.sendVerificationCode(request.getEmail());
             log.info("Verification code sent to: {}", request.getEmail());
-            
+
             return BaseResponse.success("Verification code sent successfully");
         } catch (Exception e) {
             log.error("Failed to send verification code", e);
@@ -69,10 +77,10 @@ public class AuthController {
         try {
             UserModel user = userService.register(request);
             log.info("User registered successfully: {}", user.getUsername());
-            
+
             // Remove password from response
             user.setPassword(null);
-            
+
             return BaseResponse.success("User registered successfully", user);
         } catch (Exception e) {
             log.error("User registration failed", e);
@@ -88,27 +96,27 @@ public class AuthController {
         try {
             UserLoginResponse response = userService.login(request);
             log.info("User logged in successfully: {}", response.getUsername());
-            
+
             // Create session for template-based navigation
             HttpSession session = httpRequest.getSession(true);
-            
+
             // Create authentication for session
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                response.getUsername(),
-                null, // Don't store password
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                    response.getUsername(),
+                    null, // Don't store password
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
             );
-            
+
             // Set authentication in security context
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
             securityContext.setAuthentication(auth);
-            
+
             // Store security context in session
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
             SecurityContextHolder.setContext(securityContext);
-            
+
             log.info("Session created for user: {}", response.getUsername());
-            
+
             return BaseResponse.success("Login successful", response);
         } catch (Exception e) {
             log.error("User login failed", e);
@@ -126,7 +134,7 @@ public class AuthController {
             // This allows for automatic user creation during login
             String code = emailService.sendLoginVerificationCode(request.getEmail());
             log.info("Login verification code sent to: {}", request.getEmail());
-            
+
             return BaseResponse.success("Login verification code sent successfully");
         } catch (Exception e) {
             log.error("Failed to send login verification code", e);
@@ -142,27 +150,27 @@ public class AuthController {
         try {
             UserLoginResponse response = userService.loginWithVerificationCode(request);
             log.info("User logged in with verification code successfully: {}", response.getUsername());
-            
+
             // Create session for template-based navigation
             HttpSession session = httpRequest.getSession(true);
-            
+
             // Create authentication for session
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                response.getUsername(),
-                null, // Don't store password
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                    response.getUsername(),
+                    null, // Don't store password
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
             );
-            
+
             // Set authentication in security context
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
             securityContext.setAuthentication(auth);
-            
+
             // Store security context in session
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
             SecurityContextHolder.setContext(securityContext);
-            
+
             log.info("Session created for user: {}", response.getUsername());
-            
+
             return BaseResponse.success("Login with verification code successful", response);
         } catch (Exception e) {
             log.error("User login with verification code failed", e);
@@ -181,9 +189,9 @@ public class AuthController {
                 session.invalidate();
                 log.info("Session invalidated for logout");
             }
-            
+
             SecurityContextHolder.clearContext();
-            
+
             return BaseResponse.success("Logout successful");
         } catch (Exception e) {
             log.error("Logout failed", e);
@@ -216,6 +224,118 @@ public class AuthController {
         } catch (Exception e) {
             log.error("Error checking email", e);
             return BaseResponse.error("Error checking email");
+        }
+    }
+
+    /**
+     * Get current user's information
+     */
+    @GetMapping("/profile")
+    public BaseResponse<Map<String, Object>> getUserProfile(HttpServletRequest request) {
+        try {
+            Long userId = getUserIdFromRequest(request);
+            if (userId == null) {
+                return BaseResponse.error("User not authenticated");
+            }
+
+            UserModel user = userService.findById(userId);
+
+            if (user == null) {
+                return BaseResponse.error("User not found");
+            }
+
+            // Create response with user info and hasPassword flag
+            Map<String, Object> profileData = new HashMap<>();
+            profileData.put("id", user.getId());
+            profileData.put("username", user.getUsername());
+            profileData.put("email", user.getEmail());
+            profileData.put("enabled", user.getEnabled());
+            profileData.put("emailVerified", user.getEmailVerified());
+            profileData.put("createTime", user.getCreateTime());
+            profileData.put("updateTime", user.getUpdateTime());
+            profileData.put("lastLoginTime", user.getLastLoginTime());
+            profileData.put("hasPassword", user.getPassword() != null);
+
+            return BaseResponse.success("User profile retrieved successfully", profileData);
+        } catch (Exception e) {
+            log.error("Error getting user profile", e);
+            return BaseResponse.error("Error getting user profile");
+        }
+    }
+
+    /**
+     * Update username
+     */
+    @PutMapping("/update-username")
+    public BaseResponse<UserModel> updateUsername(@Validated @RequestBody UpdateUsernameRequest request, HttpServletRequest httpRequest) {
+        try {
+            Long userId = getUserIdFromRequest(httpRequest);
+            if (userId == null) {
+                return BaseResponse.error("User not authenticated");
+            }
+
+            UserModel currentUser = userService.findById(userId);
+
+            if (currentUser == null) {
+                return BaseResponse.error("User not found");
+            }
+
+            UserModel updatedUser = userService.updateUsername(currentUser.getId(), request);
+
+            // Remove password from response
+            updatedUser.setPassword(null);
+
+            log.info("Username updated successfully: {} -> {}", currentUser.getUsername(), request.getUsername());
+            return BaseResponse.success("Username updated successfully", updatedUser);
+        } catch (Exception e) {
+            log.error("Username update failed", e);
+            return BaseResponse.error("Username update failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update password
+     */
+    @PutMapping("/update-password")
+    public BaseResponse<String> updatePassword(@Validated @RequestBody UpdatePasswordRequest request, HttpServletRequest httpRequest) {
+        try {
+            Long userId = getUserIdFromRequest(httpRequest);
+            if (userId == null) {
+                return BaseResponse.error("User not authenticated");
+            }
+
+            UserModel user = userService.findById(userId);
+
+            if (user == null) {
+                return BaseResponse.error("User not found");
+            }
+
+            userService.updatePassword(user.getId(), request);
+
+            log.info("Password updated successfully for user: {}", user.getUsername());
+            return BaseResponse.success("Password updated successfully");
+        } catch (Exception e) {
+            log.error("Password update failed", e);
+            return BaseResponse.error("Password update failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Extract user ID from JWT token in request
+     */
+    private Long getUserIdFromRequest(HttpServletRequest request) {
+        try {
+            final String authorizationHeader = request.getHeader("Authorization");
+
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                String jwt = authorizationHeader.substring(7);
+                return jwtUtil.extractUserId(jwt);
+            }
+
+            return null;
+        } catch (Exception e) {
+            log.error("Error extracting user ID from request", e);
+            return null;
         }
     }
 }
