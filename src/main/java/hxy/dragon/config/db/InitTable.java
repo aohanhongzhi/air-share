@@ -55,7 +55,7 @@ public class InitTable {
                             primary key autoincrement,
                     username        varchar(50) not null unique,
                     email           varchar(100) not null unique,
-                    password        varchar(255) not null,
+                    password        varchar(255)  null,
                     enabled         boolean default true,
                     email_verified  boolean default false,
                     create_time     timestamp default current_timestamp,

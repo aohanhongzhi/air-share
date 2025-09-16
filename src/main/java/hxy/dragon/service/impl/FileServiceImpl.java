@@ -739,7 +739,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         log.debug("remoteAddr: {},serverName{},code={}", remoteAddr, serverName, code);
         LambdaQueryWrapper<FileModel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         if (serverName != null) {
-            log.warn("域名{}", serverName);
+            log.info("域名{}", serverName);
             lambdaQueryWrapper.eq(FileModel::getServerName, serverName);
         }
         IPage page = new Page(pageNum, pageSize);
