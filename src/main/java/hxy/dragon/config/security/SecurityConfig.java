@@ -1,5 +1,6 @@
 package hxy.dragon.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.PrintWriter;
 
 /**
  * Security configuration
@@ -72,7 +75,55 @@ public class SecurityConfig {
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )
-                .authenticationProvider(authenticationProvider())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .successHandler((request, response, authentication) -> {
+                            // FIXME 没有生效，等chatgpt6来解决
+                            // Check if it's an AJAX request
+                            String accept = request.getHeader("Accept");
+                            String contentType = request.getHeader("Content-Type");
+
+                            if (accept != null && accept.contains("application/json") ||
+                                    (contentType != null && contentType.contains("application/json"))) {
+                                // Handle AJAX request - return JSON
+                                response.setContentType("application/json;charset=utf-8");
+                                PrintWriter out = response.getWriter();
+                                response.setStatus(200);
+                                out.write("{\"success\": true, \"message\": \"登录成功\", \"user\": " +
+                                        new ObjectMapper().writeValueAsString(authentication.getPrincipal()) + "}");
+                                out.flush();
+                                out.close();
+                            } else {
+                                // Handle form submission - redirect to home page
+                                response.sendRedirect("/?login=success");
+                            }
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            // FIXME 没有生效，等chatgpt6来解决
+                            // Check if it's an AJAX request
+                            String accept = request.getHeader("Accept");
+                            String contentType = request.getHeader("Content-Type");
+
+                            if (accept != null && accept.contains("application/json") ||
+                                    (contentType != null && contentType.contains("application/json"))) {
+                                // Handle AJAX request - return JSON
+                                response.setContentType("application/json;charset=utf-8");
+                                PrintWriter out = response.getWriter();
+                                response.setStatus(401);
+                                out.write("{\"success\": false, \"error\": \"" + exception.getMessage() + "\"}");
+                                out.flush();
+                                out.close();
+                            } else {
+                                // Handle form submission - redirect back to login page with error
+                                response.sendRedirect("/login?login=error");
+                            }
+                        })
+                        .permitAll()
+                )
+                // JWT过滤器在表单登录之前处理，这样JWT认证的请求不会被表单登录处理器拦截
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
