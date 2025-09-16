@@ -101,7 +101,7 @@ public class JwtUtil {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (Exception e) {
-            log.error("Error extracting claims from token", e);
+            log.warn("Error extracting claims from token", e);
             throw new RuntimeException("Invalid token");
         }
     }

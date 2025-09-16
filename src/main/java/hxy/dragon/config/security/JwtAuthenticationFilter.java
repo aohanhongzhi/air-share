@@ -56,6 +56,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             jwt = authorizationHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwt);
+            } catch (RuntimeException e) {
+                log.warn("Error extracting username from JWT", e);
             } catch (Exception e) {
                 log.error("Error extracting username from JWT", e);
             }
