@@ -6,5 +6,5 @@ ps -ef|grep 'java'|grep 'air-share'|grep 'air-share-0.0.1-SNAPSHOT.jar'|grep -v 
 
 export LC_ALL="en_US.UTF-8" # 解决文件乱码，上传部分中文字符的文件错误
 
-nohup /media/data/opt/jbr_jcef-21.0.2-linux-x64-b375.1/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -jar /media/data/app/air-share/air-share-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod -Xmx1G -Xms1G -server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError >> /media/data/app/air-share/air-share.log  2>&1 &
+nohup /media/data/opt/zulu25.28.85-ca-jdk25.0.0-linux_x64/bin/java -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -jar /media/data/app/air-share/air-share-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod -Xmx1G -Xms1G -server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError >> /media/data/app/air-share/air-share.log  2>&1 &
 #LC_ALL="en_US.UTF-8" /media/data/system/jdk/bin/java -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=utf-8 -Duser.timezone=GMT+08 -jar /home/insite/app/air-share/air-share-0.0.1-SNAPSHOT.jar --spring.profiles.active=beta
