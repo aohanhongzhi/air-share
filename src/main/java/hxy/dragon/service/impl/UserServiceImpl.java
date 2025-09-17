@@ -101,12 +101,13 @@ public class UserServiceImpl implements UserService {
         user.setLastLoginTime(LocalDateTime.now());
         userMapper.updateById(user);
 
-        // Generate JWT token
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getEmail());
+        // Generate tokens
+        String token = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername(), user.getEmail());
 
         log.info("User logged in successfully: {}", user.getUsername());
         
-        return new UserLoginResponse(token, user.getUsername(), user.getEmail(), user.getId());
+        return new UserLoginResponse(token, refreshToken, user.getUsername(), user.getEmail(), user.getId());
     }
 
     @Override
@@ -134,12 +135,13 @@ public class UserServiceImpl implements UserService {
         user.setLastLoginTime(LocalDateTime.now());
         userMapper.updateById(user);
 
-        // Generate JWT token
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getEmail());
+        // Generate tokens
+        String token = jwtUtil.generateAccessToken(user.getId(), user.getUsername(), user.getEmail());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getUsername(), user.getEmail());
 
         log.info("User logged in with verification code successfully: {}", user.getUsername());
         
-        return new UserLoginResponse(token, user.getUsername(), user.getEmail(), user.getId());
+        return new UserLoginResponse(token, refreshToken, user.getUsername(), user.getEmail(), user.getId());
     }
 
     /**

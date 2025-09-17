@@ -6,6 +6,7 @@ import hxy.dragon.entity.request.EmailVerificationRequest;
 import hxy.dragon.entity.request.UpdatePasswordRequest;
 import hxy.dragon.entity.request.UpdateUsernameRequest;
 import hxy.dragon.entity.request.UserLoginRequest;
+import lombok.Data;
 import hxy.dragon.entity.request.UserRegisterRequest;
 import hxy.dragon.entity.request.VerificationCodeLoginRequest;
 import hxy.dragon.entity.response.UserLoginResponse;
@@ -197,6 +198,37 @@ public class AuthController {
             log.error("Logout failed", e);
             return BaseResponse.error("Logout failed: " + e.getMessage());
         }
+    }
+
+    /**
+     * Refresh access token using refresh token
+     */
+    @PostMapping("/refresh")
+    public BaseResponse<UserLoginResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        try {
+            String refreshToken = request.getRefreshToken();
+            String username = jwtUtil.extractUsername(refreshToken);
+            if (!jwtUtil.validateRefreshToken(refreshToken, username)) {
+                return BaseResponse.error("Invalid refresh token");
+            }
+
+            Long userId = jwtUtil.extractUserId(refreshToken);
+            String email = jwtUtil.extractEmail(refreshToken);
+
+            String newAccessToken = jwtUtil.generateAccessToken(userId, username, email);
+            String newRefreshToken = jwtUtil.generateRefreshToken(userId, username, email);
+
+            UserLoginResponse response = new UserLoginResponse(newAccessToken, newRefreshToken, username, email, userId);
+            return BaseResponse.success("Token refreshed", response);
+        } catch (Exception e) {
+            log.error("Failed to refresh token", e);
+            return BaseResponse.error("Failed to refresh token");
+        }
+    }
+
+    @Data
+    static class RefreshTokenRequest {
+        private String refreshToken;
     }
 
     /**

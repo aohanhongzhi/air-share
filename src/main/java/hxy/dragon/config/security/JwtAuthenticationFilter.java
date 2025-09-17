@@ -66,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // If username is extracted and no authentication is set
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // Validate token
-            if (jwtUtil.validateToken(jwt, username)) {
+            if (jwtUtil.validateAccessToken(jwt, username)) {
                 // Get user from database
                 UserModel user = userService.findByUsernameOrEmail(username);
                 if (user != null && user.getEnabled()) {

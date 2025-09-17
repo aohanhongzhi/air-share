@@ -40,7 +40,8 @@ server:
 
 # JWT configuration
 jwt:
-  expiration: 86400000 # 24 hours in milliseconds
+  accessExpiration: 7200000 # 2 hours in milliseconds
+  refreshExpiration: 2592000000 # 30 days in milliseconds
 
 # 日志邮件报警
 email:

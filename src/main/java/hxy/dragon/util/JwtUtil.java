@@ -24,30 +24,46 @@ import java.util.function.Function;
 public class JwtUtil {
 
     private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor("mySecretKeyForJwtTokenGenerationAndValidation12345".getBytes(StandardCharsets.UTF_8));
-    
-    @Value("${jwt.expiration:86400000}") // Default 24 hours
-    private Long expiration;
+
+    @Value("${jwt.accessExpiration:7200000}") // default 2 hours
+    private Long accessExpiration;
+
+    @Value("${jwt.refreshExpiration:2592000000}") // default 30 days
+    private Long refreshExpiration;
 
     /**
      * Generate token for user
      */
-    public String generateToken(Long userId, String username, String email) {
+    public String generateAccessToken(Long userId, String username, String email) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("username", username);
         claims.put("email", email);
-        return createToken(claims, username);
+        claims.put("tokenType", "access");
+        return createToken(claims, username, accessExpiration);
+    }
+
+    /**
+     * Generate refresh token for user
+     */
+    public String generateRefreshToken(Long userId, String username, String email) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("username", username);
+        claims.put("email", email);
+        claims.put("tokenType", "refresh");
+        return createToken(claims, username, refreshExpiration);
     }
 
     /**
      * Create token with claims and subject
      */
-    private String createToken(Map<String, Object> claims, String subject) {
+    private String createToken(Map<String, Object> claims, String subject, Long expiresInMs) {
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .expiration(new Date(System.currentTimeMillis() + expiresInMs))
                 .signWith(SECRET_KEY)
                 .compact();
     }
@@ -109,7 +125,7 @@ public class JwtUtil {
     /**
      * Check if token is expired
      */
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
@@ -124,6 +140,43 @@ public class JwtUtil {
             log.error("Token validation failed", e);
             return false;
         }
+    }
+
+    /**
+     * Validate access token (ensure tokenType is access)
+     */
+    public Boolean validateAccessToken(String token, String username) {
+        try {
+            final String extractedUsername = extractUsername(token);
+            final String tokenType = extractTokenType(token);
+            return ("access".equals(tokenType) && extractedUsername.equals(username) && !isTokenExpired(token));
+        } catch (Exception e) {
+            log.error("Access token validation failed", e);
+            return false;
+        }
+    }
+
+    /**
+     * Validate refresh token (ensure tokenType is refresh)
+     */
+    public Boolean validateRefreshToken(String token, String username) {
+        try {
+            final String extractedUsername = extractUsername(token);
+            final String tokenType = extractTokenType(token);
+            return ("refresh".equals(tokenType) && extractedUsername.equals(username) && !isTokenExpired(token));
+        } catch (Exception e) {
+            log.error("Refresh token validation failed", e);
+            return false;
+        }
+    }
+
+    /**
+     * Extract token type (access/refresh)
+     */
+    public String extractTokenType(String token) {
+        Claims claims = extractAllClaims(token);
+        Object type = claims.get("tokenType");
+        return type == null ? null : type.toString();
     }
 
     /**
