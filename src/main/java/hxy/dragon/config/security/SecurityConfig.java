@@ -68,6 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/file/list").authenticated() // Require authentication to get file list (API only)
                         .requestMatchers("/file/del").authenticated() // Protect file deletion via web interface (supports session auth)
                         .requestMatchers("/file/upload").authenticated()
+                        .requestMatchers("/file/rename").authenticated()
                         .requestMatchers("/file/delete/**").authenticated()
                         // All other requests require authentication
                         .anyRequest().authenticated()

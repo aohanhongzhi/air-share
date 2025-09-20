@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hxy.dragon.dao.mapper.FileMapper;
 import hxy.dragon.dao.model.FileModel;
 import hxy.dragon.entity.reponse.BaseResponse;
+import hxy.dragon.entity.request.RenameFileRequest;
 import hxy.dragon.service.FileService;
 import hxy.dragon.util.DateUtil;
 import hxy.dragon.util.ResponseJsonUtil;
@@ -753,6 +754,30 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
         IPage<FileModel> page1 = (IPage<FileModel>) fileMapper.selectPage(page, lambdaQueryWrapper);
 
         return BaseResponse.success(page1);
+    }
+
+    @Override
+    public BaseResponse renameFile(RenameFileRequest request) {
+        if (request == null || (request.getId() == null && (request.getFileUuid() == null || request.getFileUuid().trim().isEmpty()))) {
+            return BaseResponse.error("参数不完整");
+        }
+        if (request.getNewName() == null || request.getNewName().trim().isEmpty()) {
+            return BaseResponse.error("新文件名不能为空");
+        }
+
+        LambdaUpdateWrapper<FileModel> wrapper = new LambdaUpdateWrapper<>();
+        if (request.getId() != null) {
+            wrapper.eq(FileModel::getId, request.getId());
+        } else {
+            wrapper.eq(FileModel::getFileUuid, request.getFileUuid());
+        }
+        wrapper.set(FileModel::getFileName, request.getNewName().trim());
+
+        int updated = fileMapper.update(wrapper);
+        if (updated > 0) {
+            return BaseResponse.success("重命名成功");
+        }
+        return BaseResponse.error("重命名失败，文件不存在");
     }
 
 

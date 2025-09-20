@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import hxy.dragon.entity.request.RenameFileRequest;
 
 @CrossOrigin
 @RestController
@@ -79,6 +80,18 @@ public class FileController {
         log.info("File delete requested by user: {}, fileUuid: {}", currentUser, fileUuid);
         
         return fileService.deleteFile(fileUuid);
+    }
+
+    /**
+     * 重命名文件（仅更新数据库file_name） - 需要登录
+     */
+    @PostMapping("/file/rename")
+    public BaseResponse rename(@RequestBody RenameFileRequest renameRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return BaseResponse.error("User not authenticated");
+        }
+        return fileService.renameFile(renameRequest);
     }
 
     /**

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
+import hxy.dragon.entity.request.RenameFileRequest;
 
 /**
  * @author eric
@@ -55,4 +56,9 @@ public interface FileService extends IService<FileModel> {
      * @return 返回BaseResponse对象，包含分页列表信息
      */
     BaseResponse filePageList(int pageSize, int pageNum,String searchValue,HttpServletRequest serverRequest);
+
+    /**
+     * 重命名文件（仅更新数据库中的 file_name，不改物理文件）
+     */
+    BaseResponse renameFile(RenameFileRequest request);
 }
