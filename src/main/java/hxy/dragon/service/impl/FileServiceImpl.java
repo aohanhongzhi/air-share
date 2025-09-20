@@ -405,7 +405,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
             log.warn("{}", e.getMessage(), e);
             response.setStatus(500);
             return BaseResponse.error("文件上传失败", e.getMessage());
-        }catch (IOException e) {
+        } catch (IOException e) {
             log.error("{}", e.getMessage(), e);
             response.setStatus(500);
             return BaseResponse.error("文件上传失败", e.getMessage());
@@ -638,7 +638,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 response.setContentType(contentType);
 //                response.setHeader("Content-Type", contentType);
                 //inline表示浏览器直接使用，attachment表示下载，fileName表示下载的文件名
-                response.setHeader("Content-Disposition", "inline;filename=" + fileName);
+                response.setHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");// 注意 inline;【空格】filename=文件名
                 response.setHeader("Content-Length", String.valueOf(contentLength));
                 // Content-Range，格式为：[要下载的开始位置]-[结束位置]/[文件总大小]
                 response.setHeader("Content-Range", "bytes " + startByte + "-" + endByte + "/" + file.length());
