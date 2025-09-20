@@ -6,7 +6,6 @@ import hxy.dragon.entity.request.EmailVerificationRequest;
 import hxy.dragon.entity.request.UpdatePasswordRequest;
 import hxy.dragon.entity.request.UpdateUsernameRequest;
 import hxy.dragon.entity.request.UserLoginRequest;
-import lombok.Data;
 import hxy.dragon.entity.request.UserRegisterRequest;
 import hxy.dragon.entity.request.VerificationCodeLoginRequest;
 import hxy.dragon.entity.response.UserLoginResponse;
@@ -14,18 +13,20 @@ import hxy.dragon.service.EmailService;
 import hxy.dragon.service.UserService;
 import hxy.dragon.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -98,25 +99,7 @@ public class AuthController {
             UserLoginResponse response = userService.login(request);
             log.info("User logged in successfully: {}", response.getUsername());
 
-            // Create session for template-based navigation
-            HttpSession session = httpRequest.getSession(true);
-
-            // Create authentication for session
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    response.getUsername(),
-                    null, // Don't store password
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-            );
-
-            // Set authentication in security context
-            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-            securityContext.setAuthentication(auth);
-
-            // Store security context in session
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-            SecurityContextHolder.setContext(securityContext);
-
-            log.info("Session created for user: {}", response.getUsername());
+            // Stateless login: return tokens only; do not create HTTP session
 
             return BaseResponse.success("Login successful", response);
         } catch (Exception e) {
@@ -152,25 +135,7 @@ public class AuthController {
             UserLoginResponse response = userService.loginWithVerificationCode(request);
             log.info("User logged in with verification code successfully: {}", response.getUsername());
 
-            // Create session for template-based navigation
-            HttpSession session = httpRequest.getSession(true);
-
-            // Create authentication for session
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    response.getUsername(),
-                    null, // Don't store password
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-            );
-
-            // Set authentication in security context
-            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-            securityContext.setAuthentication(auth);
-
-            // Store security context in session
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-            SecurityContextHolder.setContext(securityContext);
-
-            log.info("Session created for user: {}", response.getUsername());
+            // Stateless login with code: return tokens only; do not create HTTP session
 
             return BaseResponse.success("Login with verification code successful", response);
         } catch (Exception e) {
@@ -185,12 +150,6 @@ public class AuthController {
     @PostMapping("/logout")
     public BaseResponse<String> logout(HttpServletRequest request) {
         try {
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.invalidate();
-                log.info("Session invalidated for logout");
-            }
-
             SecurityContextHolder.clearContext();
 
             return BaseResponse.success("Logout successful");
