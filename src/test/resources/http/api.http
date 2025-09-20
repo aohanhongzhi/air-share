@@ -32,3 +32,11 @@ Content-Type: application/json
 ###
 
 GET {{host}}/build
+
+
+###
+
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{"usernameOrEmail":"aohanhongzhi@qq.com","password":"Sigh,0404"}
