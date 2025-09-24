@@ -102,18 +102,21 @@
                 data: JSON.stringify(formData),
                 success: function(response) {
                     if (response.code === 200) {
-                        // Store the token
+                        // Store the token (localStorage) and Cookie for server-side navigation
                         localStorage.setItem('authToken', response.data.token);
                         localStorage.setItem('username', response.data.username);
                         localStorage.setItem('email', response.data.email);
                         localStorage.setItem('userId', response.data.userId);
+                        // Write AUTH_TOKEN cookie (2小时). 注意: 开发环境下非HTTPS无法设置Secure
+                        var expires = new Date(Date.now() + 2*60*60*1000).toUTCString();
+                        document.cookie = 'AUTH_TOKEN=' + response.data.token + '; Path=/; Expires=' + expires + '; SameSite=Lax';
                         
                         showAlert('Login successful! Redirecting...', 'alert-success');
                         
-                        // Redirect to home page after a short delay
+                        // Redirect to files page after a short delay
                         setTimeout(function() {
-                            window.location.href = '/';
-                        }, 1000);
+                            window.location.href = '/files';
+                        }, 600);
                     } else {
                         showAlert('Login failed: ' + response.msg, 'alert-danger');
                     }

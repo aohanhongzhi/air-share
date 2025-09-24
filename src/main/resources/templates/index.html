@@ -148,11 +148,30 @@
     }
     
     function logout() {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('username');
-        localStorage.removeItem('email');
-        localStorage.removeItem('userId');
-        checkAuthStatus();
+        // Call API logout first
+        $.ajax({
+            url: '/auth/logout',
+            type: 'POST',
+            success: function(response) {
+                if (response.code === 200) {
+                    // Clear client-side data after successful server logout
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('email');
+                    localStorage.removeItem('userId');
+                    // clear AUTH_TOKEN cookie
+                    document.cookie = 'AUTH_TOKEN=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+                    checkAuthStatus();
+                    console.log('Logout successful');
+                } else {
+                    alert('Logout failed: ' + response.msg);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Logout error:', error);
+                alert('Logout failed');
+            }
+        });
     }
     
     function setupAuthenticatedUploader() {
