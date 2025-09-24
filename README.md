@@ -562,22 +562,10 @@ server {
 
 server {
     listen       80;
-    listen  [::]:80;
-    server_name file.cupb.top;
+    listen       [::]:80;
+    server_name  file.cupb.top;
 
-    location / {
-         root /usr/share/nginx/airshare;
-         index  index.html index.htm;
-    }
-    location /api/ {
-        proxy_set_header HOST $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_pass http://10.2.0.5:8888/;
-        proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
-    }
-
+    return 301 https://$host$request_uri;
 }
 
 
@@ -604,19 +592,31 @@ server {
          index  index.html index.htm;
     }
     location /api/ {
-        # 上游很慢时，拉长“读上游”的间隔超时
-        proxy_read_timeout 24h;
-        # 如需“边到边发”避免回盘/缓存，可关缓冲
-        proxy_buffering off;
-        # 如果上游不支持/不宣告 Range，强制启用断点续传
-        proxy_force_ranges on;
-        
         proxy_set_header HOST $host;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_pass http://10.2.0.5:8888/;
         proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
+
+        # 关键：关闭缓冲，边读边发
+        proxy_buffering off;
+        proxy_request_buffering off;
+        proxy_max_temp_file_size 0;
+    
+        # 透传 Range / 强制支持断点续传
+        proxy_force_ranges on;
+    
+        # 超时调大，支持超长下载
+        send_timeout        24h;
+        proxy_read_timeout  24h;
+        proxy_send_timeout  24h;
+    
+        # 避免 gzip 干扰
+        gzip off;
+    
+        # 强制明确返回头
+        add_header X-Content-Type-Options nosniff always;
     }
 
 
