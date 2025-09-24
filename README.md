@@ -13,7 +13,14 @@ git remote set-url --add origin git@github.com:aohanhongzhi/air-share.git
 git pull origin $(git rev-parse --abbrev-ref HEAD)
 ```
 
-支持jdk21
+windows下取进程
+
+```shell
+netstat -aon | findstr :8888
+taskkill /PID 26024 /F
+```
+
+支持jdk25
 
 # 目前实现的功能
 
@@ -597,6 +604,13 @@ server {
          index  index.html index.htm;
     }
     location /api/ {
+        # 上游很慢时，拉长“读上游”的间隔超时
+        proxy_read_timeout 24h;
+        # 如需“边到边发”避免回盘/缓存，可关缓冲
+        proxy_buffering off;
+        # 如果上游不支持/不宣告 Range，强制启用断点续传
+        proxy_force_ranges on;
+        
         proxy_set_header HOST $host;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Real-IP $remote_addr;

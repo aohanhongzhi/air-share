@@ -6,7 +6,7 @@ plugins {
 }
 
 //打包后的包名
-archivesBaseName = "air-share"
+//archivesBaseName = "air-share"
 group = 'hxy'
 version = '0.0.1-SNAPSHOT'
 description = "文件分享"
@@ -43,8 +43,19 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.boot:spring-boot-starter-mail')
+    
+    // Spring Security for authentication
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    
+    // JWT for token-based authentication
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    implementation 'com.ejlchina:okhttps-jackson:3.4.0'
+    implementation 'cn.zhxu:okhttps-jackson:4.1.0'
 //    https://github.com/spring-projects/spring-retry
     implementation 'org.springframework.retry:spring-retry:2.0.12'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
@@ -76,6 +87,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 test {

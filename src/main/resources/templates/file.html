@@ -34,7 +34,18 @@
         <ul class="nav nav-primary" style="margin-top: 20px">
             <li><a href="index">首页</a></li>
             <li class="active"><a href="files">文件</a></li>
+            <li class="pull-right" id="authSection">
+                <!-- Auth section will be populated by JavaScript -->
+            </li>
         </ul>
+        
+        <div id="loginRequired" style="display: none;">
+            <div class="alert alert-warning">
+                <h4>Login Required for File Management</h4>
+                <p>Please <a href="/login">login</a> to delete files. <a href="/register">Register</a> if you don't have an account.</p>
+            </div>
+        </div>
+        
         <h3>请及时删除你的文件，文件会不定期清理，如果需要保留时长，联系管理员</h3>
 
         <table class="datagrid table datatable">
@@ -64,7 +75,8 @@
                 <td th:text="${#dates.format(fileEntity.createTime, 'yyyy-MM-dd HH:mm')}"></td>
                 <td>
 
-                    <a class="btn btn-sm btn-danger" th:href="@{/file/del(fileUuid=${fileEntity.id})}"> 删除 </a>
+                    <a class="btn btn-sm btn-danger delete-btn" th:href="@{/file/del(fileUuid=${fileEntity.id})}" style="display: none;"> 删除 </a>
+                    <span class="login-required-msg" style="color: #999; font-style: italic;">Login required to delete</span>
 
                 </td>
             </tr>
@@ -85,28 +97,71 @@
 <!-- ZUI 标准版压缩后的 JavaScript 文件 -->
 <script src="../js/zui.js"></script>
 <script>
+    $(document).ready(function() {
+        checkAuthStatus();
+    });
 
     /* 初始化数据表格 */
     $('table.datatable').datatable();
-
-    // Vue.createApp({
-    //     /* 选项 */
-    //     created() {
-    //         console.log("创建vue成功")
-    //     },
-    //     methods: {
-    //         deleteFile(fileUuid) {
-    //             console.log("vue文件删除" + fileUuid)
-    //             //     axios({
-    //             //         method: 'delete',
-    //             //         url: '/file/delete',
-    //             //         data: {
-    //             //             fileUuid: 'Fred'
-    //             //         }
-    //             //     });
-    //         }
-    //     }
-    // }).mount("#app")
+    
+    // Authentication management
+    function checkAuthStatus() {
+        var token = localStorage.getItem('authToken');
+        var username = localStorage.getItem('username');
+        
+        if (token && username) {
+            // User is logged in
+            $('#authSection').html(
+                '<li class="dropdown">' +
+                '<a href="#" class="dropdown-toggle" data-toggle="dropdown">' +
+                'Welcome, ' + username + ' <b class="caret"></b>' +
+                '</a>' +
+                '<ul class="dropdown-menu">' +
+                '<li><a href="#" onclick="logout()">Logout</a></li>' +
+                '</ul>' +
+                '</li>'
+            );
+            $('#loginRequired').hide();
+            $('.delete-btn').show();
+            $('.login-required-msg').hide();
+        } else {
+            // User is not logged in
+            $('#authSection').html(
+                '<li><a href="/login">Login</a></li>' +
+                '<li><a href="/register">Register</a></li>'
+            );
+            $('#loginRequired').show();
+            $('.delete-btn').hide();
+            $('.login-required-msg').show();
+        }
+    }
+    
+    function logout() {
+        // Call API logout first
+        $.ajax({
+            url: '/auth/logout',
+            type: 'POST',
+            success: function(response) {
+                if (response.code === 200) {
+                    // Clear client-side data after successful server logout
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('email');
+                    localStorage.removeItem('userId');
+                    // clear AUTH_TOKEN cookie
+                    document.cookie = 'AUTH_TOKEN=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+                    checkAuthStatus();
+                    console.log('Logout successful');
+                } else {
+                    alert('Logout failed: ' + response.msg);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Logout error:', error);
+                alert('Logout failed');
+            }
+        });
+    }
 </script>
 
 

@@ -3,10 +3,13 @@ package hxy.dragon.controller;
 import hxy.dragon.entity.reponse.BaseResponse;
 import hxy.dragon.service.FileService;
 import hxy.dragon.util.DiskUtil;
+import hxy.dragon.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import hxy.dragon.entity.request.RenameFileRequest;
 
 @CrossOrigin
 @RestController
@@ -24,12 +28,25 @@ public class FileController {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     /**
      * 文档上传,测试在局域网下最大上传23GB文件都没有问题，电脑16GB内存的。
      * 这里的方法必须是POST
+     * 需要用户登录才能上传文件
      */
     @PostMapping("/file/upload")
     public BaseResponse upload(HttpServletRequest request, HttpServletResponse response) {
+        // Get current authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return BaseResponse.error("User not authenticated");
+        }
+        
+        String currentUser = authentication.getName();
+        log.info("File upload requested by user: {}", currentUser);
+        
         long diskinfo = DiskUtil.getFileStorage();
         if (diskinfo < 5) {
             log.error("服务器空间不足了,upload disk free size  {} GB", diskinfo);
@@ -47,12 +64,34 @@ public class FileController {
     }
 
     /**
+     * 删除文件 - 需要登录
      * @param fileUuid 传过来的实际是id，就是id，也不是主键！
      * @return
      */
     @DeleteMapping("/file/delete")
     public BaseResponse delete(@RequestBody String fileUuid) {
+        // Get current authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return BaseResponse.error("User not authenticated");
+        }
+        
+        String currentUser = authentication.getName();
+        log.info("File delete requested by user: {}, fileUuid: {}", currentUser, fileUuid);
+        
         return fileService.deleteFile(fileUuid);
+    }
+
+    /**
+     * 重命名文件（仅更新数据库file_name） - 需要登录
+     */
+    @PostMapping("/file/rename")
+    public BaseResponse rename(@RequestBody RenameFileRequest renameRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return BaseResponse.error("User not authenticated");
+        }
+        return fileService.renameFile(renameRequest);
     }
 
     /**

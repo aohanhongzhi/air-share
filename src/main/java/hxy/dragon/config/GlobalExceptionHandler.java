@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -147,6 +148,9 @@ public class GlobalExceptionHandler implements InitializingBean {
             errorLevel = false;
         } else if (exception instanceof NoResourceFoundException) {
             message = "参数检验出错啦！";
+            errorLevel = false;
+        } else if (exception instanceof HttpMediaTypeNotSupportedException) {
+            message = "媒体信息错误！";
             errorLevel = false;
         }
 
