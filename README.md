@@ -607,6 +607,8 @@ server {
         # 透传 Range / 强制支持断点续传
         proxy_force_ranges on;
     
+        proxy_ignore_client_abort on;  # 防止客户端暂停时中断
+    
         # 超时调大，支持超长下载
         send_timeout        24h;
         proxy_read_timeout  24h;
