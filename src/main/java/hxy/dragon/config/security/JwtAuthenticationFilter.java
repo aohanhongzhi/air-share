@@ -5,12 +5,12 @@ import hxy.dragon.service.UserService;
 import hxy.dragon.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,13 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Skip JWT processing if there's already an authentication (e.g., from session)
-        if (SecurityContextHolder.getContext().getAuthentication() != null && 
-            SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
+        // Always process JWT if present, regardless of existing authentication
         final String authorizationHeader = request.getHeader("Authorization");
 
         String username = null;
@@ -68,31 +62,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
+        // If JWT token is present, validate and set authentication
         if (jwt != null) {
             try {
                 username = jwtUtil.extractUsername(jwt);
+
+                // Validate token
+                if (jwtUtil.validateAccessToken(jwt, username)) {
+                    // Get user from database
+                    UserModel user = userService.findByUsernameOrEmail(username);
+                    if (user != null && user.getEnabled()) {
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(
+                                        username,
+                                        null,
+                                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                                );
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    } else {
+                        log.error("当前用户不存在 {}", username);
+                    }
+                }
             } catch (RuntimeException e) {
                 log.warn("Error extracting username from JWT", e);
             } catch (Exception e) {
                 log.error("Error extracting username from JWT", e);
-            }
-        }
-
-        // If username is extracted and no authentication is set
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Validate token
-            if (jwtUtil.validateAccessToken(jwt, username)) {
-                // Get user from database
-                UserModel user = userService.findByUsernameOrEmail(username);
-                if (user != null && user.getEnabled()) {
-                    UsernamePasswordAuthenticationToken authToken = 
-                        new UsernamePasswordAuthenticationToken(
-                            username, 
-                            null, 
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-                        );
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
             }
         }
 

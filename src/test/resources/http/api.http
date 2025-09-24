@@ -40,3 +40,23 @@ POST {{host}}/auth/login
 Content-Type: application/json
 
 {"usernameOrEmail":"aohanhongzhi@qq.com","password":"Sigh,0404"}
+
+
+###
+
+curl 'http://localhost:8888/file/list?pageNum=1&pageSize=20' \
+  -H 'accept: application/json, text/plain, */*' \
+  -H 'accept-language: zh,en;q=0.9,en-US;q=0.8,zh-CN;q=0.7' \
+  -H 'authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJ1c2VySWQiOjEsImVtYWlsIjoiYW9oYW5ob25nemhpQHFxLmNvbSIsInVzZXJuYW1lIjoiYW9oYW5ob25nemhpIiwic3ViIjoiYW9oYW5ob25nemhpIiwiaWF0IjoxNzU4NzA1NDE3LCJleHAiOjE3NTg3MTI2MTd9.1DjpIoslPGlW0t-K1xD4lEQMMsf_E6Xh4XaC2UYhTBiQQlgi_kbTnFJEo-wXt_QM' \
+  -b 'JSESSIONID=FAB59A26E48D6CEFB2BC371A3F6A9B99' \
+  -H 'priority: u=1, i' \
+  -H 'referer: https://file.cupb.top/' \
+  -H 'sec-ch-ua: "Chromium";v="140", "Not=A?Brand";v="24", "Microsoft Edge";v="140"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0' \
+  -H 'x-env: development' \
+  -H 'x-version: 1.0.0'
