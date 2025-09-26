@@ -6,7 +6,7 @@ plugins {
 }
 
 //打包后的包名
-archivesBaseName = "air-share"
+//archivesBaseName = "air-share"
 group = 'hxy'
 version = '0.0.1-SNAPSHOT'
 description = "文件分享"
