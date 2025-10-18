@@ -36,8 +36,14 @@ logging:
     
 server:
   port: 8888
-#  address: 0.0.0.0 # 这里不会影响局域网访问
-
+  #  address: 0.0.0.0 # 这里不会影响局域网访问
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 3MB
+      max-request-size: 3MB
+      file-size-threshold: 0  # 所有文件先存内存，不写临时文件
+#      location: /tmp/tomcat  # 如需自定义临时目录
 # JWT configuration
 jwt:
   accessExpiration: 7200000 # 2 hours in milliseconds
