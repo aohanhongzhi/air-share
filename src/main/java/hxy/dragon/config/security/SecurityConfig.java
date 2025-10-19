@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,7 +19,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 /**
  * Security configuration
@@ -56,26 +60,61 @@ public class SecurityConfig {
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return (request, response, authException) -> {
+            if (isApiRequest((HttpServletRequest) request)) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"code\":401,\"msg\":\"Unauthorized\"}");
+            } else {
+                response.sendRedirect("/login");
+            }
+        };
+    }
 
-            // 获取 header? 决定302还是 401？
+    private boolean isApiRequest(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String accept = request.getHeader("Accept");
+        String contentType = request.getHeader("Content-Type");
+        String xrw = request.getHeader("X-Requested-With");
+        if (uri != null && uri.startsWith("/file/")) {
+            return true;
+        }
+        if (xrw != null && "XMLHttpRequest".equalsIgnoreCase(xrw)) {
+            return true;
+        }
+        if (accept != null && accept.toLowerCase().contains("application/json")) {
+            return true;
+        }
+        if (contentType != null && contentType.toLowerCase().contains("application/json")) {
+            return true;
+        }
+        return false;
+    }
 
-            // For template pages (like /files), redirect to login
-//            response.sendRedirect("/login");
+    @Bean
+    public AuthenticationEntryPoint loginRedirectEntryPoint() {
+        return new LoginUrlAuthenticationEntryPoint("/login");
+    }
 
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    @Bean
+    public AccessDeniedHandler restAccessDeniedHandler() {
+        return (request, response, ex) -> {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"code\":401,\"msg\":\"Unauthorized\"}");
+            response.getWriter().write("{\"code\":403,\"msg\":\"Forbidden\"}");
         };
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .formLogin(form -> form.disable()) // 禁用表单登录（避免 302）
-                .httpBasic(httpBasic -> httpBasic.disable()) // 如果不需要 Basic
+                .formLogin(form -> form.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint())
+                        .accessDeniedHandler(restAccessDeniedHandler())
+                )
                 .authorizeHttpRequests(authz -> authz
                         // Public endpoints
                         .requestMatchers("/auth/**").permitAll()
