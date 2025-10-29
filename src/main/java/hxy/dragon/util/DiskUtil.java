@@ -18,6 +18,7 @@ public class DiskUtil {
         String fileStoreDir = DirUtil.getFileStoreDir();
         File file = new File(fileStoreDir);
         long freeSpace = file.getFreeSpace();
+        log.info("存储目录 {} , File store dir is {}", fileStoreDir, fileStoreDir);
         return freeSpace / 1024 / 1024 / 1024;
     }
 
