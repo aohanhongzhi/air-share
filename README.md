@@ -301,6 +301,8 @@ https://github.com/logscore/Nimbus
 
 https://localsend.org
 
+https://github.com/localsend/localsend
+
 #### flix
 
 基于 localsend二次开发的，界面更加美化。
@@ -326,6 +328,12 @@ https://nitroshare.net/
 
 https://github.com/nitroshare
 
+
+### alt-sendme
+
+类似LocalSend，但是没有移动端。
+
+https://github.com/tonyantony300/alt-sendme
 
 ### tagspaces 3.5k
 
