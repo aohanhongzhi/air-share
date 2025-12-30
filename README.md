@@ -331,7 +331,7 @@ https://github.com/nitroshare
 
 ### alt-sendme
 
-类似LocalSend，但是没有移动端。
+类似LocalSend，但是没有移动端。是 P2P传输，Rust开发，很不错。
 
 https://github.com/tonyantony300/alt-sendme
 
