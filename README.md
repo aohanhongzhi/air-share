@@ -22,6 +22,14 @@ taskkill /PID 26024 /F
 
 支持jdk25
 
+# gradle
+
+9.4 之后，下载gradle就可以不是hardcode了。
+
+https://github.com/gradle/gradle/issues/27863
+
+https://github.com/gradle/gradle/pull/35963
+
 # 目前实现的功能
 
 1. 分块上传
