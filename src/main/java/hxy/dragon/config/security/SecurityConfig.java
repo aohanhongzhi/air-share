@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
 
 /**
  * Security configuration
@@ -54,6 +56,13 @@ public class SecurityConfig {
     }
 
     @Bean
+    public RequestCache requestCache() {
+        HttpSessionRequestCache cache = new HttpSessionRequestCache();
+        cache.setCreateSesson(false);
+        return cache;
+    }
+
+    @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return (request, response, authException) -> {
             // For API requests, return 401 instead of redirect
@@ -75,6 +84,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint()))
+                .requestCache(cache -> cache.requestCache(requestCache()))
                 .authorizeHttpRequests(authz -> authz
                         // Public endpoints
                         .requestMatchers("/auth/**").permitAll()
