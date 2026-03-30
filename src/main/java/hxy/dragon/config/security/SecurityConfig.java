@@ -57,9 +57,7 @@ public class SecurityConfig {
 
     @Bean
     public RequestCache requestCache() {
-        HttpSessionRequestCache cache = new HttpSessionRequestCache();
-        cache.setCreateSesson(false);
-        return cache;
+        return new org.springframework.security.web.savedrequest.NullRequestCache();
     }
 
     @Bean
