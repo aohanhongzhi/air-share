@@ -162,6 +162,7 @@
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
+        <filter class="com.bosch.framework.config.log.EmailDenyFilter" />
     </appender>
 
     <!-- 读取 application.properties 中的 log.level 属性，如果没有配置，默认 INFO -->
