@@ -229,7 +229,13 @@ public class AiFileServiceImpl implements AiFileService {
             return out;
         }
 
-        String serverName = request.getServerName();
+        String publicBase = aiFileProperties.getPublicBaseUrl();
+        String serverName;
+        if (StringUtils.hasText(publicBase)) {
+            serverName = publicBase.replaceFirst("^https?://", "").split("/")[0].split(":")[0];
+        } else {
+            serverName = request.getServerName();
+        }
         FileModel fileModel = new FileModel();
         fileModel.setFilePath(relativePath);
         fileModel.setFileName(fileName);
