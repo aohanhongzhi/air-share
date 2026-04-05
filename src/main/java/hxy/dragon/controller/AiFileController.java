@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/api/ai-files")
+@RequestMapping({"/api/ai-files", "/ai-files"})
 @Slf4j
 public class AiFileController {
 

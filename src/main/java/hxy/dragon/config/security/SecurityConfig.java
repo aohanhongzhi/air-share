@@ -58,7 +58,8 @@ public class SecurityConfig {
         return (request, response, authException) -> {
             // For API requests, return 401 instead of redirect
             String requestURI = request.getRequestURI();
-            if (requestURI.startsWith("/api/") || requestURI.startsWith("/file/")) {
+            if (requestURI.startsWith("/api/") || requestURI.startsWith("/file/")
+                    || requestURI.startsWith("/ai-files/")) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json;charset=UTF-8");
                 response.getWriter().write("{\"code\":401,\"msg\":\"Unauthorized\"}");
@@ -82,7 +83,9 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register").permitAll()
                         .requestMatchers("/static/**", "/css/**", "/js/**", "/lib/**", "/images/**").permitAll()
                         .requestMatchers("/file/download/**").permitAll() // Allow public file downloads
-                        .requestMatchers("/api/ai-files/**").permitAll() // AI 免登录文件接口（可选静态密钥在应用内校验）
+                        // AI 免登录文件接口（可选静态密钥在应用内校验）
+                        // 同时匹配 /api/ai-files/** 与 /ai-files/**（后者适用于 Nginx 去掉 /api 前缀反代）
+                        .requestMatchers("/api/ai-files/**", "/ai-files/**").permitAll()
                         // Protected endpoints - require authentication
                         .requestMatchers("/files").authenticated() // Require authentication to view files page (supports session auth)
                         .requestMatchers("/file/list").authenticated() // Require authentication to get file list (API only)
