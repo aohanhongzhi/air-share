@@ -52,6 +52,14 @@ email:
   from: aohanhongzhi@qq.com
   to: aohanhongzhi@qq.com
 
+# AI 免登录文件接口（/api/ai-files），详见 docs/ai-file-api.md
+ai:
+  file:
+    enabled: ${AI_FILE_ENABLED:true}
+    upload-key: ${AI_FILE_UPLOAD_KEY:}
+    public-base-url: ${AI_FILE_PUBLIC_BASE_URL:https://file.kmgo.top}
+    max-upload-mb: ${AI_FILE_MAX_UPLOAD_MB:100}
+
 info:
   build:
     artifact: hxy.dragon

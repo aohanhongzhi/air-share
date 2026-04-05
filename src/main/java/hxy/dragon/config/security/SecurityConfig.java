@@ -82,6 +82,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register").permitAll()
                         .requestMatchers("/static/**", "/css/**", "/js/**", "/lib/**", "/images/**").permitAll()
                         .requestMatchers("/file/download/**").permitAll() // Allow public file downloads
+                        .requestMatchers("/api/ai-files/**").permitAll() // AI 免登录文件接口（可选静态密钥在应用内校验）
                         // Protected endpoints - require authentication
                         .requestMatchers("/files").authenticated() // Require authentication to view files page (supports session auth)
                         .requestMatchers("/file/list").authenticated() // Require authentication to get file list (API only)
