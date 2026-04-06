@@ -399,6 +399,10 @@ http://esin.vivo.com/
 
 http://as.vivo.com/
 
+### 蓝眼云盘
+
+https://github.com/eyebluecn/tank
+
 # 热重启
 
 https://github.com/HotswapProjects/HotswapAgent
