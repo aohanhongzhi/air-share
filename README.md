@@ -222,6 +222,10 @@ https://github.com/xddcode/free-fs
 
 https://github.com/pglombardo/PasswordPusher
 
+### microbin
+
+https://github.com/szabodanika/microbin
+
 ## 企业级推荐
 
 ### alist
