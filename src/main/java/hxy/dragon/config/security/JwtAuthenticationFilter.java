@@ -81,12 +81,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     } else {
                         log.error("当前用户不存在 {}", username);
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json;charset=UTF-8");
+                        response.getWriter().write("{\"code\":401,\"msg\":\"Unauthorized\"}");
+                        return;
                     }
+                } else {
+                    // Token validation failed
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"code\":401,\"msg\":\"Invalid or expired token\"}");
+                    return;
                 }
             } catch (RuntimeException e) {
                 log.warn("Error extracting username from JWT", e);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"code\":401,\"msg\":\"Invalid token\"}");
+                return;
             } catch (Exception e) {
                 log.error("Error extracting username from JWT", e);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"code\":401,\"msg\":\"Authentication error\"}");
+                return;
             }
         }
 
