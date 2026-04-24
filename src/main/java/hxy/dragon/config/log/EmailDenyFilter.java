@@ -3,6 +3,8 @@ package hxy.dragon.config.log;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 自定义邮箱发送过滤器：
@@ -11,6 +13,8 @@ import ch.qos.logback.core.spi.FilterReply;
  * - 拒绝包含断言失败的业务异常日志
  */
 public class EmailDenyFilter extends Filter<ILoggingEvent> {
+
+    private static final Logger log = LoggerFactory.getLogger(EmailDenyFilter.class);
 
     @Override
     public FilterReply decide(ILoggingEvent event) {
@@ -25,9 +29,12 @@ public class EmailDenyFilter extends Filter<ILoggingEvent> {
         if (loggerName != null) {
             if (loggerName.startsWith("org.apache.catalina") ||
                     loggerName.startsWith("org.apache.juli.logging")) {
+                log.info("该log就不发送邮件了 {} -> {}", loggerName, message);
                 return FilterReply.DENY;
             }
         }
+
+        log.info("该log可能要发送邮件 {} -> {}", loggerName, message);
 
         // 基于消息内容的拒绝：URLDecoder / 防火墙拒绝等
         if (message != null) {
@@ -37,17 +44,22 @@ public class EmailDenyFilter extends Filter<ILoggingEvent> {
                     message.contains("Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception") ||
                     message.contains("uriSessionMapFullCount") ||
                     message.contains("[Assertion failed] - this expression must be true")) {
+                log.info("该log就不发送邮件了 {} -> {}", loggerName, message);
                 return FilterReply.DENY;
             }
         }
+
+        log.info("该log可能要发送邮件 {} -> {}", loggerName, message);
 
         // 检查异常信息
         if (event.getThrowableProxy() != null) {
             String throwableMessage = event.getThrowableProxy().getMessage();
             if (throwableMessage != null && throwableMessage.contains("[Assertion failed] - this expression must be true")) {
+                log.info("该log就不发送邮件了 {} -> {}", loggerName, message);
                 return FilterReply.DENY;
             }
         }
+        log.info("该log发送邮件 {} -> {}", loggerName, message);
 
         return FilterReply.NEUTRAL;
     }

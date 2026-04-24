@@ -152,6 +152,9 @@ public class GlobalExceptionHandler implements InitializingBean {
         } else if (exception instanceof HttpMediaTypeNotSupportedException) {
             message = "媒体信息错误！";
             errorLevel = false;
+        } else if (exception instanceof java.lang.IllegalStateException) {
+            message = "IllegalStateException！";
+            errorLevel = false;
         }
 
         if (errorLevel) {
