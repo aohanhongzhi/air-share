@@ -231,6 +231,9 @@ public class AuthController {
 
             UserLoginResponse response = new UserLoginResponse(newAccessToken, newRefreshToken, username, email, userId);
             return BaseResponse.success("Token refreshed", response);
+        } catch (RuntimeException e) {
+            log.warn("Failed to refresh token", e);
+            return BaseResponse.error("Failed to refresh token");
         } catch (Exception e) {
             log.error("Failed to refresh token", e);
             return BaseResponse.error("Failed to refresh token");
