@@ -377,9 +377,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                                 fileModel.setFileSize(destFile.length());
                                 fileModel.setCreateTime(new Date());
                                 fileModel.setServerName(serverName);
-                                int insert = fileMapper.insert(fileModel);
+                                int insert = fileMapper.saveUniqueByFileUuid(fileModel);
                                 if (insert <= 0) {
-                                    log.error("插入数据库失败 {}", fileModel);
+                                    log.error("保存文件数据库记录失败 {}", fileModel);
                                 } else {
                                     log.info("成功上传文件，存入数据库{}", fileModel);
                                 }

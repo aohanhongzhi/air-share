@@ -76,6 +76,19 @@ public class InitTable {
                     expire_time       timestamp not null
                 )
                 """,
+                """
+                delete from file_model
+                where file_uuid is not null
+                  and file_uuid <> ''
+                  and id not in (
+                      select min(id)
+                      from file_model
+                      where file_uuid is not null
+                        and file_uuid <> ''
+                      group by file_uuid
+                  )
+                """,
+                "create unique index if not exists uk_file_model_file_uuid on file_model(file_uuid) where file_uuid is not null and file_uuid <> ''",
                 "create index if not exists idx_user_username on user_model(username)",
                 "create index if not exists idx_user_email on user_model(email)",
                 "create index if not exists idx_email_verification_email on email_verification(email)",

@@ -245,9 +245,9 @@ public class AiFileServiceImpl implements AiFileService {
         fileModel.setCreateTime(new Date());
         fileModel.setServerName(serverName);
 
-        int insert = fileMapper.insert(fileModel);
+        int insert = fileMapper.saveUniqueByFileUuid(fileModel);
         if (insert <= 0) {
-            log.error("insert failed {}", fileModel);
+            log.error("save file record failed {}", fileModel);
             //noinspection ResultOfMethodCallIgnored
             destFile.delete();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
