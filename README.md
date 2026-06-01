@@ -63,6 +63,14 @@ https://github.com/gradle/gradle/pull/35963
 	--reloadcmd     "docker exec -it  nginx-rblc nginx -s reload"
 ```
 
+# 上传会导致临时文件产生
+
+```shell
+crontab -e 添加
+```
+````
+0 3 * * * find /media/data/app/air-share/tmp -type f -mtime +1 -delete
+```
 # 类似开源实现
 
 ## 练手项目

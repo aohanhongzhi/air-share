@@ -7,6 +7,10 @@ spring:
     url: jdbc:sqlite:airshare.db
     driver-class-name: org.sqlite.JDBC
 
+app:
+  upload:
+    tmp-dir: /media/data/app/air-share/tmp # Apache Commons FileUpload 临时目录，避免占用系统 /tmp
+
 hxy:
   print:
     file: /upload-file

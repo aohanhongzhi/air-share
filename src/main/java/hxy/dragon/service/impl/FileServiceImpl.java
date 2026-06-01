@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.apache.commons.fileupload2.core.FileItem;
 import org.apache.commons.fileupload2.core.FileUploadException;
 import org.apache.commons.fileupload2.core.ProgressListener;
@@ -41,6 +42,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -66,6 +68,9 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
 
     @Resource
     private FileMapper fileMapper;
+
+    @Value("${app.upload.tmp-dir:/tmp}")
+    private String uploadTmpDir;
     
     /**
      * Sanitizes a file path to prevent directory traversal attacks
@@ -194,7 +199,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileModel> implemen
                 Integer chunk = 0, chunks = 0, currentChunkSize = 0;
                 long chunkSize = 0;
 
-                DiskFileItemFactory diskFactory = DiskFileItemFactory.builder().get();
+                Path tmpDir = Paths.get(uploadTmpDir);
+                if (!Files.exists(tmpDir)) {
+                    Files.createDirectories(tmpDir);
+                }
+                DiskFileItemFactory diskFactory = DiskFileItemFactory.builder().setPath(tmpDir).get();
                 // threshold 极限、临界值，即硬盘缓存 1M
 //                diskFactory.setSizeThreshold(4 * 1024);
 
