@@ -159,7 +159,7 @@
         <!-- 这里采用等级过滤器 指定等级相符才发送 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
-            <onMatch>ACCEPT</onMatch>
+            <onMatch>NEUTRAL</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
         <filter class="hxy.dragon.config.log.EmailDenyFilter" />
